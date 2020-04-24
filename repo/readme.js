@@ -21,12 +21,13 @@ writeFileSync(
   format(
     `
 <p align="center">
-  <img src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
+  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
 </p>
 
 <p align="center">
-  <img alt="${licenses.shift().type ||
-    ''} License" src="https://img.shields.io/github/license/${name.replace(
+  <img alt="${
+    licenses.shift().type || ''
+  } License" src="https://img.shields.io/github/license/${name.replace(
       '@',
       '',
     )}?color=%23525ddc&style=flat-square">
