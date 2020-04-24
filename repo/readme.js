@@ -22,8 +22,12 @@ writeFileSync(
     `
 # 🌱 ${name}
 
-![License: ${license}](https://img.shields.io/github/license/${name}?color=%23525ddc&style=flat-square)
-![GitHub release](https://img.shields.io/github/release/${name}?color=%23525ddc&style=flat-square)
+![License: ${license}](https://img.shields.io/github/license/${name.substring(
+      1,
+    )}?color=%23525ddc&style=flat-square)
+![GitHub release](https://img.shields.io/github/release/${name.substring(
+      1,
+    )}?color=%23525ddc&style=flat-square)
 
 > ## A command-line interface (CLI) for the WordPress block editor.
 
