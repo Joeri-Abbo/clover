@@ -17,14 +17,10 @@ const BudPluginNew = props => {
 
   const output = props.inputArgs[2] ? join(cwd(), props.inputArgs[2]) : join(cwd(), props.output)
 
-  const definition = props.definition
-    ? require(join(cwd(), props.definition))
-    : require(DEFAULT_TEMPLATE)
+  const definition = props.definition ? require(join(cwd(), props.definition)) : require(DEFAULT_TEMPLATE)
 
   useMemo(() => {
-    !props.default
-      ? prompt(definition.fields).then(data => setData(data))
-      : setData(definition.default)
+    !props.default ? prompt(definition.fields).then(data => setData(data)) : setData(definition.default)
   }, [])
 
   return (
