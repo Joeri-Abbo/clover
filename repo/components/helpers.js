@@ -34,7 +34,7 @@ module.exports = {
    * Example plugin tree
    */
   pluginTree: () => {
-    execa.commandSync('bud plugin new --default')
+    execa.commandSync('./build/cli.js --default')
     const tree = execa.commandSync('tree --dirsfirst -a -r bud-plugin').stdout
 
     execa.commandSync('rm -rf ./bud-plugin')
