@@ -46,7 +46,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 | Requirement | Version |
 | ----------- | ------- |
 | PHP         | >=7.1   |
-| Node        | >=10    |
+| Node        | >=12    |
 
 ## Usage
 

@@ -15,7 +15,7 @@
     "bud": "./build/cli.js"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
   "files": [
     "build"
