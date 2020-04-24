@@ -1,13 +1,45 @@
-# 🌱 @roots/bud
+<p align="center">
+  <img src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
+</p>
 
-![License: undefined](https://img.shields.io/github/license/roots/bud?color=%23525ddc&style=flat-square)
-![GitHub Release](https://img.shields.io/github/release/roots/bud?color=%23525ddc&style=flat-square)
-![Build Status](https://img.shields.io/circleci/project/github/roots/bud/master.svg?style=flat-square)
-[![Follow Roots](https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2)](https://twitter.com/rootswp)
+<p align="center">
+  <img alt="MIT License" src="https://img.shields.io/github/license/roots/bud?color=%23525ddc&style=flat-square">
 
-> ## A command-line interface (CLI) for the WordPress block editor.
+  <img alt="devDependency Status" src="https://img.shields.io/david/dev/roots/bud.svg?style=flat-square">
 
-Scaffold new Gutenberg features with the `bud` command.
+  <img alt="Build Status" src="https://img.shields.io/circleci/project/github/roots/bud/master.svg?style=flat-square">
+
+  <a href="https://twitter.com/rootswp">
+    <img alt="Follow Roots" src="https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2" />
+  </a>
+</p>
+
+<p align="center">
+  <strong>Powerful Block Scaffolding for WordPress</strong>
+  <br />
+  Built with ❤️
+</p>
+
+<p align="center">
+  <a href="https://roots.io">Official Website</a> | <a href="https://roots.io/docs/bud/master/usage">Documentation</a> | <a href="https://roots.io/docs/bud/master/changes">Change Log</a>
+</p>
+
+## Supporting
+
+**Bud** is an open source project and completely free to use.
+
+However, the amount of effort needed to maintain and develop new features and products within the Roots ecosystem is not sustainable without proper financial backing. If you have the capability, please consider donating using the links below:
+
+<div align="center">
+
+[![Donate via Patreon](https://img.shields.io/badge/donate-patreon-orange.svg?style=flat-square&logo=patreon")](https://www.patreon.com/rootsdev)
+[![Donate via PayPal](https://img.shields.io/badge/donate-paypal-blue.svg?style=flat-square&logo=paypal)](https://www.paypal.me/rootsdev)
+
+</div>
+
+## Overview
+
+Bud is an extendable, zero configuration scaffolding CLI for WordPress editor blocks, also known as [Gutenberg](https://wordpress.org/gutenberg/).
 
 ## Requirements
 
