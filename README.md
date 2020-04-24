@@ -1,7 +1,9 @@
 # 🌱 @roots/bud
 
-![License: undefined](https://img.shields.io/github/license/@roots/bud?color=%23525ddc&style=flat-square)
-![GitHub release](https://img.shields.io/github/release/@roots/bud?color=%23525ddc&style=flat-square)
+![License: undefined](https://img.shields.io/github/license/roots/bud?color=%23525ddc&style=flat-square)
+![GitHub Release](https://img.shields.io/github/release/roots/bud?color=%23525ddc&style=flat-square)
+![Build Status](https://img.shields.io/circleci/project/github/roots/bud/master.svg?style=flat-square)
+[![Follow Roots](https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2)](https://twitter.com/rootswp)
 
 > ## A command-line interface (CLI) for the WordPress block editor.
 

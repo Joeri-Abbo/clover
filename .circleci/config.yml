@@ -19,6 +19,7 @@ orbs:
           - run: yarn install --frozen-lockfile
           - run: yarn run lint
           - run: yarn run build
+          - run: yarn run docs
           - run: node ./bin/bud --default
           - save_cache:
               key: node-v1-{{ checksum "yarn.lock" }}

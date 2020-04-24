@@ -22,12 +22,19 @@ writeFileSync(
     `
 # 🌱 ${name}
 
-![License: ${license}](https://img.shields.io/github/license/${name.substring(
-      1,
+![License: ${license}](https://img.shields.io/github/license/${name.replace(
+      '@',
+      '',
     )}?color=%23525ddc&style=flat-square)
-![GitHub release](https://img.shields.io/github/release/${name.substring(
-      1,
+![GitHub Release](https://img.shields.io/github/release/${name.replace(
+      '@',
+      '',
     )}?color=%23525ddc&style=flat-square)
+![Build Status](https://img.shields.io/circleci/project/github/${name.replace(
+      '@',
+      '',
+    )}/master.svg?style=flat-square)
+[![Follow Roots](https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2)](https://twitter.com/rootswp)
 
 > ## A command-line interface (CLI) for the WordPress block editor.
 
