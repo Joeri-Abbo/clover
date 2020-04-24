@@ -246,6 +246,7 @@ module.exports = {
       react: await getLatest('react'),
       'react-dom': await getLatest('react-dom'),
       'style-loader': await getLatest('style-loader'),
+      'tree-node-cli': await getLatest('tree-node-cli'),
       'uglifyjs-webpack-plugin': await getLatest('uglifyjs-webpack-plugin'),
       'url-loader': await getLatest('url-loader'),
       webpack: await getLatest('webpack'),

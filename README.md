@@ -61,22 +61,22 @@ A typical block that was created with Bud has the following structure:
 ```sh
 bud-plugin
 ├── blocks
-│   └── block
-│       ├── styles
-│       │   ├── public.css
-│       │   ├── editor.css
-│       │   └── common.css
-│       └── scripts
-│           ├── public
-│           │   └── index.js
-│           └── editor
-│               ├── containers
-│               │   ├── save.js
-│               │   └── edit.js
-│               ├── components
-│               │   └── Media.js
-│               ├── block.js
-│               └── attributes.json
+│   └── block
+│       ├── styles
+│       │   ├── public.css
+│       │   ├── editor.css
+│       │   └── common.css
+│       └── scripts
+│           ├── public
+│           │   └── index.js
+│           └── editor
+│               ├── containers
+│               │   ├── save.js
+│               │   └── edit.js
+│               ├── components
+│               │   └── Media.js
+│               ├── block.js
+│               └── attributes.json
 ├── webpack.config.js
 ├── prettierrc.json
 ├── postcss.config.js
@@ -90,8 +90,6 @@ bud-plugin
 ├── .eslintignore
 ├── .editorconfig
 └── .babelrc.js
-
-8 directories, 22 files
 ```
 
 ### Plugin Dependencies
@@ -120,6 +118,7 @@ bud-plugin
 - husky
 - markdownlint-cli
 - npm-run-all
+- tree-node-cli
 
 ## Roadmap
 

@@ -35,7 +35,12 @@ module.exports = {
    */
   pluginTree: () => {
     execa.commandSync('./build/cli.js --default')
-    const tree = execa.commandSync('tree --dirsfirst -a -r bud-plugin').stdout
+
+    const tree = require('tree-node-cli')('bud-plugin', {
+      allFiles: true,
+      dirsFirst: true,
+      reverse: true,
+    })
 
     execa.commandSync('rm -rf ./bud-plugin')
 
