@@ -1,0 +1,32 @@
+version: 2.1
+
+orbs:
+  bud:
+    executors:
+      node-12:
+        docker:
+          - image: 'circleci/node:12-stretch'
+    jobs:
+      build-node:
+        executor: node-12
+        steps:
+          - run: yarn versions
+          - checkout
+          - restore_cache:
+              keys:
+                - node-v1-{{ checksum "yarn.lock" }}
+                - node-v1-
+          - run: yarn install --frozen-lockfile
+          - run: yarn run lint
+          - run: yarn run build
+          - run: yarn run docs
+          - run: node ./build/cli.js --default
+          - save_cache:
+              key: node-v1-{{ checksum "yarn.lock" }}
+              paths:
+                - node_modules
+
+workflows:
+  build:
+    jobs:
+      - bud/build-node

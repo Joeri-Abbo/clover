@@ -5,21 +5,10 @@ const { writeFileSync } = require('fs')
 const { format } = require('prettier')
 
 /** Util */
-const {
-  block,
-  listKeys,
-  pluginTree,
-  commands,
-} = require('./components/helpers')
+const { block, listKeys, pluginTree, commands } = require('./components/helpers')
 
 /** Data */
-const {
-  name,
-  license,
-  dependencies,
-  devDependencies,
-  engines,
-} = require('./../package.json')
+const { name, licenses, dependencies, devDependencies, engines } = require('./../package.json')
 
 /** Target */
 const readme = resolve(__dirname, '../README.md')
@@ -27,15 +16,55 @@ const readme = resolve(__dirname, '../README.md')
 /**
  * README contents.
  */
-writeFileSync(readme, format(`
-# 🌱 ${name}
+writeFileSync(
+  readme,
+  format(
+    `
+<p align="center">
+  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
+</p>
 
-![License: ${license}](https://img.shields.io/github/license/${name}?color=%23525ddc&style=flat-square)
-![GitHub release](https://img.shields.io/github/release/${name}?color=%23525ddc&style=flat-square)
+<p align="center">
+  <img alt="${licenses.shift().type || ''} License" src="https://img.shields.io/github/license/${name.replace(
+      '@',
+      '',
+    )}?color=%23525ddc&style=flat-square">
 
-> ## A command-line interface (CLI) for the WordPress block editor.
+  <img alt="devDependency Status" src="https://img.shields.io/david/dev/${name.replace('@', '')}.svg?style=flat-square">
 
-Scaffold new Gutenberg features with the \`bud\` command.
+  <img alt="Build Status" src="https://img.shields.io/circleci/project/github/${name.replace('@', '')}/master.svg?style=flat-square">
+
+  <a href="https://twitter.com/rootswp">
+    <img alt="Follow Roots" src="https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2" />
+  </a>
+</p>
+
+<p align="center">
+  <strong>Powerful Block Scaffolding for WordPress</strong>
+  <br />
+  Built with ❤️
+</p>
+
+<p align="center">
+  <a href="https://roots.io">Official Website</a> | <a href="https://roots.io/docs/bud/master/usage">Documentation</a> | <a href="https://roots.io/docs/bud/master/changes">Change Log</a>
+</p>
+
+## Supporting
+
+**Bud** is an open source project and completely free to use.
+
+However, the amount of effort needed to maintain and develop new features and products within the Roots ecosystem is not sustainable without proper financial backing. If you have the capability, please consider donating using the links below:
+
+<div align="center">
+
+  [![Donate via Patreon](https://img.shields.io/badge/donate-patreon-orange.svg?style=flat-square&logo=patreon")](https://www.patreon.com/rootsdev)
+  [![Donate via PayPal](https://img.shields.io/badge/donate-paypal-blue.svg?style=flat-square&logo=paypal)](https://www.paypal.me/rootsdev)
+
+</div>
+
+## Overview
+
+Bud is an extendable, zero configuration scaffolding CLI for WordPress editor blocks, also known as [Gutenberg](https://wordpress.org/gutenberg/).
 
 ## Requirements
 
@@ -92,4 +121,8 @@ Keep track of development and community news.
 - Subscribe to the [Roots Newsletter](https://roots.io/subscribe/)
 - Listen to the [Roots Radio podcast](https://roots.io/podcast/)
 
-`, { parser: 'markdown' }), 'utf8');
+`,
+    { parser: 'markdown' },
+  ),
+  'utf8',
+)

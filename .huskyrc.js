@@ -1,5 +1,5 @@
 module.exports = {
   hooks: {
-    'pre-commit': 'node ./repo/readme.js',
+    'pre-commit': 'npm run lint && npm run docs',
   },
-};
+}

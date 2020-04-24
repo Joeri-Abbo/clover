@@ -1,4 +1,4 @@
-const got = require('got');
+const got = require('got')
 
 /**
  * Templating utilities
@@ -13,9 +13,9 @@ module.exports = {
         resolveBodyOnly: true,
       }).json()
 
-      return await pkg['dist-tags'].latest;
+      return await pkg['dist-tags'].latest
     } catch (err) {
-      return err;
+      return err
     }
   },
 }

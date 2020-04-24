@@ -1,14 +1,7 @@
 module.exports = {
   root: true,
-  extends: [
-    'eslint:recommended',
-    'plugin:react/recommended',
-  ],
-  plugins: [
-    'react',
-    'react-hooks',
-    'jsx-a11y',
-  ],
+  extends: ['eslint:recommended', 'plugin:react/recommended'],
+  plugins: ['react', 'react-hooks', 'jsx-a11y'],
   globals: {
     wp: true,
     window: true,
@@ -34,18 +27,17 @@ module.exports = {
     },
   },
   rules: {
-    'strict': 0,
+    strict: 0,
     'no-console': 0,
     'react/prop-types': 0,
     'react/react-in-jsx-scope': 0,
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
     quotes: [
       'error',
       'single',
       {
         allowTemplateLiterals: true,
-        avoidEscape: true
+        avoidEscape: true,
       },
     ],
     'comma-dangle': [
@@ -59,4 +51,4 @@ module.exports = {
       },
     ],
   },
-};
+}

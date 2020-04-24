@@ -1,5 +1,5 @@
 const { resolve } = require('path')
-const { getLatest } = require('./../bud/template-utilities');
+const { getLatest } = require('./../bud/template-utilities')
 
 /**
  * Scaffold Plugin
@@ -69,38 +69,20 @@ module.exports = {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
-      choices: [
-        { name: 'RichText' },
-        { name: 'InnerBlocks' },
-        { name: 'MediaUpload' },
-      ],
+      choices: [{ name: 'RichText' }, { name: 'InnerBlocks' }, { name: 'MediaUpload' }],
     },
     {
       type: 'select',
       name: 'category',
       message: 'Category',
       initial: 'common',
-      choices: [
-        'common',
-        'formatting',
-        'layout',
-        'widgets',
-        'embed',
-      ],
+      choices: ['common', 'formatting', 'layout', 'widgets', 'embed'],
     },
     {
       type: 'multiselect',
       name: 'supports',
       message: 'Supports',
-      choices: [
-        'align',
-        'alignWide',
-        'customClassName',
-        'html',
-        'inserter',
-        'multiple',
-        'reusable',
-      ],
+      choices: ['align', 'alignWide', 'customClassName', 'html', 'inserter', 'multiple', 'reusable'],
     },
   ],
   files: [
@@ -233,11 +215,11 @@ module.exports = {
       '@prettier/plugin-php': await getLatest('@prettier/plugin-php'),
       '@wordpress/browserslist-config': await getLatest('@wordpress/browserslist-config'),
       '@wordpress/dependency-extraction-webpack-plugin': await getLatest('@wordpress/dependency-extraction-webpack-plugin'),
-      'autoprefixer': await getLatest('autoprefixer'),
+      autoprefixer: await getLatest('autoprefixer'),
       'babel-eslint': await getLatest('babel-eslint'),
       'babel-loader': await getLatest('babel-loader'),
       'css-loader': await getLatest('css-loader'),
-      'eslint': await getLatest('eslint'),
+      eslint: await getLatest('eslint'),
       'eslint-loader': await getLatest('eslint-loader'),
       'eslint-plugin-import': await getLatest('eslint-plugin-import'),
       'eslint-plugin-jsx-a11y': await getLatest('eslint-plugin-jsx-a11y'),
@@ -246,20 +228,22 @@ module.exports = {
       'file-loader': await getLatest('file-loader'),
       'friendly-errors-webpack-plugin': await getLatest('friendly-errors-webpack-plugin'),
       'mini-css-extract-plugin': await getLatest('mini-css-extract-plugin'),
+      'npm-run-all': await getLatest('npm-run-all'),
       'postcss-import': await getLatest('postcss-import'),
       'postcss-loader': await getLatest('postcss-loader'),
       'postcss-preset-env': await getLatest('postcss-preset-env'),
       'prop-types': await getLatest('prop-types'),
-      'react': await getLatest('react'),
+      react: await getLatest('react'),
       'react-dom': await getLatest('react-dom'),
       'style-loader': await getLatest('style-loader'),
+      'tree-node-cli': await getLatest('tree-node-cli'),
       'uglifyjs-webpack-plugin': await getLatest('uglifyjs-webpack-plugin'),
       'url-loader': await getLatest('url-loader'),
-      'webpack': await getLatest('webpack'),
+      webpack: await getLatest('webpack'),
       'webpack-cli': await getLatest('webpack-cli'),
       'webpack-dev-server': await getLatest('webpack-dev-server'),
       'webpack-livereload-plugin': await getLatest('webpack-livereload-plugin'),
-      'webpackbar': await getLatest('webpackbar'),
+      webpackbar: await getLatest('webpackbar'),
     }
   },
 }

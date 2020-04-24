@@ -6,7 +6,7 @@ import { Box, Static, Text } from 'ink'
 import { prompt } from 'enquirer'
 import Bud from './../bud/Bud'
 
-const DEFAULT_TEMPLATE = resolve(__dirname, './../../templates/plugin.js');
+const DEFAULT_TEMPLATE = resolve(__dirname, './../../templates/plugin.js')
 
 /**
  * Plugin New
@@ -15,42 +15,27 @@ const DEFAULT_TEMPLATE = resolve(__dirname, './../../templates/plugin.js');
 const BudPluginNew = props => {
   const [data, setData] = useState(null)
 
-  const output = props.inputArgs[2]
-      ? join(cwd(), props.inputArgs[2])
-      : join(cwd(), props.output)
+  const output = props.inputArgs[2] ? join(cwd(), props.inputArgs[2]) : join(cwd(), props.output)
 
-  const definition = props.definition
-    ? require(join(cwd(), props.definition))
-    : require(DEFAULT_TEMPLATE)
+  const definition = props.definition ? require(join(cwd(), props.definition)) : require(DEFAULT_TEMPLATE)
 
   useMemo(() => {
-    ! props.default
-      ? prompt(definition.fields)
-        .then(data => setData(data))
-      : setData(definition.default)
+    !props.default ? prompt(definition.fields).then(data => setData(data)) : setData(definition.default)
   }, [])
 
   return (
     <Box>
       {!data ? (
         <Box minHeight={2}>
-        <Text>
-          Create new Block plugin
-        </Text>
-      </Box>
+          <Text>Create new Block plugin</Text>
+        </Box>
       ) : (
         <Static>
           <Box marginBottom={1}>
-            <Text>
-              Creating {data.name}
-            </Text>
+            <Text>Creating {data.name}</Text>
           </Box>
 
-          <Bud
-            data={data}
-            definition={definition}
-            output={output}
-          />
+          <Bud data={data} definition={definition} output={output} />
         </Static>
       )}
     </Box>

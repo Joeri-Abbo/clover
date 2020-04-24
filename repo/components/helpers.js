@@ -34,8 +34,13 @@ module.exports = {
    * Example plugin tree
    */
   pluginTree: () => {
-    execa.commandSync('bud plugin new --default')
-    const tree = execa.commandSync('tree --dirsfirst -a -r bud-plugin').stdout
+    execa.commandSync('./build/cli.js --default')
+
+    const tree = require('tree-node-cli')('bud-plugin', {
+      allFiles: true,
+      dirsFirst: true,
+      reverse: true,
+    })
 
     execa.commandSync('rm -rf ./bud-plugin')
 
@@ -52,7 +57,6 @@ module.exports = {
 
     const signatures = files.map(file => {
       const command = fs.readFileSync(file, 'utf-8')
-      const name = path.basename(file, '.js')
 
       return {
         dir: path.basename(path.dirname(file)),
