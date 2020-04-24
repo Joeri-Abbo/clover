@@ -39,17 +39,25 @@ registerBlockType('${data.get('namespace')}/${data.get('name')}', {
    */
   category: '${data.get('category')}',
 
-  ${data.get('keywords') ? `\
+  ${
+    data.get('keywords')
+      ? `\
   /**
    * Searchable keywords for discovery.
    */
-  keywords: [${data.get('keywords')}],`:[]}
+  keywords: [${data.get('keywords')}],`
+      : []
+  }
 
-  ${data.get('icon') ? `\
+  ${
+    data.get('icon')
+      ? `\
   /**
    * Icon for the block
    */
-  icon: '${data.get('icon')}',`:[]}
+  icon: '${data.get('icon')}',`
+      : []
+  }
 
   /**
    * Extended support features

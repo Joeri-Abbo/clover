@@ -8,7 +8,6 @@ import bud from './../bud.config'
  * @prop {bool}   stringify should stringify
  * @prop {fn}     children  react children
  */
-const Prettier = ({ parser, contents }) =>
-  prettier.format(contents, { ...bud.prettier, parser })
+const Prettier = ({ parser, contents }) => prettier.format(contents, { ...bud.prettier, parser })
 
-export default Prettier;
+export default Prettier

@@ -52,7 +52,6 @@ module.exports = {
 
     const signatures = files.map(file => {
       const command = fs.readFileSync(file, 'utf-8')
-      const name = path.basename(file, '.js')
 
       return {
         dir: path.basename(path.dirname(file)),

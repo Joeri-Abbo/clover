@@ -5,21 +5,10 @@ const { writeFileSync } = require('fs')
 const { format } = require('prettier')
 
 /** Util */
-const {
-  block,
-  listKeys,
-  pluginTree,
-  commands,
-} = require('./components/helpers')
+const { block, listKeys, pluginTree, commands } = require('./components/helpers')
 
 /** Data */
-const {
-  name,
-  license,
-  dependencies,
-  devDependencies,
-  engines,
-} = require('./../package.json')
+const { name, license, dependencies, devDependencies, engines } = require('./../package.json')
 
 /** Target */
 const readme = resolve(__dirname, '../README.md')
@@ -27,7 +16,10 @@ const readme = resolve(__dirname, '../README.md')
 /**
  * README contents.
  */
-writeFileSync(readme, format(`
+writeFileSync(
+  readme,
+  format(
+    `
 # 🌱 ${name}
 
 ![License: ${license}](https://img.shields.io/github/license/${name}?color=%23525ddc&style=flat-square)
@@ -92,4 +84,8 @@ Keep track of development and community news.
 - Subscribe to the [Roots Newsletter](https://roots.io/subscribe/)
 - Listen to the [Roots Radio podcast](https://roots.io/podcast/)
 
-`, { parser: 'markdown' }), 'utf8');
+`,
+    { parser: 'markdown' },
+  ),
+  'utf8',
+)

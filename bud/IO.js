@@ -16,10 +16,7 @@ const Read = ({ path }) => fs.readFileSync(path)
 const Write = ({ path, contents }) => {
   fs.outputFileSync(path, contents)
 
-  return null;
+  return null
 }
 
-export {
-  Read,
-  Write,
-};
+export { Read, Write }

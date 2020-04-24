@@ -13,16 +13,14 @@ const collect = require('collect.js')
  * @prop {string}     strategy
  */
 const Runner = ({ data, definition, templatePath, outputPath, strategy, parser }) => {
-  (async () => {
-    return await ( async() => {
+  !(async () => {
+    return await (async () => {
       if (strategy == 'literals') {
         Write({
           path: outputPath,
           contents: Prettier({
             parser,
-            contents: require(
-              templatePath
-            )(collect(data)),
+            contents: require(templatePath)(collect(data)),
           }),
         })
       }
@@ -56,7 +54,9 @@ const Runner = ({ data, definition, templatePath, outputPath, strategy, parser }
     })()
   })()
 
-  return <Text>{`[${data.name}]${outputPath.split('/').slice(outputPath.split('/').length - 1)}`}</Text>
+  return (
+    <Text>{`[${data.name}]${outputPath.split('/').slice(outputPath.split('/').length - 1)}`}</Text>
+  )
 }
 
 export default Runner

@@ -77,9 +77,15 @@ bud-plugin
 
 ### Development dependencies
 
+- babel-eslint
+- eslint
+- eslint-plugin-jsx-a11y
+- eslint-plugin-react
+- eslint-plugin-react-hooks
 - globby
 - husky
 - markdownlint-cli
+- npm-run-all
 
 ## Roadmap
 

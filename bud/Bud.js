@@ -11,7 +11,7 @@ import Runner from './Runner'
  * @prop {string}     strategy     one of: 'literals'
  */
 const Bud = ({ data, definition, output }) =>
-  definition.files.map((file, id) =>
+  definition.files.map((file, id) => (
     <Runner
       key={id}
       data={data}
@@ -21,6 +21,6 @@ const Bud = ({ data, definition, output }) =>
       strategy={file.strategy}
       parser={file.parser}
     />
-  )
+  ))
 
 export default Bud

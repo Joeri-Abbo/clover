@@ -1,13 +1,14 @@
 module.exports = data => `
   /** @wordpress */
   import { getBlockDefaultClassName } from '@wordpress/blocks'\
-  ${(data.get('components').includes('InnerBlocks') || data.get('components').includes('RichText'))
-    ? `
+  ${
+    data.get('components').includes('InnerBlocks') || data.get('components').includes('RichText')
+      ? `
       import {
         ${data.get('components').includes('InnerBlocks') ? `InnerBlocks,` : []}
         ${data.get('components').includes('RichText') ? `RichText,` : []}
       } from '@wordpress/block-editor'`
-    : []
+      : []
   }
 
   /** Modules */
@@ -22,13 +23,14 @@ module.exports = data => `
   */
   const save = ({ attributes }) => {
     const className = getBlockDefaultClassName('${data.get('namespace')}/${data.get('name')}')\
-    ${(data.get('components').includes('MediaUpload') || data.get('components').includes('RichText'))
-      ? `
+    ${
+      data.get('components').includes('MediaUpload') || data.get('components').includes('RichText')
+        ? `
         const {
           ${data.get('components').includes('MediaUpload') ? `mediaUrl,` : []}
           ${data.get('components').includes('RichText') ? `text,` : []}
         } = attributes;`
-      : []
+        : []
     }
 
     /**
@@ -36,15 +38,21 @@ module.exports = data => `
      */
     return (
       <>
-        ${data.get('components').includes('MediaUpload') ? `
+        ${
+          data.get('components').includes('MediaUpload')
+            ? `
           {mediaUrl && (
             <figure>
               <img alt="alt text" src={mediaUrl} />
             </figure>
           )}
-        ` : []}
+        `
+            : []
+        }
 
-        ${data.get('components').includes('RichText') ? `
+        ${
+          data.get('components').includes('RichText')
+            ? `
           {text && (
             <RichText.Content
               tagName={'h2'}
@@ -52,7 +60,9 @@ module.exports = data => `
               value={text}
             />
           )}
-        ` : []}
+        `
+            : []
+        }
 
         ${data.get('components').includes('InnerBlocks') ? `<InnerBlocks.Content />` : []}
       </>
