@@ -82,15 +82,7 @@ module.exports = {
       type: 'multiselect',
       name: 'supports',
       message: 'Supports',
-      choices: [
-        'align',
-        'alignWide',
-        'customClassName',
-        'html',
-        'inserter',
-        'multiple',
-        'reusable',
-      ],
+      choices: ['align', 'alignWide', 'customClassName', 'html', 'inserter', 'multiple', 'reusable'],
     },
   ],
   files: [
@@ -222,9 +214,7 @@ module.exports = {
       '@babel/preset-react': await getLatest('@babel/preset-react'),
       '@prettier/plugin-php': await getLatest('@prettier/plugin-php'),
       '@wordpress/browserslist-config': await getLatest('@wordpress/browserslist-config'),
-      '@wordpress/dependency-extraction-webpack-plugin': await getLatest(
-        '@wordpress/dependency-extraction-webpack-plugin',
-      ),
+      '@wordpress/dependency-extraction-webpack-plugin': await getLatest('@wordpress/dependency-extraction-webpack-plugin'),
       autoprefixer: await getLatest('autoprefixer'),
       'babel-eslint': await getLatest('babel-eslint'),
       'babel-loader': await getLatest('babel-loader'),

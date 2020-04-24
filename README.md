@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
+  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
 </p>
 
 <p align="center">

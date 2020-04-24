@@ -2,9 +2,7 @@ module.exports = data => `
   /** @wordpress */
   import { __ } from '@wordpress/i18n'
   ${
-    data.get('components').includes('InnerBlocks') ||
-    data.get('components').includes('RichText') ||
-    data.get('components').includes('MediaUpload')
+    data.get('components').includes('InnerBlocks') || data.get('components').includes('RichText') || data.get('components').includes('MediaUpload')
       ? `import {
       ${data.get('components').includes('InnerBlocks') ? `InnerBlocks,` : []}
       ${data.get('components').includes('RichText') ? `RichText,` : []}
@@ -16,11 +14,7 @@ module.exports = data => `
   import PropTypes from 'prop-types'
 
   /** Components */
-  ${
-    data.get('components').includes('MediaUpload')
-      ? `import Media from './../components/Media'`
-      : []
-  }
+  ${data.get('components').includes('MediaUpload') ? `import Media from './../components/Media'` : []}
 
   /**
    * Edit: ${data.get('namespace')}/${data.get('name')}
@@ -30,13 +24,14 @@ module.exports = data => `
   ${data.get('components').includes('RichText') ? ` * @prop {string} attribute.text\n` : []}\
   */
   const edit = ({ attributes, className, setAttributes }) => {
-    ${(data.get('components').includes('RichText') ||
-      data.get('components').includes('MediaUpload')) &&
+    ${
+      (data.get('components').includes('RichText') || data.get('components').includes('MediaUpload')) &&
       `\
       const {
         ${data.get('components').includes('MediaUpload') ? `mediaId, mediaUrl,` : []}
         ${data.get('components').includes('RichText') ? `text,` : []}
-      } = attributes;`}
+      } = attributes;`
+    }
 
     /**
      * Generic attribute handler.

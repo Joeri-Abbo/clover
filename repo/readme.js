@@ -25,22 +25,14 @@ writeFileSync(
 </p>
 
 <p align="center">
-  <img alt="${
-    licenses.shift().type || ''
-  } License" src="https://img.shields.io/github/license/${name.replace(
+  <img alt="${licenses.shift().type || ''} License" src="https://img.shields.io/github/license/${name.replace(
       '@',
       '',
     )}?color=%23525ddc&style=flat-square">
 
-  <img alt="devDependency Status" src="https://img.shields.io/david/dev/${name.replace(
-    '@',
-    '',
-  )}.svg?style=flat-square">
+  <img alt="devDependency Status" src="https://img.shields.io/david/dev/${name.replace('@', '')}.svg?style=flat-square">
 
-  <img alt="Build Status" src="https://img.shields.io/circleci/project/github/${name.replace(
-    '@',
-    '',
-  )}/master.svg?style=flat-square">
+  <img alt="Build Status" src="https://img.shields.io/circleci/project/github/${name.replace('@', '')}/master.svg?style=flat-square">
 
   <a href="https://twitter.com/rootswp">
     <img alt="Follow Roots" src="https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2" />

@@ -54,9 +54,7 @@ const Runner = ({ data, definition, templatePath, outputPath, strategy, parser }
     })()
   })()
 
-  return (
-    <Text>{`[${data.name}]${outputPath.split('/').slice(outputPath.split('/').length - 1)}`}</Text>
-  )
+  return <Text>{`[${data.name}]${outputPath.split('/').slice(outputPath.split('/').length - 1)}`}</Text>
 }
 
 export default Runner
