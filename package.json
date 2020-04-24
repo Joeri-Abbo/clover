@@ -1,0 +1,49 @@
+{
+  "name": "@roots/bud",
+  "version": "0.1.0",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/roots/bud.git"
+  },
+  "bin": {
+    "bud": "./build/cli.js"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "docs": "node ./repo/readme.js",
+    "lint": "prettier --write ./commands/*",
+    "dev": "pastel dev",
+    "build": "pastel build",
+    "prepare": "pastel build"
+  },
+  "dependencies": {
+    "@prettier/plugin-php": "^0.13.0",
+    "collect.js": "^4.20.3",
+    "enquirer": "^2.3.4",
+    "esm": "^3.2.25",
+    "execa": "^4.0.0",
+    "fs-extra": "^9.0.0",
+    "got": "^10.6.0",
+    "ink": "^2.7.1",
+    "pastel": "^1.0.3",
+    "prettier": "1.19.1",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "globby": "^11.0.0",
+    "husky": "^4.2.3",
+    "markdownlint-cli": "^0.22.0"
+  }
+}

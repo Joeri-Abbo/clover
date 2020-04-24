@@ -1,0 +1,19 @@
+{
+  "name": "block-name",
+  "description": "block-description",
+  "private": true,
+  "license": "MIT",
+  "main": "dist/editor.js",
+  "browserslist": [
+    "extends @wordpress/browserslist-config"
+  ],
+  "scripts": {
+    "build": "webpack --progress --colors --inline -p --config webpack.config.js",
+    "lint": "npm-run-all lint:*",
+    "lint:css": "./node_modules/.bin/stylelint .",
+    "lint:js": "./node_modules/.bin/eslint .",
+    "format": "prettier --config 'prettierrc.json' --ignore-path='./node_modules,./dist' --write './resources'"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
