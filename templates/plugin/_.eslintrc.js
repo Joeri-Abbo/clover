@@ -1,7 +1,15 @@
 module.exports = {
   root: true,
-  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:jsx-a11y/recommended'],
-  plugins: ['react', 'react-hooks', 'jsx-a11y'],
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:jsx-a11y/recommended',
+  ],
+  plugins: [
+    'react',
+    'react-hooks',
+    'jsx-a11y',
+  ],
   globals: {
     wp: true,
     window: true,
@@ -27,7 +35,7 @@ module.exports = {
     },
   },
   rules: {
-    strict: 0,
+    'strict': 0,
     'no-console': 0,
     'no-unused-vars': 'warn',
     'jsx-a11y/alt-text': 'warn',
@@ -54,4 +62,4 @@ module.exports = {
       },
     ],
   },
-}
+};

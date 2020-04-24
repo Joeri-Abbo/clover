@@ -1,14 +1,19 @@
 module.exports = data => `
   /** @wordpress */
   import { __ } from '@wordpress/i18n'
-  ${
-    data.get('components').includes('InnerBlocks') || data.get('components').includes('RichText') || data.get('components').includes('MediaUpload')
-      ? `import {
-      ${data.get('components').includes('InnerBlocks') ? `InnerBlocks,` : []}
-      ${data.get('components').includes('RichText') ? `RichText,` : []}
-  } from '@wordpress/block-editor'\n`
-      : []
-  }\
+  ${(data.get('components').includes('InnerBlocks')
+  || data.get('components').includes('RichText')
+  || data.get('components').includes('MediaUpload'))
+    ? `import {
+      ${data.get('components').includes('InnerBlocks')
+        ? `InnerBlocks,`
+        : []
+      }
+      ${data.get('components').includes('RichText')
+        ? `RichText,`
+        : []
+      }
+  } from '@wordpress/block-editor'\n` : []}\
 
   /** Modules */
   import PropTypes from 'prop-types'
@@ -24,9 +29,7 @@ module.exports = data => `
   ${data.get('components').includes('RichText') ? ` * @prop {string} attribute.text\n` : []}\
   */
   const edit = ({ attributes, className, setAttributes }) => {
-    ${
-      (data.get('components').includes('RichText') || data.get('components').includes('MediaUpload')) &&
-      `\
+    ${(data.get('components').includes('RichText') || data.get('components').includes('MediaUpload')) && `\
       const {
         ${data.get('components').includes('MediaUpload') ? `mediaId, mediaUrl,` : []}
         ${data.get('components').includes('RichText') ? `text,` : []}
@@ -43,9 +46,8 @@ module.exports = data => `
       setAttributes({ [\`$\{attr}\`]: value })
     }
 
-    ${
-      data.get('components').includes('MediaUpload')
-        ? `
+    ${data.get('components').includes('MediaUpload')
+      ? `
         /**
          * Media attribute handler.
          *
@@ -58,7 +60,7 @@ module.exports = data => `
             mediaUrl: media.url
           })
         }`
-        : []
+      : []
     }
 
     /**
@@ -66,39 +68,49 @@ module.exports = data => `
      */
     return (
       <div className={className}>
-        ${
-          data.get('components').includes('MediaUpload')
-            ? `
+        ${data.get('components').includes('MediaUpload')
+          ? `
             <Media
               id={mediaId || ''}
               url={mediaUrl || ''}
               setMedia={setMedia}
             />`
-            : []
+          : []
         }
 
-        ${
-          data.get('components').includes('RichText')
-            ? `
+        ${data.get('components').includes('RichText')
+          ? `
             <RichText
               placeholder={__('placeholder heading', '${data.get('namespace')}')}
               tagName={\`h2\`}
               value={text || ''}
               onChange={value => onAttribute('text', value)}
             />`
-            : []
+          : []
         }
 
-        ${data.get('components').includes('InnerBlocks') ? `<InnerBlocks />` : []}
+        ${data.get('components').includes('InnerBlocks')
+          ? `<InnerBlocks />`
+          : []
+        }
       </div>
     )
   }
 
   edit.propTypes = {
     attributes: PropTypes.shape({
-      ${data.get('components').includes('MediaUpload') ? `mediaId: PropTypes.number,` : []}
-      ${data.get('components').includes('MediaUpload') ? `mediaUrl: PropTypes.string,` : []}
-      ${data.get('components').includes('RichText') ? `text: PropTypes.string,` : []}
+      ${data.get('components').includes('MediaUpload')
+        ? `mediaId: PropTypes.number,`
+        : []
+      }
+      ${data.get('components').includes('MediaUpload')
+        ? `mediaUrl: PropTypes.string,`
+        : []
+      }
+      ${data.get('components').includes('RichText')
+        ? `text: PropTypes.string,`
+        : []
+      }
     }),
     className: PropTypes.string,
     isSelected: PropTypes.bool,
