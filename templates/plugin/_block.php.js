@@ -1,13 +1,13 @@
 module.exports = data => `\
 <?php
 /**
- * Plugin Name  ${data.get('name')}
- * Plugin URI   ${data.get('website')}
- * Description  ${data.get('description')}
- * Version      0.0.1
- * Author       ${data.get('author')} <${data.get('email')}>
- * License      MIT
- * Text Domain  ${data.get('namespace')}
+ * Plugin Name:  ${data.get('name')}
+ * Plugin URI:   ${data.get('website')}
+ * Description:  ${data.get('description')}
+ * Version:      0.0.1
+ * Author:       ${data.get('author')} <${data.get('email')}>
+ * License:      MIT
+ * Text Domain:  ${data.get('namespace')}
  */
 
 /**
