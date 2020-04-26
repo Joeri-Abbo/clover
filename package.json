@@ -1,24 +1,32 @@
 {
   "name": "@roots/bud",
-  "version": "0.1.0",
+  "description": "Powerful block scaffolding for WordPress",
+  "version": "0.0.3",
+  "homepage": "https://roots.io/bud",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/roots/bud.git"
+  },
+  "bugs": {
+    "url": "https://github.com/roots/bud/issues"
+  },
   "licenses": [
     {
       "type": "MIT",
       "url": "http://opensource.org/licenses/MIT"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/roots/bud.git"
-  },
   "bin": {
-    "bud": "./build/cli.js"
+    "bud": "build/cli.js"
   },
   "engines": {
     "node": ">=12"
   },
   "files": [
-    "build"
+    "build",
+    "templates",
+    "bud",
+    "bud.config.js"
   ],
   "scripts": {
     "docs": "node ./repo/readme.js",
