@@ -1,11 +1,26 @@
 {
   "arrowParens": "avoid",
-  "bracketSpacing": true,
+  "bracketSpacing": false,
   "tabWidth": 2,
-  "printWidth": 60,
+  "printWidth": 100,
   "singleQuote": true,
   "jsxBracketSameLine": true,
   "useTabs": false,
   "trailingComma": "all",
-  "semi": false
+  "semi": false,
+  "overrides": [
+    {
+      "files": ["*.php"],
+      "options": {
+        "tabWidth": 4,
+        "parser": "plugin-php"
+      }
+    },
+    {
+      "files": ["*.md"],
+      "options": {
+        "parser": "markdown"
+      }
+    }
+  ]
 }

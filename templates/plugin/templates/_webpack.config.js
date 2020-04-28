@@ -1,4 +1,4 @@
-const { resolve } = require('path')
+const {resolve} = require('path')
 const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 const LiveReloadPlugin = require('webpack-livereload-plugin')
@@ -34,7 +34,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          { loader: MiniCssExtractPlugin.loader },
+          {loader: MiniCssExtractPlugin.loader},
           {
             loader: 'css-loader',
             options: {
