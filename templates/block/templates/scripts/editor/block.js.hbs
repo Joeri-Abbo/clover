@@ -1,0 +1,83 @@
+/** @wordpress */
+import { __ } from '@wordpress/i18n'
+import { registerBlockType } from '@wordpress/blocks'
+
+/** {{name}} components */
+import { edit } from './containers/edit'
+import { save } from './containers/save'
+import { attributes } from './attributes.json'
+
+/** {{name}} styles */
+import './../../styles/editor.css'
+
+/**
+ * Registers a new block provided a unique name and an object defining its
+ * behavior. Once registered, the block is made available as an option to any
+ * editor interface where blocks are implemented.
+ *
+ * @param {string} name
+ * @param {Object} settings
+ */
+registerBlockType('{{namespace}}/{{name}}', {
+  /**
+   * The block title.
+   * @param {string}
+   */
+  title: __("{{title}}", '{{namespace}}'),
+
+  /**
+   * A short description of the block.
+   */
+  description: __("{{description}}", '{{namespace}}'),
+
+  /**
+   * The block category.
+   */
+  category: '{{category}}',
+
+  {{~#if keywords}}
+    /**
+    * Searchable keywords for discovery.
+    */
+    keywords: [{{#each keywords}} {{this}} {{/each}}]
+  {{/if}}
+
+  {{~#if icon}}
+    /**
+    * Icon for the block
+    */
+    icon: '{{icon}}'
+  {{/if}}
+
+  /**
+   * Extended support features
+   */
+  supports: {
+    /**
+     * Enable alignments.
+     * Set to true to enable all.
+     */
+    align: {{#has 'supports' 'align'}}true{{else}}false{{/has}},
+
+    /**
+     * Enable wide alignment.
+     * Dependent on the align definition.
+     */
+    alignWide: {{#has 'supports' 'alignWide'}}true{{else}}false{{/has}},
+  },
+
+  /**
+   * Block attributes.
+   */
+  attributes,
+
+  /**
+   * Component to render in the editor.
+   */
+  edit,
+
+  /**
+   * Component to render to the database.
+   */
+  save,
+});

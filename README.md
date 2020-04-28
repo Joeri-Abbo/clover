@@ -50,9 +50,11 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 ## Usage
 
-| Command | Description               |
-| ------- | ------------------------- |
-| `bud`   | Create a new block plugin |
+| Command          | Description |
+| ---------------- | ----------- |
+| `bud bud`        | undefined   |
+| `bud bud block`  | undefined   |
+| `bud bud plugin` | undefined   |
 
 ## Generated files
 
@@ -61,14 +63,8 @@ A typical block that was created with Bud has the following structure:
 ```sh
 bud-plugin
 ├── blocks
-│   └── block
-│       ├── styles
-│       │   ├── public.css
-│       │   ├── editor.css
-│       │   └── common.css
+│   └── {{BUD_NAME}}
 │       └── scripts
-│           ├── public
-│           │   └── index.js
 │           └── editor
 │               ├── containers
 │               │   ├── save.js
@@ -101,6 +97,7 @@ bud-plugin
 - execa
 - fs-extra
 - got
+- handlebars
 - ink
 - pastel
 - prettier
@@ -109,16 +106,40 @@ bud-plugin
 
 ### Development dependencies
 
+- @babel/cli
+- @babel/core
+- @babel/preset-env
+- @babel/preset-react
+- @wordpress/browserslist-config
+- @wordpress/dependency-extraction-webpack-plugin
+- autoprefixer
 - babel-eslint
+- babel-loader
+- css-loader
 - eslint
+- eslint-loader
+- eslint-plugin-import
 - eslint-plugin-jsx-a11y
 - eslint-plugin-react
 - eslint-plugin-react-hooks
+- file-loader
+- friendly-errors-webpack-plugin
 - globby
 - husky
 - markdownlint-cli
 - npm-run-all
+- postcss-import
+- postcss-loader
+- postcss-preset-env
+- react-dom
+- style-loader
 - tree-node-cli
+- uglifyjs-webpack-plugin
+- url-loader
+- webpack
+- webpack-cli
+- webpack-dev-server
+- webpackbar
 
 ## Roadmap
 
