@@ -1,0 +1,71 @@
+/** @wordpress */
+import { getBlockDefaultClassName } from '@wordpress/blocks'
+{{#hasAny 'components' (array 'InnerBlocks' 'RichText' 'MediaUpload')}}
+  import {
+    {{#has 'components' 'InnerBlocks'}}InnerBlocks,{{/has}}
+    {{#has 'components' 'RichText'}}RichText,{{/has}}
+  } from '@wordpress/block-editor'
+{{/hasAny}}
+
+/** Modules */
+import PropTypes from 'prop-types'
+
+/**
+ * Save: {{namespace}}/{{name}}
+ *
+{{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaUrl {{/has}}
+{{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaId {{/has}}
+{{#has 'components' 'RichText'}} * @prop {string} attribute.text {{/has}}
+ */
+const save = ({ attributes }) => {
+  const className = getBlockDefaultClassName('{{namespace}}/{{name}}')
+  {{#hasAny 'components' (array 'MediaUpload' 'RichText')}}
+    const {
+      {{#has 'components' 'MediaUpload'}} mediaUrl, {{/has}}
+      {{#has 'components' 'RichText'}} text, {{/has}}
+    } = attributes;
+  {{/hasAny}}
+
+  /**
+    * Render the component.
+    */
+  return (
+    <>
+      {{#has 'components' 'MediaUpload'}}
+        {mediaUrl && (
+          <figure>
+            <img alt="alt text" src={mediaUrl} />
+          </figure>
+        )}
+      {{/has}}
+
+      {{#has 'components' 'RichText'}}
+        {text && (
+          <RichText.Content
+            tagName={'h2'}
+            className={`${className}__text`}
+            value={text}
+          />
+        )}
+      {{/has}}
+
+      {{#has 'components' 'MediaUrl'}}
+        <InnerBlocks.Content />
+      {{/has}}
+    </>
+  )
+}
+
+save.propTypes = {
+  attributes: PropTypes.shape({
+    {{#has 'components' 'MediaUpload'}}
+      mediaId: PropTypes.number,
+      mediaUrl: PropTypes.string,
+    {{/has}}
+    {{#has 'components' 'RichText'}}
+      text: PropTypes.string,
+    {{/has}}
+  }),
+}
+
+export { save }

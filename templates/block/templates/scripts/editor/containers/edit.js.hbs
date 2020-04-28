@@ -1,0 +1,105 @@
+/** @wordpress */
+import { __ } from '@wordpress/i18n'
+{{#hasAny 'components' (array 'InnerBlocks' 'RichText' 'MediaUpload')}}
+import {
+  {{#has 'components' 'InnerBlocks'}}InnerBlocks,{{/has}}
+  {{#has 'components' 'RichText'}}RichText,{{/has}}
+} from '@wordpress/block-editor'
+{{/hasAny}}
+
+/** Modules */
+import PropTypes from 'prop-types'
+
+{{#has 'components' 'MediaUpload'}}
+/** Components */
+import Media from './../components/Media'
+{{/has}}
+
+/**
+ * Edit: {{namespace}}/{{name}}
+ *
+{{#hasAny 'components' (array 'MediaUpload' 'RichText')}}
+{{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaUrl {{/has}}
+{{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaId {{/has}}
+{{#has 'components' 'RichText'}} * @prop {string} attribute.text {{/has}}
+{{/hasAny}}
+ */
+const edit = ({ attributes, className, setAttributes }) => {
+{{#hasAny 'components' (array 'RichText' 'MediaUpload')}}
+  const {
+    {{#has 'components' 'MediaUpload'}}mediaId,{{/has}}
+    {{#has 'components' 'MediaUpload'}}mediaUrl,{{/has}}
+    {{#has 'components' 'RichText'}} text, {{/has}}
+  } = attributes
+{{/hasAny}}
+
+  /**
+   * Generic attribute handler.
+   *
+   * @param {string} attribute key
+   * @param {mixed}  attribute value
+   */
+  const onAttribute = (attr, value) => {
+    setAttributes({ [`${attr}`]: value })
+  }
+
+{{#has 'components' 'MediaUpload'}}
+  /**
+    * Media attribute handler.
+    *
+    * @param {number} mediaId
+    * @param {string} mediaUrl
+    */
+  const setMedia = media => {
+    setAttributes({
+      mediaId: media.id,
+      mediaUrl: media.url
+    })
+  }
+{{/has}}
+
+  /**
+   * Render the component.
+   */
+  return (
+    <div className={className}>
+    {{#has 'components' 'MediaUpload'}}
+      <Media
+        id={mediaId || ''}
+        url={mediaUrl || ''}
+        setMedia={setMedia}
+      />
+    {{/has}}
+
+    {{#has 'components' 'RichText'}}
+      <RichText
+        placeholder={__('placeholder heading', '{{namespace}}')}
+        tagName={'h2'}
+        value={text || ''}
+        onChange={value => onAttribute('text', value)}
+      />
+    {{/has}}
+
+    {{#has 'components' 'InnerBlocks'}}
+      <InnerBlocks />
+    {{/has}}
+    </div>
+  )
+}
+
+edit.propTypes = {
+  attributes: PropTypes.shape({
+    {{#has 'components' 'MediaUpload'}}
+      mediaId: PropTypes.number,
+      mediaUrl: PropTypes.string,
+    {{/has}}
+    {{#has 'components' 'RichText'}}
+      text: PropTypes.string,
+    {{/has}}
+  }),
+  className: PropTypes.string,
+  isSelected: PropTypes.bool,
+  setAttributes: PropTypes.func,
+}
+
+export { edit }

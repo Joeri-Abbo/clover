@@ -2,6 +2,7 @@ const execa = require('execa')
 const globby = require('globby')
 const fs = require('fs')
 const path = require('path')
+const nodeTree = require('tree-node-cli')
 
 /**
  * Readme helpers
@@ -34,9 +35,9 @@ module.exports = {
    * Example plugin tree
    */
   pluginTree: () => {
-    execa.commandSync('./build/cli.js --default')
+    execa.commandSync('bud --default')
 
-    const tree = require('tree-node-cli')('bud-plugin', {
+    const tree = nodeTree('bud-plugin', {
       allFiles: true,
       dirsFirst: true,
       reverse: true,
@@ -60,13 +61,14 @@ module.exports = {
 
       return {
         dir: path.basename(path.dirname(file)),
-        description: [...command.matchAll(/\/\/\/ (.*)\n/)][0][1],
+        command: [...command.matchAll(/\/\/\/ (.*)\n/)][0][1],
+        description: [...command.matchAll(/\/\/\/ (.*)\n/)][0][2],
       }
     })
 
     let output = ``
     signatures.forEach(sig => {
-      output += `| \`bud\` | ${sig.description} |\n`
+      output += `| \`${sig.command}\` | ${sig.description} |\n`
     })
 
     return output

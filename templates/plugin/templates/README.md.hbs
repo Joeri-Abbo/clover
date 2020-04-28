@@ -1,7 +1,6 @@
-module.exports = ({ pkgManager, namespace, name, description }) => `\
+# {{namespace}}/{{name}}
 
-# ${namespace}/${name}
-${description && `\n${description}`}.
+{{description}}
 
 This project was bootstrapped with [🌱 Bud](https://github.com/roots/bud).
 
@@ -16,7 +15,7 @@ You can install this plugin via Composer on a [Bedrock install](https://roots.io
 ### via Composer
 
 \`\`\`sh
-composer require ${namespace}/${name}
+composer require {{namespace}}/{{name}}
 \`\`\`
 
 ### via WordPress Admin Panel
@@ -30,13 +29,13 @@ composer require ${namespace}/${name}
 
 From the project dir, try running:
 
-### \`${pkgManager || `yarn`} dev\`
+### \`yarn dev\`
 
 Runs the app in the development mode.
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### \`${pkgManager || `yarn`} build\`
+### \`yarn build\`
 
 Transpiles and minifies the block source files to the \`dist\` directory.
 
@@ -47,5 +46,3 @@ Your block is ready to be installed and/or distributed!
 - [🌱 Bud](https://github.com/roots/bud)
 - [React documentation](https://reactjs.org/)
 - [Gutenberg docmentation](https://github.com/WordPress/gutenberg/tree/master/docs)
-
-`

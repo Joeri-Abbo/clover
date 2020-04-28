@@ -1,64 +1,50 @@
-import { cwd } from 'process'
-import { resolve, join } from 'path'
+import { resolve } from 'path'
 import React, { useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { Box, Static, Text } from 'ink'
+import { Box, Text } from 'ink'
 import { prompt } from 'enquirer'
-import Bud from './../bud/Bud'
+import { bud } from './../bud'
 
-const DEFAULT_TEMPLATE = resolve(__dirname, './../../templates/plugin.js')
-
-/**
- * Plugin New
- */
-/// Create a new block plugin
-const BudPluginNew = props => {
+/// bud
+/// Create a new block starter
+const Bud = props => {
   const [data, setData] = useState(null)
-
-  const output = props.inputArgs[2] ? join(cwd(), props.inputArgs[2]) : join(cwd(), props.output)
-
-  const definition = props.definition ? require(join(cwd(), props.definition)) : require(DEFAULT_TEMPLATE)
+  const pluginDefinition = require(
+    resolve(__dirname, './../../templates/plugin/plugin.bud.js')
+  )
 
   useMemo(() => {
-    !props.default ? prompt(definition.fields).then(data => setData(data)) : setData(definition.default)
+    props.default
+      ? setData(pluginDefinition.default)
+      : prompt(pluginDefinition.prompts).then(data => setData(data))
   }, [])
 
-  return (
-    <Box>
-      {!data ? (
-        <Box minHeight={2}>
-          <Text>Create new Block plugin</Text>
-        </Box>
-      ) : (
-        <Static>
-          <Box marginBottom={1}>
-            <Text>Creating {data.name}</Text>
-          </Box>
-
-          <Bud data={data} definition={definition} output={output} />
-        </Static>
-      )}
+  return ! data ? (
+    <Box minHeight={2}>
+      <Text>Create new Block plugin</Text>
     </Box>
+  ) : (
+    [
+      bud.init({ outDir: props.output, data, budFile: './../../templates/plugin/plugin.bud.js' }).actions(),
+      bud.init({ outDir: props.output, data, budFile: './../../templates/block/block.bud.js' }).actions(),
+    ]
   )
 }
 
-BudPluginNew.propTypes = {
+Bud.propTypes = {
   /// Output directory
   output: PropTypes.string,
-  /// Path to bud template definition
-  definition: PropTypes.string,
-  /// Skip prompts; use defaults
+  /// Skip prompts
   default: PropTypes.bool,
 }
 
-BudPluginNew.shortFlags = {
+Bud.shortFlags = {
   output: 'o',
-  definition: 'd',
 }
 
-BudPluginNew.defaultProps = {
+Bud.defaultProps = {
   output: './bud-plugin',
-  default: false,
+  default: null,
 }
 
-export default BudPluginNew
+export default Bud

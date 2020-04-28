@@ -1,7 +1,6 @@
-module.exports = data => `
 {
   "attributes": {
-    ${data.pluck('components.media') ? `
+    {{#has 'components' 'MediaUpload'}}
       "mediaId": {
         "type": "number"
       },
@@ -10,15 +9,14 @@ module.exports = data => `
         "source": "attribute",
         "selector": "img",
         "attribute": "src"
-      },\
-    ` : []}\
-    ${data.pluck('components.text') ? `
+      },
+    {{/has}}
+    {{#has 'components' 'RichText'}}
       "text": {
         "type": "array",
         "source": "children",
         "selector": "h2"
       }
-    ` : []}
+    {{/has}}
   }
 }
-`

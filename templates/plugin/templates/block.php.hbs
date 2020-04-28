@@ -1,17 +1,16 @@
-module.exports = data => `\
 <?php
 /**
- * Plugin Name:  ${data.get('name')}
- * Plugin URI:   ${data.get('website')}
- * Description:  ${data.get('description')}
+ * Plugin Name:  {{name}}
+ * Plugin URI:   {{website}}
+ * Description:  {{description}}
  * Version:      0.0.1
- * Author:       ${data.get('author')} <${data.get('email')}>
+ * Author:       {{author}} <{{email}}>
  * License:      MIT
- * Text Domain:  ${data.get('namespace')}
+ * Text Domain:  {{namespace}}
  */
 
 /**
- * Register ${data.get('namespace')} block assets
+ * Register {{namespace}} block assets
  *
  * @see Enqueueing Editor Assets <https://git.io/JvPHy>
  * @see Dependency Extraction Webpack Plugin <https://git.io/Jv1ll>
@@ -23,11 +22,11 @@ add_action('init', function () {
          * @var array
          */
         public $blocks = [
-            "${data.get('namespace')}/${data.get('name')}"
+            "{{namespace}}/{{name}}"
         ];
 
         /**
-         * ${data.get('namespace')} plugin directory.
+         * {{namespace}} plugin directory.
          * @var string
          */
         public $dir;
@@ -43,7 +42,7 @@ add_action('init', function () {
         /**
          * Class invocation.
          *
-         * @throws \\WP_Error
+         * @throws \WP_Error
          * @return void
          */
         public function __invoke(): void
@@ -69,9 +68,9 @@ add_action('init', function () {
                  * been generated or is otherwise not found.
                  */
                 if (! realpath($manifestFile = "{$this->dir}/dist/{$scriptName}.asset.json")) {
-                    throw new \\WP_Error(
+                    throw new \WP_Error(
                         'manifest_not_found',
-                        "There was an issue registering " . $this->name,
+                        "There was an issue registering {{namespace}}",
                         "Run 'npm build' in " . $this->dir
                     );
                 }
@@ -125,5 +124,3 @@ add_action('init', function () {
         }
     })();
 });
-
-`
