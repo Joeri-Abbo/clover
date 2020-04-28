@@ -35,12 +35,13 @@ module.exports = {
    * Example plugin tree
    */
   pluginTree: () => {
-    execa.commandSync('bud --default')
+    execa.commandSync('bud --default --name=block --skip-install')
 
     const tree = nodeTree('bud-plugin', {
       allFiles: true,
       dirsFirst: true,
       reverse: true,
+      exclude: [/node_modules/],
     })
 
     execa.commandSync('rm -rf ./bud-plugin')
@@ -58,11 +59,10 @@ module.exports = {
 
     const signatures = files.map(file => {
       const command = fs.readFileSync(file, 'utf-8')
-
       return {
         dir: path.basename(path.dirname(file)),
-        command: [...command.matchAll(/\/\/\/ (.*)\n/)][0][1],
-        description: [...command.matchAll(/\/\/\/ (.*)\n/)][0][2],
+        command: [...command.matchAll(/\/\*\* Command: (.*) \*\/\n/)][0][1],
+        description: [...command.matchAll(/\/\/\/ (.*)\n/)][0][1],
       }
     })
 
