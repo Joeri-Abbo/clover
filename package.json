@@ -24,7 +24,7 @@
     "docs": "node ./repo/readme.js",
     "lint": "npm-run-all lint:*",
     "lint:eslint": "eslint .",
-    "lint:prettier": "prettier --write ./commands/**/*",
+    "lint:prettier": "prettier --config 'prettierrc.json' --ignore-path './node_modules,./build' --write './**/*.js'",
     "dev": "pastel dev",
     "build": "pastel build"
   },

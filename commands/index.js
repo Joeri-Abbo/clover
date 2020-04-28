@@ -1,47 +1,49 @@
-import { resolve } from 'path'
-import React, { useState, useMemo } from 'react'
+import {resolve} from 'path'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import { Box, Text } from 'ink'
-import { prompt } from 'enquirer'
-import { bud } from './../bud'
+import {Box, Text} from 'ink'
+import {prompt} from 'enquirer'
+import {bud} from './../bud'
 
 /** Command: bud */
 /// Create a new block starter
 const Bud = props => {
   const [data, setData] = useState(null)
-  const pluginDefinition = require(
-    resolve(__dirname, './../../templates/plugin/plugin.bud.js')
-  )
+  const pluginDefinition = require(resolve(__dirname, './../../templates/plugin/plugin.bud.js'))
 
   useMemo(() => {
     props.default || props.name || props.namespace
       ? setData({
-        ...pluginDefinition.default,
-        name: props.name ? props.name : pluginDefinition.default.name,
-        namespace: props.namespace ? props.namespace : pluginDefinition.default.namespace,
-      })
+          ...pluginDefinition.default,
+          name: props.name ? props.name : pluginDefinition.default.name,
+          namespace: props.namespace ? props.namespace : pluginDefinition.default.namespace,
+        })
       : prompt(pluginDefinition.prompts).then(data => setData(data))
   }, [])
 
-  return ! data ? (
+  return !data ? (
     <Box minHeight={2}>
       <Text>Create new Block plugin</Text>
     </Box>
   ) : (
     [
-      bud.init({
-        data,
-        budFile: './../../templates/plugin/plugin.bud.js',
-        skipInstall: props.skipInstall,
-        outDir: props.output,
-      }).actions(),
+      bud
+        .init({
+          data,
+          budFile: './../../templates/plugin/plugin.bud.js',
+          skipInstall: props.skipInstall,
+          outDir: props.output,
+        })
+        .actions(),
 
-      bud.init({
-        data,
-        budFile: './../../templates/block/block.bud.js',
-        outDir: props.output,
-        skipInstall: props.skipInstall,
-      }).actions(),
+      bud
+        .init({
+          data,
+          budFile: './../../templates/block/block.bud.js',
+          outDir: props.output,
+          skipInstall: props.skipInstall,
+        })
+        .actions(),
     ]
   )
 }

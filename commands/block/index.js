@@ -1,9 +1,9 @@
-import { resolve } from 'path'
-import React, { useState, useMemo, useEffect } from 'react'
+import {resolve} from 'path'
+import React, {useState, useMemo, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import { Box, Text } from 'ink'
-import { prompt } from 'enquirer'
-import { bud } from './../../bud'
+import {Box, Text} from 'ink'
+import {prompt} from 'enquirer'
+import {bud} from './../../bud'
 
 /** Command: bud block */
 /// Create a new block
@@ -14,11 +14,17 @@ const BudBlockNew = props => {
   const budFile = resolve(__dirname, './../../../templates/block/block.bud.js')
   const definition = require(budFile)
 
-  useMemo(() => (!props.default ? prompt(definition.prompts).then(data => setData(data)) : setData(definition.default)), [])
+  useMemo(
+    () =>
+      !props.default
+        ? prompt(definition.prompts).then(data => setData(data))
+        : setData(definition.default),
+    [],
+  )
 
   useEffect(() => {
     if (data) {
-      bud.init({ data, budFile }).actions() && setResults(true)
+      bud.init({data, budFile}).actions() && setResults(true)
     }
   }, [data])
 

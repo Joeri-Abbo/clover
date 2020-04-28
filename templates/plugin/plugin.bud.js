@@ -1,4 +1,4 @@
-const { resolve } = require('path')
+const {resolve} = require('path')
 const path = resolve(__dirname, './templates')
 
 /**
@@ -70,24 +70,14 @@ module.exports = {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
-      choices: [
-        { name: 'RichText' },
-        { name: 'InnerBlocks' },
-        { name: 'MediaUpload' },
-      ],
+      choices: [{name: 'RichText'}, {name: 'InnerBlocks'}, {name: 'MediaUpload'}],
     },
     {
       type: 'select',
       name: 'category',
       message: 'Category',
       initial: 'common',
-      choices: [
-        'common',
-        'formatting',
-        'layout',
-        'widgets',
-        'embed',
-      ],
+      choices: ['common', 'formatting', 'layout', 'widgets', 'embed'],
     },
     {
       type: 'multiselect',

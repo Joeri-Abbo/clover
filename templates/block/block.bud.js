@@ -1,4 +1,4 @@
-const { resolve } = require('path')
+const {resolve} = require('path')
 
 /**
  * Bud generator
@@ -16,13 +16,7 @@ module.exports = {
     description: '{{BUD_DESCRIPTION}}',
     components: ['RichText', 'InnerBlocks', 'MediaUpload'],
     category: 'common',
-    supports: [
-      'align',
-      'alignWide',
-      'inserter',
-      'multiple',
-      'reusable',
-    ],
+    supports: ['align', 'alignWide', 'inserter', 'multiple', 'reusable'],
   },
   prompts: [
     {
@@ -75,24 +69,14 @@ module.exports = {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
-      choices: [
-        { name: 'RichText' },
-        { name: 'InnerBlocks' },
-        { name: 'MediaUpload' },
-      ],
+      choices: [{name: 'RichText'}, {name: 'InnerBlocks'}, {name: 'MediaUpload'}],
     },
     {
       type: 'select',
       name: 'category',
       message: 'Category',
       initial: 'common',
-      choices: [
-        'common',
-        'formatting',
-        'layout',
-        'widgets',
-        'embed',
-      ],
+      choices: ['common', 'formatting', 'layout', 'widgets', 'embed'],
     },
     {
       type: 'multiselect',

@@ -31,46 +31,46 @@ export const bud = {
     return [
       {
         helper: 'array',
-        fn: function() {
-          return Array.prototype.slice.call(arguments, 0, -1);
+        fn: function () {
+          return Array.prototype.slice.call(arguments, 0, -1)
         },
       },
       {
         helper: 'ifIn',
-        fn: function(elem, list, options) {
+        fn: function (elem, list, options) {
           if (list.indexOf(elem) > -1) {
-            return options.fn(this);
+            return options.fn(this)
           }
 
-          return options.inverse(this);
+          return options.inverse(this)
         },
       },
       {
         helper: 'has',
-        fn: function(object, component, options) {
+        fn: function (object, component, options) {
           if (data[object].indexOf(component) > -1) {
-            return options.fn(this);
+            return options.fn(this)
           }
 
-          return options.inverse(this);
+          return options.inverse(this)
         },
       },
       {
         helper: 'hasAny',
-        fn: function(object, components, options) {
-          let uses = false;
+        fn: function (object, components, options) {
+          let uses = false
 
           if (components) {
             components.forEach(component => {
               if (data[object].indexOf(component) > -1) {
-                uses = true;
+                uses = true
               }
             })
           } else {
             console.log('components not defined')
           }
 
-          return uses ? options.fn(this) : options.inverse(this);
+          return uses ? options.fn(this) : options.inverse(this)
         },
       },
     ]
@@ -87,11 +87,11 @@ export const bud = {
     this.budFile = require(budFile)
     this.skipInstall = skipInstall
 
-    this.helpers(this.data).forEach(({ helper, fn }) => {
-      this.engine.registerHelper(helper, fn);
+    this.helpers(this.data).forEach(({helper, fn}) => {
+      this.engine.registerHelper(helper, fn)
     })
 
-    return this;
+    return this
   },
 
   /**
@@ -111,12 +111,12 @@ export const bud = {
    * @param {string} path
    * @param {string} template
    */
-  template: function({parser, path, template}) {
+  template: function ({parser, path, template}) {
     const templateContents = fs.readFileSync(join(this.budFile.path, template), 'utf8')
 
     const raw = this.engine.compile(templateContents)(this.data)
     const output = {
-      content: parser ? prettier.format(raw, { ...prettierConfig, parser }) : raw,
+      content: parser ? prettier.format(raw, {...prettierConfig, parser}) : raw,
       path: resolve(process.cwd(), `${this.outDir}/${this.engine.compile(path)(this.data)}`),
     }
 
@@ -129,15 +129,13 @@ export const bud = {
    * @param {array} pkgs
    * @param {bool}  dev
    */
-  npm: function({pkgs, dev}) {
+  npm: function ({pkgs, dev}) {
     if (this.skipInstall) {
-      return;
+      return
     }
 
     pkgs.forEach(pkg => {
-      const command = dev
-        ? `yarn add -D ${pkg}`
-        : `yarn add ${pkg}`
+      const command = dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`
 
       this.runner.commandSync(command, {
         cwd: resolve(process.cwd(), `${this.outDir}`),
@@ -152,11 +150,13 @@ export const bud = {
    * @param {bool} composer
    */
   install: function ({npm, composer}) {
-    npm && this.runner.commandSync(`yarn`, {
-      cwd: resolve(process.cwd(), `${this.outDir}`),
-    })
-    composer && this.runner.commandSync(`composer install`, {
-      cwd: resolve(process.cwd(), `${this.outDir}`),
-    })
+    npm &&
+      this.runner.commandSync(`yarn`, {
+        cwd: resolve(process.cwd(), `${this.outDir}`),
+      })
+    composer &&
+      this.runner.commandSync(`composer install`, {
+        cwd: resolve(process.cwd(), `${this.outDir}`),
+      })
   },
 }
