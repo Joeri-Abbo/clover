@@ -5,7 +5,7 @@ import { Box, Text } from 'ink'
 import { prompt } from 'enquirer'
 import { bud } from './../../bud'
 
-/// bud block
+/** Command: bud block */
 /// Create a new block
 const BudBlockNew = props => {
   const [data, setData] = useState(null)

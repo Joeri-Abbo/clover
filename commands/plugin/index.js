@@ -6,7 +6,7 @@ import { Box, Text } from 'ink'
 import { prompt } from 'enquirer'
 import { bud } from './../../bud'
 
-/// bud plugin
+/** Command: bud plugin */
 /// Create a new plugin
 const BudPluginNew = props => {
   const [data, setData] = useState(null)

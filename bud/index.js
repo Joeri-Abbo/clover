@@ -81,10 +81,11 @@ export const bud = {
    *
    * @param {string} path
    */
-  init: function ({outDir, data, budFile}) {
+  init: function ({outDir, data, budFile, skipInstall}) {
     this.data = data
     this.outDir = outDir
     this.budFile = require(budFile)
+    this.skipInstall = skipInstall
 
     this.helpers(this.data).forEach(({ helper, fn }) => {
       this.engine.registerHelper(helper, fn);
@@ -129,12 +130,18 @@ export const bud = {
    * @param {bool}  dev
    */
   npm: function({pkgs, dev}) {
+    if (this.skipInstall) {
+      return;
+    }
+
     pkgs.forEach(pkg => {
       const command = dev
         ? `yarn add -D ${pkg}`
         : `yarn add ${pkg}`
 
-      this.runner.commandSync(command, process.cwd())
+      this.runner.commandSync(command, {
+        cwd: resolve(process.cwd(), `${this.outDir}`),
+      })
     })
   },
 
@@ -145,7 +152,11 @@ export const bud = {
    * @param {bool} composer
    */
   install: function ({npm, composer}) {
-    npm && this.runner.commandSync(`yarn`)
-    composer && this.runner.commandSync(`composer install`)
+    npm && this.runner.commandSync(`yarn`, {
+      cwd: resolve(process.cwd(), `${this.outDir}`),
+    })
+    composer && this.runner.commandSync(`composer install`, {
+      cwd: resolve(process.cwd(), `${this.outDir}`),
+    })
   },
 }
