@@ -21,19 +21,21 @@ const BudBlockNew = props => {
     [],
   )
 
-  return ! data ? (
+  return !data ? (
     <Box minHeight={2}>
       <Text>Bud: Create new Block</Text>
     </Box>
-  ) : [
-    bud
-      .init({
-        data,
-        budFile,
-        skipInstall: props.skipInstall,
-      })
-      .actions(),
-  ]
+  ) : (
+    [
+      bud
+        .init({
+          data,
+          budFile,
+          skipInstall: props.skipInstall,
+        })
+        .actions(),
+    ]
+  )
 }
 
 BudBlockNew.propTypes = {

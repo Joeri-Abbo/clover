@@ -132,10 +132,9 @@ export const bud = {
     }
 
     pkgs.forEach(pkg => {
-      this.runner.commandSync(
-        dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`,
-        {cwd: resolve(process.cwd(), `${this.outDir}`)},
-      )
+      this.runner.commandSync(dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`, {
+        cwd: resolve(process.cwd(), `${this.outDir}`),
+      })
     })
   },
 

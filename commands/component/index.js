@@ -14,25 +14,27 @@ const BudComponentNew = props => {
 
   useMemo(
     () =>
-      ! props.default
+      !props.default
         ? prompt(definition.prompts).then(data => setData(data))
         : setData(definition.default),
     [],
   )
 
-  return ! data ? (
+  return !data ? (
     <Box minHeight={2}>
       <Text>Bud: Create new Component</Text>
     </Box>
-  ) : [
-    bud
-      .init({
-        data,
-        budFile,
-        skipInstall: props.skipInstall,
-      })
-      .actions(),
-  ]
+  ) : (
+    [
+      bud
+        .init({
+          data,
+          budFile,
+          skipInstall: props.skipInstall,
+        })
+        .actions(),
+    ]
+  )
 }
 
 export default BudComponentNew

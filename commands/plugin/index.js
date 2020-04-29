@@ -29,16 +29,18 @@ const BudPluginNew = props => {
     <Box minHeight={2}>
       <Text>Bud: Create new Plugin</Text>
     </Box>
-  ) : [
-    bud
-      .init({
-        data,
-        budFile,
-        skipInstall: props.skipInstall,
-        outDir: props.output,
-      })
-      .actions(),
-  ]
+  ) : (
+    [
+      bud
+        .init({
+          data,
+          budFile,
+          skipInstall: props.skipInstall,
+          outDir: props.output,
+        })
+        .actions(),
+    ]
+  )
 }
 
 BudPluginNew.propTypes = {

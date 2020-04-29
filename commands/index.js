@@ -29,13 +29,10 @@ const Bud = props => {
           name: props.name ? props.name : buds.plugin.default.name,
           namespace: props.namespace ? props.namespace : buds.plugin.default.namespace,
         })
-      : prompt(...[
-        ...buds.plugin.prompts,
-        ...buds.block.prompts,
-      ]).then(data => setData(data))
+      : prompt(...[...buds.plugin.prompts, ...buds.block.prompts]).then(data => setData(data))
   }, [])
 
-  return ! data ? (
+  return !data ? (
     <Box minHeight={2}>
       <Text>Create new Block plugin</Text>
     </Box>

@@ -41,10 +41,7 @@ module.exports = {
       allFiles: true,
       dirsFirst: true,
       reverse: true,
-      exclude: [
-        /node_modules/,
-        /.\.lock/,
-      ],
+      exclude: [/node_modules/, /.\.lock/],
     })
 
     execa.commandSync('rm -rf ./bud-plugin')
