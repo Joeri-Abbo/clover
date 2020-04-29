@@ -27,30 +27,45 @@ const BudPluginNew = props => {
 
   return !data ? (
     <Box minHeight={2}>
-      <Text>Create new Block plugin</Text>
+      <Text>Bud: Create new Plugin</Text>
     </Box>
-  ) : (
-    bud.init({data, budFile}).actions()
-  )
+  ) : [
+    bud
+      .init({
+        data,
+        budFile,
+        skipInstall: props.skipInstall,
+        outDir: props.output,
+      })
+      .actions(),
+  ]
 }
 
 BudPluginNew.propTypes = {
+  /// Plugin name
+  name: PropTypes.string,
+  /// Plugin namespace
+  namespace: PropTypes.string,
+  /// Author name
+  author: PropTypes.string,
+  /// Author email
+  email: PropTypes.string,
+  /// Skip install
+  skipInstall: PropTypes.bool,
   /// Output directory
   output: PropTypes.string,
-  /// Path to bud template definition
-  definition: PropTypes.string,
-  /// Skip prompts; use defaults
+  /// Skip prompts
   default: PropTypes.bool,
 }
 
-BudPluginNew.shortFlags = {
-  output: 'o',
-  definition: 'd',
-}
-
 BudPluginNew.defaultProps = {
+  name: 'block-name',
+  namespace: 'block-plugin',
+  author: 'block-author',
+  email: 'author@google.com',
+  skipInstall: false,
   output: './bud-plugin',
-  default: false,
+  default: null,
 }
 
 export default BudPluginNew

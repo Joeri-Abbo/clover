@@ -1,12 +1,16 @@
 const {resolve} = require('path')
-const path = resolve(__dirname, './templates')
+
+/**
+ * Template files
+ */
+const templates = resolve(__dirname, './templates')
 
 /**
  * Bud generator
  * Block plugin base
  */
 module.exports = {
-  path,
+  path: templates,
   default: {
     namespace: '{{BUD_NAMESPACE}}',
     name: '{{BUD_NAME}}',
@@ -15,9 +19,6 @@ module.exports = {
     website: '{{BUD_WEBSITE}}',
     title: '{{BUD_TITLE}}',
     description: '{{BUD_DESCRIPTION}}',
-    components: ['RichText', 'InnerBlocks', 'MediaUpload'],
-    category: 'common',
-    supports: ['align', 'alignWide', 'inserter', 'multiple', 'reusable'],
   },
   prompts: [
     {
@@ -66,33 +67,6 @@ module.exports = {
       message: 'Website',
       initial: 'https://acme.co',
     },
-    {
-      type: 'multiselect',
-      name: 'components',
-      message: 'Components',
-      choices: [{name: 'RichText'}, {name: 'InnerBlocks'}, {name: 'MediaUpload'}],
-    },
-    {
-      type: 'select',
-      name: 'category',
-      message: 'Category',
-      initial: 'common',
-      choices: ['common', 'formatting', 'layout', 'widgets', 'embed'],
-    },
-    {
-      type: 'multiselect',
-      name: 'supports',
-      message: 'Supports',
-      choices: [
-        'align',
-        'alignWide',
-        'customClassName',
-        'html',
-        'inserter',
-        'multiple',
-        'reusable',
-      ],
-    },
   ],
   actions: [
     {
@@ -115,57 +89,57 @@ module.exports = {
     },
     {
       action: 'template',
-      template: '_.babelrc.js',
+      template: '.babelrc.js',
       path: '.babelrc.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: '_.editorconfig',
+      template: '.editorconfig',
       path: '.editorconfig',
     },
     {
       action: 'template',
-      template: '_.eslintrc.js',
+      template: '.eslintrc.js',
       path: '.eslintrc.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: '_.eslintignore',
+      template: '.eslintignore',
       path: '.eslintignore',
     },
     {
       action: 'template',
-      template: '_.gitignore',
+      template: '.gitignore',
       path: '.gitignore',
     },
     {
       action: 'template',
-      template: '_.postcss.config.js',
+      template: '.postcss.config.js',
       path: 'postcss.config.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: '_.prettierrc.json',
+      template: '.prettierrc.json',
       path: 'prettierrc.json',
       parser: 'json',
     },
     {
       action: 'template',
-      template: '_.stylelintrc',
+      template: '.stylelintrc',
       path: '.stylelintrc',
     },
     {
       action: 'template',
-      template: '_webpack.config.js',
+      template: 'webpack.config.js',
       path: 'webpack.config.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: '_package.json',
+      template: 'package.json.hbs',
       path: 'package.json',
       parser: 'json',
     },
@@ -200,7 +174,6 @@ module.exports = {
         'react',
         'react-dom',
         'style-loader',
-        'tree-node-cli',
         'uglifyjs-webpack-plugin',
         'url-loader',
         'webpack',
