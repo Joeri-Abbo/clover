@@ -1,17 +1,19 @@
 const {resolve} = require('path')
 
 /**
+ * Templates
+ */
+const templates = resolve(__dirname, './templates')
+
+/**
  * Bud generator
  * Block plugin base
  */
 module.exports = {
-  path: resolve(__dirname, './templates'),
+  path: templates,
   default: {
     namespace: '{{BUD_NAMESPACE}}',
     name: '{{BUD_NAME}}',
-    author: '{{BUD_AUTHOR_NAME}}',
-    email: '{{BUD_AUTHOR_EMAIL}}',
-    website: '{{BUD_WEBSITE}}',
     title: '{{BUD_TITLE}}',
     description: '{{BUD_DESCRIPTION}}',
     components: ['RichText', 'InnerBlocks', 'MediaUpload'],
@@ -48,24 +50,6 @@ module.exports = {
       initial: 'Short description of acme-block',
     },
     {
-      type: 'input',
-      name: 'author',
-      message: 'Author name',
-      initial: 'Wiley C.',
-    },
-    {
-      type: 'input',
-      name: 'email',
-      message: 'Author email',
-      initial: 'wiley@gmail.com',
-    },
-    {
-      type: 'input',
-      name: 'website',
-      message: 'Website',
-      initial: 'https://acme.co',
-    },
-    {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
@@ -97,32 +81,44 @@ module.exports = {
     {
       action: 'template',
       template: 'scripts/editor/attributes.json.hbs',
-      path: 'blocks/{{name}}/scripts/editor/attributes.json',
+      path: 'src/blocks/{{name}}/scripts/editor/attributes.json',
       parser: 'json',
     },
     {
       action: 'template',
       template: 'scripts/editor/block.js.hbs',
-      path: 'blocks/{{name}}/scripts/editor/block.js',
+      path: 'src/blocks/{{name}}/scripts/editor/block.js',
       parser: 'babel',
     },
     {
       action: 'template',
       template: 'scripts/editor/containers/edit.js.hbs',
-      path: 'blocks/{{name}}/scripts/editor/containers/edit.js',
+      path: 'src/blocks/{{name}}/scripts/editor/containers/edit.js',
       parser: 'babel',
     },
     {
       action: 'template',
       template: 'scripts/editor/containers/save.js.hbs',
-      path: 'blocks/{{name}}/scripts/editor/containers/save.js',
+      path: 'src/blocks/{{name}}/scripts/editor/containers/save.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: 'scripts/editor/components/Media.js.hbs',
-      path: 'blocks/{{name}}/scripts/editor/components/Media.js',
-      parser: 'babel',
+      template: 'styles/common.css',
+      path: 'src/blocks/{{name}}/styles/common.css',
+      parser: 'css',
+    },
+    {
+      action: 'template',
+      template: 'styles/editor.css',
+      path: 'src/blocks/{{name}}/styles/editor.css',
+      parser: 'css',
+    },
+    {
+      action: 'template',
+      template: 'styles/public.css',
+      path: 'src/blocks/{{name}}/styles/public.css',
+      parser: 'css',
     },
   ],
 }

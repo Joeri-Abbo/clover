@@ -11,8 +11,8 @@ const WebpackBar = require('webpackbar')
  */
 module.exports = {
   entry: {
-    editor: resolve(__dirname, 'blocks/block/scripts/editor/block.js'),
-    public: resolve(__dirname, 'blocks/block/scripts/public/index.js'),
+    editor: resolve(__dirname, 'src/blocks/block/scripts/editor/block.js'),
+    public: resolve(__dirname, 'src/blocks/block/scripts/public/index.js'),
   },
   output: {
     path: resolve(__dirname, 'dist'),

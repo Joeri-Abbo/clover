@@ -1,6 +1,6 @@
 /** @wordpress */
-import { Button } from '@wordpress/components'
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor'
+import {Button} from '@wordpress/components'
+import {MediaUpload, MediaUploadCheck} from '@wordpress/block-editor'
 
 /** Modules */
 import PropTypes from 'prop-types'
@@ -25,7 +25,7 @@ const Media = ({ id, url, setMedia }) => (
       multiple={false}
       value={id}
       onSelect={setMedia}
-      render={({ open }) => (
+      render={({open}) => (
         <>
           {url && (
             <figure>

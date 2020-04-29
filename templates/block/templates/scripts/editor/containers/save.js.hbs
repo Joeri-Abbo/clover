@@ -13,9 +13,11 @@ import PropTypes from 'prop-types'
 /**
  * Save: {{namespace}}/{{name}}
  *
+{{#hasAny 'components' (array 'RichText' 'MediaUpload')}}
 {{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaUrl {{/has}}
 {{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaId {{/has}}
 {{#has 'components' 'RichText'}} * @prop {string} attribute.text {{/has}}
+{{/hasAny}}
  */
 const save = ({ attributes }) => {
   const className = getBlockDefaultClassName('{{namespace}}/{{name}}')

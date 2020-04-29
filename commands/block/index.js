@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import React, {useState, useMemo, useEffect} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from 'ink'
 import {prompt} from 'enquirer'
@@ -9,7 +9,6 @@ import {bud} from './../../bud'
 /// Create a new block
 const BudBlockNew = props => {
   const [data, setData] = useState(null)
-  const [results, setResults] = useState(false)
 
   const budFile = resolve(__dirname, './../../../templates/block/block.bud.js')
   const definition = require(budFile)
@@ -22,38 +21,37 @@ const BudBlockNew = props => {
     [],
   )
 
-  useEffect(() => {
-    if (data) {
-      bud.init({data, budFile}).actions() && setResults(true)
-    }
-  }, [data])
-
-  return !results ? (
+  return ! data ? (
     <Box minHeight={2}>
-      <Text>Bud: create block</Text>
+      <Text>Bud: Create new Block</Text>
     </Box>
-  ) : (
-    <Box minHeight={2}>
-      <Text>All done</Text>
-    </Box>
-  )
+  ) : [
+    bud
+      .init({
+        data,
+        budFile,
+        skipInstall: props.skipInstall,
+      })
+      .actions(),
+  ]
 }
 
 BudBlockNew.propTypes = {
-  /// Output directory
-  output: PropTypes.string,
-  /// Skip prompts; use defaults
+  /// Block name
+  name: PropTypes.string,
+  /// Block namespace
+  namespace: PropTypes.string,
+  /// Skip install
+  skipInstall: PropTypes.bool,
+  /// Skip prompts
   default: PropTypes.bool,
 }
 
-BudBlockNew.shortFlags = {
-  output: 'o',
-  definition: 'd',
-}
-
 BudBlockNew.defaultProps = {
-  output: './block',
-  default: false,
+  name: 'block-name',
+  namespace: 'block-plugin',
+  skipInstall: false,
+  default: null,
 }
 
 export default BudBlockNew

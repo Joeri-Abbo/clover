@@ -20,11 +20,6 @@ export const bud = {
   runner: execa,
 
   /**
-   * Output
-   */
-  log: [],
-
-  /**
    * Helpers
    */
   helpers: data => {
@@ -79,9 +74,12 @@ export const bud = {
   /**
    * Initialize
    *
-   * @param {string} path
+   * @param {string} outDir
+   * @param {object} data
+   * @param {string} budFile
+   * @param {bool}   skipInstall
    */
-  init: function ({outDir, data, budFile, skipInstall}) {
+  init: function ({outDir = './', data, budFile, skipInstall = false}) {
     this.data = data
     this.outDir = outDir
     this.budFile = require(budFile)
@@ -99,15 +97,14 @@ export const bud = {
    */
   actions: function () {
     this.budFile.actions.forEach(task => {
-      this.log.push(this[task.action](task))
+      this[task.action](task)
     })
-
-    return this.log
   },
 
   /**
    * Action: template
    *
+   * @param {string} parser
    * @param {string} path
    * @param {string} template
    */
@@ -135,11 +132,10 @@ export const bud = {
     }
 
     pkgs.forEach(pkg => {
-      const command = dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`
-
-      this.runner.commandSync(command, {
-        cwd: resolve(process.cwd(), `${this.outDir}`),
-      })
+      this.runner.commandSync(
+        dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`,
+        {cwd: resolve(process.cwd(), `${this.outDir}`)},
+      )
     })
   },
 

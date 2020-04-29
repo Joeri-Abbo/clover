@@ -36,17 +36,17 @@ registerBlockType('{{namespace}}/{{name}}', {
   category: '{{category}}',
 
   {{~#if keywords}}
-    /**
-    * Searchable keywords for discovery.
-    */
-    keywords: [{{#each keywords}} {{this}} {{/each}}]
+  /**
+  * Searchable keywords for discovery.
+  */
+  keywords: [{{#each keywords}} {{this}} {{/each}}]
   {{/if}}
 
   {{~#if icon}}
-    /**
-    * Icon for the block
-    */
-    icon: '{{icon}}'
+  /**
+  * Icon for the block
+  */
+  icon: '{{icon}}'
   {{/if}}
 
   /**
