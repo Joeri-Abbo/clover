@@ -16,6 +16,11 @@ module.exports = {
     path: resolve(__dirname, 'dist'),
   },
   resolve: {
+    alias: {
+      '@blocks': resolve(__dirname, 'src/blocks'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@extensions': resolve(__dirname, 'src/extensions'),
+    },
     extensions: ['.js', '.json', '.jsx', '.css'],
     modules: [resolve(__dirname, 'node_modules')],
   },

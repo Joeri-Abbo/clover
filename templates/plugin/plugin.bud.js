@@ -144,6 +144,22 @@ module.exports = {
       parser: 'json',
     },
     {
+      action: 'dir',
+      path: 'src',
+    },
+    {
+      action: 'dir',
+      path: 'src/blocks',
+    },
+    {
+      action: 'dir',
+      path: 'src/components',
+    },
+    {
+      action: 'dir',
+      path: 'src/extensions',
+    },
+    {
       action: 'npm',
       dev: true,
       pkgs: [
@@ -182,12 +198,6 @@ module.exports = {
         'webpack-dev-server',
         'webpackbar',
       ],
-    },
-    {
-      action: 'install',
-      npm: true,
-      composer: false,
-      build: true,
     },
   ],
 }

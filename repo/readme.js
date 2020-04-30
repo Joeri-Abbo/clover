@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-const {resolve} = require('path')
-const {writeFileSync} = require('fs')
-const {format} = require('prettier')
+const { resolve } = require('path')
+const { writeFileSync } = require('fs')
+const { format } = require('prettier')
 
 /** Util */
-const {block, listKeys, pluginTree, commands} = require('./components/helpers')
+const { block, listKeys, pluginTree, commands } = require('./components/helpers')
 
 /** Data */
-const {name, licenses, dependencies, devDependencies, engines} = require('./../package.json')
+const { name, licenses, dependencies, devDependencies, engines } = require('./../package.json')
 
 /** Target */
 const readme = resolve(__dirname, '../README.md')
@@ -25,17 +25,12 @@ writeFileSync(
 </p>
 
 <p align="center">
-  <img alt="${
-    licenses.shift().type || ''
-  } License" src="https://img.shields.io/github/license/${name.replace(
+  <img alt="${licenses.shift().type || ''} License" src="https://img.shields.io/github/license/${name.replace(
       '@',
       '',
     )}?color=%23525ddc&style=flat-square">
 
-  <img alt="devDependency Status" src="https://img.shields.io/david/dev/${name.replace(
-    '@',
-    '',
-  )}.svg?style=flat-square">
+  <img alt="devDependency Status" src="https://img.shields.io/david/dev/${name.replace('@', '')}.svg?style=flat-square">
 
   <img alt="Build Status" src="https://img.shields.io/circleci/project/github/${name.replace(
     '@',
@@ -130,7 +125,7 @@ Keep track of development and community news.
 - Listen to the [Roots Radio podcast](https://roots.io/podcast/)
 
 `,
-    {parser: 'markdown'},
+    { parser: 'markdown' },
   ),
   'utf8',
 )

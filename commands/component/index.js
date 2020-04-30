@@ -1,8 +1,8 @@
-import {resolve} from 'path'
-import React, {useState, useMemo} from 'react'
-import {Box, Text} from 'ink'
-import {prompt} from 'enquirer'
-import {bud} from './../../bud'
+import { resolve } from 'path'
+import React, { useState, useMemo } from 'react'
+import { Box, Text } from 'ink'
+import { prompt } from 'enquirer'
+import { bud } from './../../bud'
 
 /** Command: bud component */
 /// Create a new component
@@ -13,10 +13,7 @@ const BudComponentNew = props => {
   const definition = require(budFile)
 
   useMemo(
-    () =>
-      !props.default
-        ? prompt(definition.prompts).then(data => setData(data))
-        : setData(definition.default),
+    () => (!props.default ? prompt(definition.prompts).then(data => setData(data)) : setData(definition.default)),
     [],
   )
 

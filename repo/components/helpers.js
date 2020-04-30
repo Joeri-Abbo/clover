@@ -54,7 +54,7 @@ module.exports = {
    */
   commands: () => {
     const files = globby.sync(path.resolve(__dirname, '../../commands'), {
-      expandDirectories: {extensions: ['js']},
+      expandDirectories: { extensions: ['js'] },
     })
 
     const signatures = files.map(file => {
