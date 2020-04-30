@@ -1,9 +1,9 @@
-import {resolve} from 'path'
-import React, {useState, useMemo} from 'react'
+import { resolve } from 'path'
+import React, { useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import {Box, Text} from 'ink'
-import {prompt} from 'enquirer'
-import {bud} from './../bud'
+import { Box, Text } from 'ink'
+import { prompt } from 'enquirer'
+import { bud } from './../bud'
 
 /** Command: bud */
 /// Create a new block starter

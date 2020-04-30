@@ -126,5 +126,11 @@ module.exports = {
       path: 'src/blocks/{{name}}/styles/public.css',
       parser: 'css',
     },
+    {
+      action: 'install',
+      npm: true,
+      composer: false,
+      build: true,
+    },
   ],
 }

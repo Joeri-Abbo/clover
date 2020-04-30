@@ -1,10 +1,10 @@
-import {cwd} from 'process'
-import {resolve, join} from 'path'
-import React, {useState, useMemo} from 'react'
+import { cwd } from 'process'
+import { resolve, join } from 'path'
+import React, { useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import {Box, Text} from 'ink'
-import {prompt} from 'enquirer'
-import {bud} from './../../bud'
+import { Box, Text } from 'ink'
+import { prompt } from 'enquirer'
+import { bud } from './../../bud'
 
 /** Command: bud plugin */
 /// Create a new plugin
@@ -18,10 +18,7 @@ const BudPluginNew = props => {
   const definition = require(budFile)
 
   useMemo(
-    () =>
-      !props.default
-        ? prompt(definition.prompts).then(data => setData(data))
-        : setData(definition.default),
+    () => (!props.default ? prompt(definition.prompts).then(data => setData(data)) : setData(definition.default)),
     [],
   )
 
