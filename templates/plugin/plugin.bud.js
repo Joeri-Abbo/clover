@@ -133,7 +133,7 @@ module.exports = {
     },
     {
       action: 'template',
-      template: 'webpack.config.js',
+      template: 'webpack.config.js.hbs',
       path: 'webpack.config.js',
       parser: 'babel',
     },
@@ -170,6 +170,7 @@ module.exports = {
         'postcss-import',
         'postcss-loader',
         'postcss-preset-env',
+        'prettier',
         'prop-types',
         'react',
         'react-dom',
@@ -186,6 +187,7 @@ module.exports = {
       action: 'install',
       npm: true,
       composer: false,
+      build: true,
     },
   ],
 }

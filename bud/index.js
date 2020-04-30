@@ -3,73 +3,18 @@ const fs = require('fs-extra')
 const execa = require('execa')
 const Handlebars = require('handlebars')
 const prettier = require('prettier')
-const prettierConfig = require('./../prettierrc.json')
+const basePrettierConfig = require('./../prettier.config.js')
+const helpers = require('./helpers')
 
 /**
  * Bud Core
  */
 export const bud = {
-  /**
-   * Templating engine
-   */
+  /** Templating Engine */
   engine: Handlebars,
 
-  /**
-   * Command runner
-   */
+  /** Command runner */
   runner: execa,
-
-  /**
-   * Helpers
-   */
-  helpers: data => {
-    return [
-      {
-        helper: 'array',
-        fn: function () {
-          return Array.prototype.slice.call(arguments, 0, -1)
-        },
-      },
-      {
-        helper: 'ifIn',
-        fn: function (elem, list, options) {
-          if (list.indexOf(elem) > -1) {
-            return options.fn(this)
-          }
-
-          return options.inverse(this)
-        },
-      },
-      {
-        helper: 'has',
-        fn: function (object, component, options) {
-          if (data[object].indexOf(component) > -1) {
-            return options.fn(this)
-          }
-
-          return options.inverse(this)
-        },
-      },
-      {
-        helper: 'hasAny',
-        fn: function (object, components, options) {
-          let uses = false
-
-          if (components) {
-            components.forEach(component => {
-              if (data[object].indexOf(component) > -1) {
-                uses = true
-              }
-            })
-          } else {
-            console.log('components not defined')
-          }
-
-          return uses ? options.fn(this) : options.inverse(this)
-        },
-      },
-    ]
-  },
 
   /**
    * Initialize
@@ -80,16 +25,26 @@ export const bud = {
    * @param {bool}   skipInstall
    */
   init: function ({outDir = './', data, budFile, skipInstall = false}) {
-    this.data = data
     this.outDir = outDir
+    this.cwd = resolve(process.cwd(), this.outDir)
+    this.runnerOptions = {cwd: this.cwd}
+
     this.budFile = require(budFile)
     this.skipInstall = skipInstall
+    this.data = data
 
-    this.helpers(this.data).forEach(({helper, fn}) => {
-      this.engine.registerHelper(helper, fn)
-    })
+    this.registerHelpers()
 
     return this
+  },
+
+  /**
+   * Register helpers
+   */
+  registerHelpers: function () {
+    helpers(this.data).forEach(({helper, fn}) => {
+      this.engine.registerHelper(helper, fn)
+    })
   },
 
   /**
@@ -109,15 +64,14 @@ export const bud = {
    * @param {string} template
    */
   template: function ({parser, path, template}) {
-    const templateContents = fs.readFileSync(join(this.budFile.path, template), 'utf8')
+    const src = join(this.budFile.path, template)
+    const dest = resolve(this.cwd, this.engine.compile(path)(this.data))
+    const prettierConfig = {...basePrettierConfig, parser}
 
-    const raw = this.engine.compile(templateContents)(this.data)
-    const output = {
-      content: parser ? prettier.format(raw, {...prettierConfig, parser}) : raw,
-      path: resolve(process.cwd(), `${this.outDir}/${this.engine.compile(path)(this.data)}`),
-    }
+    const contents = fs.readFileSync(src, 'utf8')
+    const compiled = this.engine.compile(contents)(this.data)
 
-    fs.outputFileSync(output.path, output.content)
+    fs.outputFileSync(dest, parser ? prettier.format(compiled, prettierConfig) : compiled)
   },
 
   /**
@@ -132,9 +86,7 @@ export const bud = {
     }
 
     pkgs.forEach(pkg => {
-      this.runner.commandSync(dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`, {
-        cwd: resolve(process.cwd(), `${this.outDir}`),
-      })
+      this.runner.commandSync(dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`, this.runnerOptions)
     })
   },
 
@@ -144,14 +96,11 @@ export const bud = {
    * @param {bool} npm
    * @param {bool} composer
    */
-  install: function ({npm, composer}) {
-    npm &&
-      this.runner.commandSync(`yarn`, {
-        cwd: resolve(process.cwd(), `${this.outDir}`),
-      })
-    composer &&
-      this.runner.commandSync(`composer install`, {
-        cwd: resolve(process.cwd(), `${this.outDir}`),
-      })
+  install: async function ({npm, composer, build}) {
+    npm && this.runner.commandSync(`yarn`, this.runnerOptions)
+
+    composer && this.runner.commandSync(`composer install`, this.runnerOptions)
+
+    build && this.runner.commandSync(`yarn build`, this.runnerOptions)
   },
 }

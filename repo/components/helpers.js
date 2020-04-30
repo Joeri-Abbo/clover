@@ -35,7 +35,7 @@ module.exports = {
    * Example plugin tree
    */
   pluginTree: () => {
-    execa.commandSync('bud --default --name=block --skip-install')
+    execa.commandSync('node ./build/cli --default --name=block --skip-install')
 
     const tree = nodeTree('bud-plugin', {
       allFiles: true,
