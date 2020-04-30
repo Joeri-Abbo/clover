@@ -12,7 +12,7 @@ import PropTypes from 'prop-types'
 
 {{#has 'components' 'MediaUpload'}}
 /** Components */
-import Media from './../components/Media'
+import MediaUpload from './../../../../../components/MediaUpload'
 {{/has}}
 
 /**
@@ -64,7 +64,7 @@ const edit = ({ attributes, className, setAttributes }) => {
   return (
     <div className={className}>
     {{#has 'components' 'MediaUpload'}}
-      <Media
+      <MediaUpload
         id={mediaId || ''}
         url={mediaUrl || ''}
         setMedia={setMedia}

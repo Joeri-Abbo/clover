@@ -73,6 +73,8 @@ bud-plugin
 │           │   ├── editor.css
 │           │   └── common.css
 │           └── scripts
+│               ├── public
+│               │   └── index.js
 │               └── editor
 │                   ├── containers
 │                   │   ├── save.js
@@ -120,7 +122,9 @@ bud-plugin
 - husky
 - markdownlint-cli
 - npm-run-all
+- prettier-plugin-package
 - tree-node-cli
+- typescript
 
 ## Roadmap
 

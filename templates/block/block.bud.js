@@ -104,6 +104,12 @@ module.exports = {
     },
     {
       action: 'template',
+      template: 'scripts/public/index.js.hbs',
+      path: 'src/blocks/{{name}}/scripts/public/index.js',
+      parser: 'babel',
+    },
+    {
+      action: 'template',
       template: 'styles/common.css',
       path: 'src/blocks/{{name}}/styles/common.css',
       parser: 'css',

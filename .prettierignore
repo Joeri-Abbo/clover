@@ -1,2 +1,6 @@
+.*
+*.log
+*.lock
+node_modules
 build
 templates
