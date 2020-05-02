@@ -1,8 +1,14 @@
+/**
+ * Prettier config.
+ */
+
+const prettierPluginPHP = require('@prettier/plugin-php')
+
 module.exports = {
   arrowParens: 'avoid',
   bracketSpacing: false,
   tabWidth: 2,
-  printWidth: 100,
+  printWidth: 80,
   singleQuote: true,
   jsxBracketSameLine: true,
   useTabs: false,
@@ -13,20 +19,8 @@ module.exports = {
       files: ['*.php'],
       options: {
         tabWidth: 4,
-        parser: 'plugin-php',
-      },
+        parser: prettierPluginPHP,
+      }
     },
-    {
-      files: ['*.md'],
-      options: {
-        parser: 'markdown',
-      },
-    },
-    {
-      files: ['*.json'],
-      options: {
-        parser: 'json',
-      },
-    },
-  ],
+  ]
 }

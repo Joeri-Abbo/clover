@@ -1,16 +1,31 @@
 const {resolve} = require('path')
+const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const WebpackBar = require('webpackbar')
+
+/**
+ * Webpack utilities
+ */
+const isProduction = process.env.NODE_ENV === 'production'
 
 /**
  * Webpack Configuration
  */
 module.exports = {
+  mode: isProduction ? 'production' : 'development',
+  devtool: 'inline-source-map',
   entry: {
-    editor: resolve(__dirname, 'src/blocks/{{name}}/scripts/editor/block.js'),
-    public: resolve(__dirname, 'src/blocks/{{name}}/scripts/public/index.js'),
+    ['editor']: [
+      resolve(__dirname, 'src/blocks/{{name}}/scripts/editor/block.js'),
+      resolve(__dirname, 'src/blocks/{{name}}/styles/editor.css'),
+    ],
+    ['public']: [
+      resolve(__dirname, 'src/blocks/{{name}}/scripts/public/index.js'),
+      resolve(__dirname, 'src/blocks/{{name}}/styles/public.css'),
+    ],
   },
   output: {
     path: resolve(__dirname, 'dist'),
@@ -25,7 +40,13 @@ module.exports = {
     modules: [resolve(__dirname, 'node_modules')],
   },
   optimization: {
-    minimizer: [new UglifyJsPlugin()],
+    minimizer: isProduction ? [new UglifyJsPlugin()] : [],
+  },
+  stats: {
+    all: false,
+    assets: true,
+    errors: true,
+    timings: true,
   },
   module: {
     rules: [
@@ -33,6 +54,18 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: resolve(__dirname, 'node_modules'),
         loaders: ['babel-loader', 'eslint-loader'],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {name: '[name].css'},
+          },
+          {loader: 'extract-loader'},
+          {loader: 'css-loader'},
+          {loader: 'postcss-loader'},
+        ],
       },
       {
         test: /\.jpe?g$|\.gif$|\.png$/i,
@@ -45,6 +78,12 @@ module.exports = {
     ],
   },
   plugins: [
+    new CleanWebpackPlugin(),
+    new ManifestPlugin({
+      output: {
+        publicPath: resolve(__dirname, 'dist'),
+      },
+    }),
     new DependencyExtractionWebpackPlugin({
       injectPolyfill: false,
       useDefaults: true,
@@ -53,5 +92,4 @@ module.exports = {
     new FriendlyErrorsWebpackPlugin(),
     new WebpackBar(),
   ],
-  stats: 'errors-only',
 }

@@ -64,6 +64,7 @@ A typical block that was created with Bud has the following structure:
 ```sh
 bud-plugin
 ├── src
+│   ├── extensions
 │   ├── components
 │   │   └── MediaUpload.js
 │   └── blocks
@@ -82,13 +83,14 @@ bud-plugin
 │                   ├── block.js
 │                   └── attributes.json
 ├── webpack.config.js
-├── prettierrc.json
+├── stylelint.config.js
+├── prettier.config.js
 ├── postcss.config.js
 ├── package.json
 ├── composer.json
 ├── block.php
 ├── README.md
-├── .stylelintrc
+├── .prettierignore
 ├── .gitignore
 ├── .eslintrc.js
 ├── .eslintignore

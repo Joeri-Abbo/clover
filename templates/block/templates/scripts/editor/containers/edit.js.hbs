@@ -1,5 +1,5 @@
 /** @wordpress */
-import { __ } from '@wordpress/i18n'
+import {__} from '@wordpress/i18n'
 {{#hasAny 'components' (array 'InnerBlocks' 'RichText' 'MediaUpload')}}
 import {
   {{#has 'components' 'InnerBlocks'}}InnerBlocks,{{/has}}
@@ -12,7 +12,7 @@ import PropTypes from 'prop-types'
 
 {{#has 'components' 'MediaUpload'}}
 /** Components */
-import MediaUpload from './../../../../../components/MediaUpload'
+import MediaUpload from '@components/MediaUpload'
 {{/has}}
 
 /**
@@ -24,7 +24,7 @@ import MediaUpload from './../../../../../components/MediaUpload'
 {{#has 'components' 'RichText'}} * @prop {string} attribute.text {{/has}}
 {{/hasAny}}
  */
-const edit = ({ attributes, className, setAttributes }) => {
+const edit = ({attributes, className, setAttributes}) => {
 {{#hasAny 'components' (array 'RichText' 'MediaUpload')}}
   const {
     {{#has 'components' 'MediaUpload'}}mediaId,{{/has}}
@@ -40,7 +40,7 @@ const edit = ({ attributes, className, setAttributes }) => {
    * @param {mixed}  attribute value
    */
   const onAttribute = (attr, value) => {
-    setAttributes({ [`${attr}`]: value })
+    setAttributes({[attr]: value})
   }
 
 {{#has 'components' 'MediaUpload'}}
