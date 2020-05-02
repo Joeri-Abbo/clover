@@ -24,10 +24,10 @@ export const bud = {
    * @param {string} budFile
    * @param {bool}   skipInstall
    */
-  init: function ({ outDir = './', data, budFile, skipInstall = false }) {
+  init: function ({outDir = './', data, budFile, skipInstall = false}) {
     this.outDir = outDir
     this.cwd = join(process.cwd(), this.outDir)
-    this.runnerOptions = { cwd: this.cwd }
+    this.runnerOptions = {cwd: this.cwd}
 
     this.budFile = require(budFile)
     this.skipInstall = skipInstall
@@ -42,7 +42,7 @@ export const bud = {
    * Register helpers
    */
   registerHelpers: function () {
-    helpers(this.data).forEach(({ helper, fn }) => {
+    helpers(this.data).forEach(({helper, fn}) => {
       this.engine.registerHelper(helper, fn)
     })
   },
@@ -72,10 +72,10 @@ export const bud = {
    * @param {string} path
    * @param {string} template
    */
-  template: function ({ parser, path, template }) {
+  template: function ({parser, path, template}) {
     const src = join(this.budFile.path, template)
     const dest = join(this.cwd, this.engine.compile(path)(this.data))
-    const prettierConfig = { ...basePrettierConfig, parser }
+    const prettierConfig = {...basePrettierConfig, parser}
 
     const contents = fs.readFileSync(src, 'utf8')
     const compiled = this.engine.compile(contents)(this.data)
@@ -89,7 +89,7 @@ export const bud = {
    * @param {array} pkgs
    * @param {bool}  dev
    */
-  npm: function ({ pkgs, dev }) {
+  npm: function ({pkgs, dev}) {
     if (this.skipInstall) {
       return
     }
@@ -105,7 +105,7 @@ export const bud = {
    * @param {bool} npm
    * @param {bool} composer
    */
-  install: async function ({ npm, composer, build }) {
+  install: async function ({npm, composer, build}) {
     npm && this.runner.commandSync(`yarn`, this.runnerOptions)
     composer && this.runner.commandSync(`composer install`, this.runnerOptions)
     build && this.runner.commandSync(`yarn build`, this.runnerOptions)

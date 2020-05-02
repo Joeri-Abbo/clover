@@ -1,20 +1,19 @@
-import {resolve} from 'path'
+import {join} from 'path'
 import React, {useState, useMemo} from 'react'
 import {Box, Text} from 'ink'
 import {prompt} from 'enquirer'
-import {bud} from './../../bud'
+import {bud} from './../bud'
 
-/** Command: bud component */
+/** Command: bud scaffold */
 /// Create a new component
-const BudComponentNew = props => {
+const BudScaffold = ({src, ...props}) => {
   const [data, setData] = useState(null)
-
-  const budFile = resolve(__dirname, './../../../templates/component-media-upload/component.bud.js')
+  const budFile = join(process.cwd(), `.bud/${src}.budfile.js`)
   const definition = require(budFile)
 
   useMemo(
     () =>
-      !props.default
+      ! props.default
         ? prompt(definition.prompts).then(data => setData(data))
         : setData(definition.default),
     [],
@@ -37,4 +36,4 @@ const BudComponentNew = props => {
   )
 }
 
-export default BudComponentNew
+export default BudScaffold
