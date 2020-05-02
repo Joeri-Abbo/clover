@@ -1,16 +1,11 @@
 const {resolve} = require('path')
 
 /**
- * Template files
- */
-const templates = resolve(__dirname, './templates')
-
-/**
  * Bud generator
  * Block plugin base
  */
 module.exports = {
-  path: templates,
+  path: resolve(__dirname, './templates'),
   default: {
     namespace: '{{BUD_NAMESPACE}}',
     name: '{{BUD_NAME}}',

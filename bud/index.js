@@ -58,6 +58,8 @@ export const bud = {
 
   /**
    * Make directory
+   *
+   * @param {string} path
    */
   dir: function ({path}) {
     const dirPath = join(this.cwd, this.engine.compile(path)(this.data))
@@ -79,8 +81,9 @@ export const bud = {
 
     const contents = fs.readFileSync(src, 'utf8')
     const compiled = this.engine.compile(contents)(this.data)
+    const outputContents = parser ? prettier.format(compiled, prettierConfig) : compiled
 
-    fs.outputFileSync(dest, parser ? prettier.format(compiled, prettierConfig) : compiled)
+    fs.outputFileSync(dest, outputContents)
   },
 
   /**
@@ -95,7 +98,9 @@ export const bud = {
     }
 
     pkgs.forEach(pkg => {
-      this.runner.commandSync(dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`, this.runnerOptions)
+      const command = dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`
+
+      this.runner.commandSync(command, this.runnerOptions)
     })
   },
 
@@ -104,6 +109,7 @@ export const bud = {
    *
    * @param {bool} npm
    * @param {bool} composer
+   * @param {bool} build
    */
   install: async function ({npm, composer, build}) {
     npm && this.runner.commandSync(`yarn`, this.runnerOptions)

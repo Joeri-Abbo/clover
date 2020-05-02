@@ -1,16 +1,24 @@
 const {resolve} = require('path')
 
 /**
- * Budfile example
+ * Starter Budfile
  */
 module.exports = {
   /**
    * Path to template files
    */
   path: resolve(__dirname, './templates'),
+
+  /**
+   * Default prompt values
+   */
   default: {
     componentName: 'ComponentName',
   },
+
+  /**
+   * Prompts
+   */
   prompts: [
     {
       type: 'input',
@@ -20,8 +28,9 @@ module.exports = {
       required: true,
     },
   ],
+
   /**
-   * Actions to run
+   * Actions
    */
   actions: [
     {
