@@ -53,6 +53,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 | Command         | Description                |
 | --------------- | -------------------------- |
 | `bud`           | Create a new block starter |
+| `bud scaffold`  | Create a new component     |
 | `bud block`     | Create a new block         |
 | `bud component` | Create a new component     |
 | `bud plugin`    | Create a new plugin        |
@@ -82,6 +83,10 @@ bud-plugin
 │                   │   └── edit.js
 │                   ├── block.js
 │                   └── attributes.json
+├── .bud
+│   ├── templates
+│   │   └── Component.js.hbs
+│   └── example.budfile.js
 ├── webpack.config.js
 ├── stylelint.config.js
 ├── prettier.config.js

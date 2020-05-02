@@ -13,7 +13,7 @@ const BudScaffold = ({src, ...props}) => {
 
   useMemo(
     () =>
-      ! props.default
+      !props.default
         ? prompt(definition.prompts).then(data => setData(data))
         : setData(definition.default),
     [],
