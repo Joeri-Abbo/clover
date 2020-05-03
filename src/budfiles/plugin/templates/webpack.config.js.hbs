@@ -1,4 +1,4 @@
-const {existsSync, readdirSync, statSync}  = require('fs')
+const {existsSync, readdirSync, statSync} = require('fs')
 const {join, resolve} = require('path')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin')
@@ -9,53 +9,62 @@ const WebpackBar = require('webpackbar')
 
 /**
  * Webpack utilities
+ *
+ * @return {bool}
  */
 const isProduction = process.env.NODE_ENV === 'production'
 
 /**
  * Return array of directories
- * @param {string} parentDir
+ *
+ * @param  {string} parentDir
+ * @return {array}
  */
 const dirs = parentDir =>
-  readdirSync(resolve(__dirname, parentDir))
-    .filter(file =>
-      statSync(join(parentDir, file)).isDirectory()
-    )
+  readdirSync(resolve(__dirname, parentDir)).filter(file =>
+    statSync(join(parentDir, file)).isDirectory(),
+  )
 
 /**
  * Block webpack entries
+ *
+ * @return {object}
  */
-const blockAssets = () =>
-  dirs('src/blocks').map(block => {
-    let entry = {}
+const entry = () => {
+  let entryPoints = {}
 
-    let {editorAssets, publicAssets} = {
-      editorAssets: [
+  dirs('src/blocks').forEach(block => {
+    let assets = {
+      editor: [
         resolve(__dirname, `src/blocks/${block}/scripts/editor/block.js`),
         resolve(__dirname, `src/blocks/${block}/styles/editor.css`),
       ],
-      publicAssets: [
+      public: [
         resolve(__dirname, `src/blocks/${block}/scripts/public/index.js`),
         resolve(__dirname, `src/blocks/${block}/styles/public.css`),
       ],
     }
 
-    editorAssets = editorAssets.filter(file => existsSync(file))
-    if (editorAssets.length > 0) entry[`${block}-editor`] = editorAssets
+    assets.editor = assets.editor.filter(file => existsSync(file))
+    assets.public = assets.public.filter(file => existsSync(file))
 
-    publicAssets = publicAssets.filter(file => existsSync(file))
-    if (publicAssets.length > 0) entry[`${block}-public`] = publicAssets
+    if (assets.editor.length > 0) {
+      entryPoints[`${block}-editor`] = assets.editor
+    }
 
-    return entry
-  })[0]
+    if (assets.public.length > 0) {
+      entryPoints[`${block}-public`] = assets.public
+    }
+  })
+
+  return entryPoints
+}
 
 /**
  * Webpack Configuration
  */
 module.exports = {
-  entry: {
-    ...blockAssets(),
-  },
+  entry,
   output: {
     path: resolve(__dirname, 'dist'),
   },
