@@ -34,7 +34,7 @@
     "docs": "node ./repo/readme.js",
     "lint": "npm-run-all lint:*",
     "lint:eslint": "eslint .",
-    "lint:prettier": "prettier --write './**/*'"
+    "lint:prettier": "prettier --write ."
   },
   "dependencies": {
     "@prettier/plugin-php": "^0.14.0",

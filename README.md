@@ -50,13 +50,13 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 ## Usage
 
-| Command         | Description                |
-| --------------- | -------------------------- |
-| `bud`           | Create a new block starter |
-| `bud scaffold`  | Create a new component     |
-| `bud block`     | Create a new block         |
-| `bud component` | Create a new component     |
-| `bud plugin`    | Create a new plugin        |
+| Command         | Description                           |
+| --------------- | ------------------------------------- |
+| `bud`           | Create a new block starter            |
+| `bud block`     | Create a new block                    |
+| `bud component` | Create a new component                |
+| `bud new`       | Scaffold functionality from a budfile |
+| `bud plugin`    | Create a new plugin                   |
 
 ## Generated files
 

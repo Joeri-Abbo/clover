@@ -3,7 +3,7 @@ import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from 'ink'
 import {prompt} from 'enquirer'
-import {bud} from './../../bud'
+import {bud} from './../../src/bud'
 
 /** Command: bud new */
 /// Scaffold functionality from a budfile
@@ -20,7 +20,15 @@ const New = props => {
     [],
   )
 
-  return data ? (
+  const name = budFile.split('/')[budFile.split('/').length - 1]
+
+  return !data ? (
+    <Box>
+      <Text>{`
+        Make new ${name}
+      `}</Text>
+    </Box>
+  ) : (
     [
       bud
         .init({
@@ -30,12 +38,6 @@ const New = props => {
         })
         .actions(),
     ]
-  ) : (
-    <Box>
-      <Text>{`
-        Make new ${budFile.split('/')[budFile.split('/').length - 1]}
-      `}</Text>
-    </Box>
   )
 }
 

@@ -4,7 +4,7 @@ import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from 'ink'
 import {prompt} from 'enquirer'
-import {bud} from './../../bud'
+import {bud} from './../../src/bud'
 
 /** Command: bud plugin */
 /// Create a new plugin
@@ -13,7 +13,7 @@ const BudPluginNew = props => {
 
   const budFile = props.definition
     ? join(cwd(), props.definition)
-    : resolve(__dirname, './../../../templates/plugin/plugin.bud.js')
+    : resolve(__dirname, './../../../src/budfiles/plugin/plugin.bud.js')
 
   const definition = require(budFile)
 

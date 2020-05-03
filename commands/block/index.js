@@ -3,14 +3,17 @@ import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from 'ink'
 import {prompt} from 'enquirer'
-import {bud} from './../../bud'
+import {bud} from './../../src/bud'
 
 /** Command: bud block */
 /// Create a new block
 const BudBlockNew = props => {
   const [data, setData] = useState(null)
 
-  const budFile = resolve(__dirname, './../../../templates/block/block.bud.js')
+  const budFile = resolve(
+    __dirname,
+    './../../../src/budfiles/block/block.bud.js',
+  )
   const definition = require(budFile)
 
   useMemo(

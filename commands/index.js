@@ -3,7 +3,7 @@ import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from 'ink'
 import {prompt} from 'enquirer'
-import {bud} from './../bud'
+import {bud} from './../src/bud'
 
 /** Command: bud */
 /// Create a new block starter
@@ -11,9 +11,9 @@ const Bud = props => {
   const [data, setData] = useState(null)
 
   const budFiles = {
-    plugin: './../../templates/plugin/plugin.bud.js',
-    block: './../../templates/block/block.bud.js',
-    mediaUpload: './../../templates/component-media-upload/component.bud.js',
+    plugin: './../../src/budfiles/plugin/plugin.bud.js',
+    block: './../../src/budfiles/block/block.bud.js',
+    mediaUpload: './../../src/budfiles/component-media-upload/component.bud.js',
   }
 
   useMemo(() => {
@@ -27,14 +27,18 @@ const Bud = props => {
           ...buds.plugin.default,
           ...buds.block.default,
           name: props.name ? props.name : buds.plugin.default.name,
-          namespace: props.namespace ? props.namespace : buds.plugin.default.namespace,
+          namespace: props.namespace
+            ? props.namespace
+            : buds.plugin.default.namespace,
         })
-      : prompt(...[...buds.plugin.prompts, ...buds.block.prompts]).then(data => setData(data))
+      : prompt(...[...buds.plugin.prompts, ...buds.block.prompts]).then(data =>
+          setData(data),
+        )
   }, [])
 
   return !data ? (
     <Box minHeight={2}>
-      <Text>Create new Block plugin</Text>
+      <Text>Create new Bud Project</Text>
     </Box>
   ) : (
     [
