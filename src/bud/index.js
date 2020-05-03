@@ -1,6 +1,8 @@
 const {join} = require('path')
 const fs = require('fs-extra')
 const execa = require('execa')
+const {Observable, from} = require('rxjs')
+const {concatMap} = require('rxjs/operators')
 const Handlebars = require('handlebars')
 const prettier = require('prettier')
 const basePrettierConfig = require('./../../prettier.config.js')
@@ -24,7 +26,7 @@ export const bud = {
    * @param {string} budFile
    * @param {bool}   skipInstall
    */
-  init: function ({outDir = './', data, budFile, skipInstall = false}) {
+  init: function ({outDir = './', data = {}, budFile, skipInstall = false}) {
     this.outDir = outDir
     this.cwd = join(process.cwd(), this.outDir)
     this.runnerOptions = {cwd: this.cwd}
@@ -39,10 +41,29 @@ export const bud = {
   },
 
   /**
+   * Get data.
+   *
+   * @return {object}
+   */
+  getData: function () {
+    return this.data
+  },
+
+  /**
+   * Set data.
+   *
+   * @param  {object} data
+   * @return {void}
+   */
+  setData: function (data) {
+    this.data = data
+  },
+
+  /**
    * Register helpers
    */
   registerHelpers: function () {
-    helpers(this.data).forEach(({helper, fn}) => {
+    helpers(this.getData()).forEach(({helper, fn}) => {
       this.engine.registerHelper(helper, fn)
     })
   },
@@ -51,8 +72,14 @@ export const bud = {
    * Actions
    */
   actions: function () {
-    this.budFile.actions.forEach(task => {
-      this[task.action](task)
+    const bud = {...this}
+    return new Observable(observer => {
+      observer.next('Templating..')
+      from(bud.budFile.actions)
+        .pipe(concatMap(task => bud[task.action](task)))
+        .subscribe(response => {
+          observer.next(response)
+        })
     })
   },
 
@@ -62,9 +89,13 @@ export const bud = {
    * @param {string} path
    */
   dir: function ({path}) {
-    const dirPath = join(this.cwd, this.engine.compile(path)(this.data))
+    return new Observable(observer => {
+      const dirPath = join(this.cwd, this.engine.compile(path)(this.getData()))
 
-    fs.ensureDirSync(dirPath)
+      fs.ensureDir(dirPath).then(() => {
+        observer.complete()
+      })
+    })
   },
 
   /**
@@ -75,17 +106,21 @@ export const bud = {
    * @param {string} template
    */
   template: function ({parser, path, template}) {
-    const src = join(this.budFile.path, template)
-    const dest = join(this.cwd, this.engine.compile(path)(this.data))
-    const prettierConfig = {...basePrettierConfig, parser}
+    return new Observable(async observer => {
+      const src = join(this.budFile.path, template)
+      const dest = join(this.cwd, this.engine.compile(path)(this.getData()))
+      const prettierConfig = {...basePrettierConfig, parser}
 
-    const contents = fs.readFileSync(src, 'utf8')
-    const compiled = this.engine.compile(contents)(this.data)
-    const outputContents = parser
-      ? prettier.format(compiled, prettierConfig)
-      : compiled
+      const contents = fs.readFileSync(src, 'utf8')
+      const compiled = this.engine.compile(contents)(this.getData())
+      const outputContents = parser
+        ? prettier.format(compiled, prettierConfig)
+        : compiled
 
-    fs.outputFileSync(dest, outputContents)
+      await fs.outputFile(dest, outputContents).then(function () {
+        observer.complete()
+      })
+    })
   },
 
   /**
@@ -95,14 +130,22 @@ export const bud = {
    * @param {bool}  dev
    */
   npm: function ({pkgs, dev}) {
-    if (this.skipInstall) {
-      return
-    }
+    return new Observable(observer => {
+      if (this.skipInstall) {
+        return
+      }
 
-    pkgs.forEach(pkg => {
-      const command = dev ? `yarn add -D ${pkg}` : `yarn add ${pkg}`
-
-      this.runner.commandSync(command, this.runnerOptions)
+      observer.next('Installing node modules...')
+      const toInstall = pkgs.join(' ')
+      this.runner
+        .command(
+          dev ? `yarn add -D ${toInstall}` : `yarn add ${toInstall}`,
+          this.runnerOptions,
+        )
+        .then(() => {
+          observer.next('Node modules installed.')
+          observer.complete()
+        })
     })
   },
 
@@ -114,8 +157,24 @@ export const bud = {
    * @param {bool} build
    */
   install: async function ({npm, composer, build}) {
-    npm && this.runner.commandSync(`yarn`, this.runnerOptions)
-    composer && this.runner.commandSync(`composer install`, this.runnerOptions)
-    build && this.runner.commandSync(`yarn build`, this.runnerOptions)
+    return new Observable(observer => {
+      npm &&
+        this.runner.command(`yarn`, this.runnerOptions).then(() => {
+          observer.next(observer)
+          observer.complete()
+        })
+
+      composer &&
+        this.runner.command(`composer install`, this.runnerOptions).then(() => {
+          observer.next(observer)
+          observer.complete()
+        })
+
+      build &&
+        this.runner.command(`yarn build`, this.runnerOptions).then(() => {
+          observer.next(observer)
+          observer.complete()
+        })
+    })
   },
 }
