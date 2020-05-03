@@ -20,7 +20,8 @@
     "extends @wordpress/browserslist-config"
   ],
   "scripts": {
-    "build": "webpack --progress --colors --inline -p --config webpack.config.js",
+    "build": "cross-env NODE_ENV=development webpack --progress --colors --inline -p --config webpack.config.js",
+    "build:production": "cross-env NODE_ENV=production webpack --progress --colors --inline -p --config webpack.config.js",
     "lint": "npm-run-all lint:*",
     "lint:css": "stylelint ./src/**/*.css",
     "lint:js": "eslint ./src/**/*.js",
