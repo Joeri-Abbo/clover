@@ -1,7 +1,8 @@
 import {resolve} from 'path'
-import {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {prompt} from 'enquirer'
+import BudCLI from './../src/components/BudCLI'
 import {bud} from './../src/bud'
 
 /** Plugin budfile */
@@ -14,20 +15,39 @@ const BudInit = props => {
 
   useMemo(() => {
     const project = require(resolve(__dirname, budFile))
+
     prompt(project.prompts).then(data => setData(data))
   }, [])
 
-  return data
-    ? [
-        bud
-          .init({
-            data,
-            budFile: budFile,
-            outDir: props.output,
-          })
-          .actions(),
-      ]
-    : []
+  useEffect(() => {
+    const observableTemplates = async () => {
+      if (!data) {
+        return
+      }
+
+      console.log('')
+
+      await bud
+        .init({
+          data,
+          budFile: resolve(__dirname, budFile),
+          outDir: props.output,
+        })
+        .actions()
+        .subscribe({
+          next(x) {
+            console.log(x)
+          },
+          complete(x) {
+            console.log(x)
+          },
+        })
+    }
+
+    observableTemplates()
+  }, [data])
+
+  return <BudCLI title={'Initialize new project'} />
 }
 
 BudInit.propTypes = {
