@@ -1,8 +1,6 @@
-const execa = require('execa')
 const globby = require('globby')
 const fs = require('fs')
 const path = require('path')
-const nodeTree = require('tree-node-cli')
 
 /**
  * Readme helpers
@@ -30,24 +28,6 @@ module.exports = {
    * @param {string} code
    */
   block: (lang, code) => `\`\`\`${lang}\n${code}\n\`\`\``,
-
-  /**
-   * Example plugin tree
-   */
-  pluginTree: () => {
-    execa.commandSync('node ./build/cli --default --name=block --skip-install')
-
-    const tree = nodeTree('bud-plugin', {
-      allFiles: true,
-      dirsFirst: true,
-      reverse: true,
-      exclude: [/node_modules/, /.\.lock/],
-    })
-
-    execa.commandSync('rm -rf ./bud-plugin')
-
-    return tree
-  },
 
   /**
    * Bud commands
