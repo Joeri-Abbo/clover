@@ -52,58 +52,14 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 | Command         | Description                           |
 | --------------- | ------------------------------------- |
-| `bud`           | Create a new block starter            |
+| `bud`           | General information                   |
+| `bud init`      | Create a new project                  |
 | `bud block`     | Create a new block                    |
 | `bud component` | Create a new component                |
 | `bud new`       | Scaffold functionality from a budfile |
 | `bud plugin`    | Create a new plugin                   |
 
-## Generated files
-
-A typical block that was created with Bud has the following structure:
-
-```sh
-bud-plugin
-├── src
-│   ├── extensions
-│   ├── components
-│   │   └── MediaUpload.js
-│   └── blocks
-│       └── block
-│           ├── styles
-│           │   ├── public.css
-│           │   ├── editor.css
-│           │   └── common.css
-│           └── scripts
-│               ├── public
-│               │   └── index.js
-│               └── editor
-│                   ├── containers
-│                   │   ├── save.js
-│                   │   └── edit.js
-│                   ├── block.js
-│                   └── attributes.json
-├── .bud
-│   ├── templates
-│   │   └── Component.js.hbs
-│   └── example.budfile.js
-├── webpack.config.js
-├── stylelint.config.js
-├── prettier.config.js
-├── postcss.config.js
-├── package.json
-├── composer.json
-├── block.php
-├── README.md
-├── .prettierignore
-├── .gitignore
-├── .eslintrc.js
-├── .eslintignore
-├── .editorconfig
-└── .babelrc.js
-```
-
-### Plugin Dependencies
+### Dependencies
 
 - @prettier/plugin-php
 - enquirer
@@ -113,6 +69,9 @@ bud-plugin
 - got
 - handlebars
 - ink
+- ink-divider
+- ink-link
+- ink-use-stdout-dimensions
 - pastel
 - prettier
 - prop-types

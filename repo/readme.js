@@ -5,7 +5,7 @@ const {writeFileSync} = require('fs')
 const {format} = require('prettier')
 
 /** Util */
-const {block, listKeys, pluginTree, commands} = require('./components/helpers')
+const {listKeys, commands} = require('./components/helpers')
 
 /** Data */
 const {
@@ -93,13 +93,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 | --- | --- |
 ${commands()}
 
-## Generated files
-
-A typical block that was created with Bud has the following structure:
-
-${block('sh', pluginTree())}
-
-### Plugin Dependencies
+### Dependencies
 
 ${listKeys(dependencies)}
 

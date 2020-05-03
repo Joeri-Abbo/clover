@@ -3,7 +3,6 @@
  * Plugin Name:  {{name}}
  * Plugin URI:   {{website}}
  * Description:  {{description}}
- * Version:      0.0.1
  * Author:       {{author}} <{{email}}>
  * License:      MIT
  * Text Domain:  {{namespace}}
@@ -16,111 +15,154 @@
  * @see Dependency Extraction Webpack Plugin <https://git.io/Jv1ll>
  */
 add_action('init', function () {
-    (new class() {
-        /**
-         * Blocks.
-         * @var array
-         */
-        public $blocks = [
-            "{{namespace}}/{{name}}"
-        ];
+  (new class {
+    /**
+     * Namespace
+     *
+     * @var string
+     */
+    public $namespace = '{{namespace}}';
 
-        /**
-         * {{namespace}} plugin directory.
-         * @var string
-         */
-        public $dir;
+    /**
+     * Plugin directory.
+     *
+     * @var string
+     */
+    public $dir;
 
-        /**
-         * Class constructor.
-         */
-        public function __construct()
-        {
-            $this->dir = dirname(__FILE__);
+    /**
+     * Class constructor.
+     */
+    public function __construct()
+    {
+      $this->dir = dirname(__FILE__);
+    }
+
+    /**
+     * Class invocation.
+     *
+     * @throws \WP_Error
+     * @return void
+     */
+    public function __invoke(): void
+    {
+        foreach ($this->getAssetsOfType('blocks') as $block) {
+            $blockName = basename($block);
+            $this->registerBlockScripts($blockName);
+            $this->registerBlockStyles($blockName);
+            $this->registerBlockType($blockName);
         }
 
-        /**
-         * Class invocation.
-         *
-         * @throws \WP_Error
-         * @return void
-         */
-        public function __invoke(): void
-        {
-            foreach ($this->blocks as $block) {
-                $this->registerScripts($block);
-                $this->registerStyles($block);
-                $this->registerBlockType($block);
+        foreach ($this->getAssetsOfType('extensions') as $extension) {
+            $extensionName = basename($extension);
+            $this->registerExtension($extensionName);
+        }
+    }
+
+    /**
+     * Glob assets from src directory
+     *
+     * @param  string
+     * @return array
+     */
+    protected function getAssetsOfType(string $type): array
+    {
+        return glob("{$this->dir}/src/{$type}/*", GLOB_ONLYDIR);
+    }
+
+    /**
+     * Register block scripts.
+     *
+     * @param  string
+     * @return void
+     */
+    protected function registerBlockScripts(string $block): void
+    {
+        foreach (['editor', 'public'] as $script) {
+            if (realpath("{$this->dir}/dist/{$block}-{$script}.js")) {
+                wp_register_script(
+                    "{$this->namespace}/{$block}/{$script}/js",
+                    plugins_url("dist/{$block}-{$script}.js", __FILE__),
+                    ...$this->getManifest("{$block}-{$script}")
+                );
             }
         }
+    }
 
-        /**
-         * Register scripts.
-         *
-         * @param  string
-         * @return void
-         */
-        protected function registerScripts(string $block): void
-        {
-            foreach (['editor', 'public'] as $scriptName) {
-                /**
-                 * Throw an error if the dependency manifest has not
-                 * been generated or is otherwise not found.
-                 */
-                if (! realpath($manifestFile = "{$this->dir}/dist/{$scriptName}.asset.json")) {
-                    throw new \WP_Error(
-                        'manifest_not_found',
-                        "There was an issue registering {{namespace}}",
-                        "Run 'npm build' in " . $this->dir
-                    );
-                }
+    /**
+     * Get webpack dependency manifest.
+     *
+     * @return array
+     */
+    protected function getManifest($block): array
+    {
+        if (!realpath($manifestFile = "{$this->dir}/dist/{$block}.asset.json")) {
+            new \WP_Error(
+                __('manifest_not_found', '{{namespace}}'),
+                __('There was an issue with the {{namespace}} plugin', '{{namespace}}'),
+                __('Please run the build scripts in the plugin directory.', '{{namespace}}')
+            );
+        }
 
-                /** Process webpack dependency manifest */
-                $manifestJSON = file_get_contents($manifestFile);
-                $manifest = array_values(json_decode($manifestJSON, true));
+        $manifest = file_get_contents($manifestFile);
+        return array_values(json_decode($manifest, true));
+    }
 
-                if (realpath("{$this->dir}/dist/{$scriptName}.js")) {
-                    wp_register_script(
-                        "{$block}/{$scriptName}/js",
-                        plugins_url("dist/{$scriptName}.js", __FILE__),
-                        ...$manifest
-                    );
-                }
+    /**
+     * Register block styles.
+     *
+     * @param  string
+     * @return void
+     */
+    protected function registerBlockStyles(string $block): void
+    {
+        foreach (['editor', 'public'] as $style) {
+            if (realpath("{$this->dir}/dist/{$block}-{$style}.css")) {
+                wp_register_style(
+                    "{$this->namespace}/{$block}/{$style}/css",
+                    plugins_url("dist/{$block}-{$style}.css", __FILE__),
+                    [],
+                    null
+                );
             }
         }
+    }
 
-        /**
-         * Register styles.
-         *
-         * @param  string
-         * @return void
-         */
-        protected function registerStyles($block): void
-        {
-            foreach (['editor', 'public'] as $styleName) {
-                if (realpath("{$this->dir}/dist/{$styleName}.css")) {
-                    wp_register_style(
-                        "{$block}/{$styleName}/css",
-                        plugins_url("dist/{$styleName}.css", __FILE__),
-                        [],
-                        null
-                    );
-                }
-            }
-        }
+    /**
+     * Register block assets.
+     *
+     * @param  string
+     * @return void
+     */
+    protected function registerBlockType(string $block): void
+    {
+        register_block_type("{$this->namespace}/{$block}", [
+            'editor_script' => "{$this->namespace}/{$block}/editor/js",
+            'editor_style' => "{$this->namespace}/{$block}/editor/css",
+            'script' => "{$this->namespace}/{$block}/public/js",
+            'style' => "{$this->namespace}/{$block}/public/css",
+        ]);
+    }
 
-        /**
-         * Register block.
-         *
-         * @param  string
-         * @return void
-         */
-        protected function registerBlockType(string $block): void
-        {
-            register_block_type($block, [
-                'editor_script' => "{$block}/editor/js",
-                'editor_style' => "{$block}/editor/css",
-            ]);
+    /**
+     * Register extension scripts.
+     *
+     * @param  string
+     * @return void
+     */
+    protected function registerExtension($extension): void
+    {
+        if (realpath("{$this->dir}/dist/{$extension}.js")) {
+            wp_register_script(
+                "{$this->namespace}/{$extension}/js",
+                plugins_url("dist/{$extension}.js", __FILE__),
+                ...$this->getManifest($extension)
+            );
+
+            add_action('enqueue_block_editor_assets', function () use ($extension) {
+                wp_enqueue_script("{$this->namespace}/{$extension}/js");
+            });
         }
-    })();
+    }
+  })();
 });
