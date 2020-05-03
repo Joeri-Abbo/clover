@@ -5,6 +5,8 @@ const {resolve} = require('path')
  * Block plugin base
  */
 module.exports = {
+  name: 'plugin',
+  type: 'project',
   path: resolve(__dirname, './templates'),
   default: {
     namespace: '{{BUD_NAMESPACE}}',
@@ -198,6 +200,7 @@ module.exports = {
         'extract-loader',
         'file-loader',
         'friendly-errors-webpack-plugin',
+        'globby',
         'npm-run-all',
         'postcss-import',
         'postcss-loader',

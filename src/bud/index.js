@@ -3,7 +3,7 @@ const fs = require('fs-extra')
 const execa = require('execa')
 const Handlebars = require('handlebars')
 const prettier = require('prettier')
-const basePrettierConfig = require('./../prettier.config.js')
+const basePrettierConfig = require('./../../prettier.config.js')
 const helpers = require('./helpers')
 
 /**
@@ -81,7 +81,9 @@ export const bud = {
 
     const contents = fs.readFileSync(src, 'utf8')
     const compiled = this.engine.compile(contents)(this.data)
-    const outputContents = parser ? prettier.format(compiled, prettierConfig) : compiled
+    const outputContents = parser
+      ? prettier.format(compiled, prettierConfig)
+      : compiled
 
     fs.outputFileSync(dest, outputContents)
   },

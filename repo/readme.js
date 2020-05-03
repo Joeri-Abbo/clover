@@ -8,7 +8,13 @@ const {format} = require('prettier')
 const {block, listKeys, pluginTree, commands} = require('./components/helpers')
 
 /** Data */
-const {name, licenses, dependencies, devDependencies, engines} = require('./../package.json')
+const {
+  name,
+  licenses,
+  dependencies,
+  devDependencies,
+  engines,
+} = require('./../package.json')
 
 /** Target */
 const readme = resolve(__dirname, '../README.md')

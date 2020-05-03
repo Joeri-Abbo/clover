@@ -2,14 +2,17 @@ import {resolve} from 'path'
 import React, {useState, useMemo} from 'react'
 import {Box, Text} from 'ink'
 import {prompt} from 'enquirer'
-import {bud} from './../../bud'
+import {bud} from './../../src/bud'
 
 /** Command: bud component */
 /// Create a new component
 const BudComponentNew = props => {
   const [data, setData] = useState(null)
 
-  const budFile = resolve(__dirname, './../../../templates/component-media-upload/component.bud.js')
+  const budFile = resolve(
+    __dirname,
+    './../../../src/budfiles/component-media-upload/component.bud.js',
+  )
   const definition = require(budFile)
 
   useMemo(

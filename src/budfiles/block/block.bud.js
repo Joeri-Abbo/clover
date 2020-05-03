@@ -1,16 +1,12 @@
 const {resolve} = require('path')
 
 /**
- * Templates
- */
-const templates = resolve(__dirname, './templates')
-
-/**
- * Bud generator
- * Block plugin base
+ * Budfile: Block
  */
 module.exports = {
-  path: templates,
+  name: 'block',
+  type: 'block',
+  path: resolve(__dirname, './templates'),
   default: {
     namespace: '{{BUD_NAMESPACE}}',
     name: '{{BUD_NAME}}',
@@ -53,7 +49,11 @@ module.exports = {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
-      choices: [{name: 'RichText'}, {name: 'InnerBlocks'}, {name: 'MediaUpload'}],
+      choices: [
+        {name: 'RichText'},
+        {name: 'InnerBlocks'},
+        {name: 'MediaUpload'},
+      ],
     },
     {
       type: 'select',

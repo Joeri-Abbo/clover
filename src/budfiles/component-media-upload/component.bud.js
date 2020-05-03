@@ -4,6 +4,8 @@ const {resolve} = require('path')
  * Generator: MediaUpload Component
  */
 module.exports = {
+  name: 'MediaUpload',
+  type: 'component',
   path: resolve(__dirname, './templates'),
   actions: [
     {
