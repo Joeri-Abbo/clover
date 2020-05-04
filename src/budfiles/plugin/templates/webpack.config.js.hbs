@@ -73,7 +73,7 @@ module.exports = {
   entry,
   output: {
     path: resolve(__dirname, 'dist'),
-    publicPath: isProduction ? '/' : `http://localhost:3000/app/plugins/{{lowercase (dashcase namespace)}}/`,
+    publicPath: isProduction ? '/' : `http://localhost:3000/{{pluginsUri}}/{{lowercase (dashcase namespace)}}/`,
     sourceMapFilename: '[file].map',
   },
   mode: isProduction ? 'production' : 'development',

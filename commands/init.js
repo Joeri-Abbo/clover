@@ -27,6 +27,10 @@ Init.propTypes = {
   email: PropTypes.string,
   /// Project website
   website: PropTypes.string,
+  /// Project development URL
+  devUrl: PropTypes.string,
+  /// Plugins URI
+  pluginsUri: PropTypes.string,
   /// Output directory
   output: PropTypes.string,
   /// Use arguments and default values instead of prompt
@@ -40,6 +44,8 @@ Init.defaultProps = {
   author: 'bud-author',
   email: 'bud-email@roots.io',
   website: 'https://roots.io/bud',
+  devUrl: 'http://acme.test',
+  pluginsUri: 'app/plugins',
   skip: false,
   budFile: resolve(__dirname, './../../src/budfiles/plugin/plugin.bud'),
 }
