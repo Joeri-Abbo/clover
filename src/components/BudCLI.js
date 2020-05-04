@@ -20,13 +20,15 @@ const BudCLI = ({
   commandValues = null,
   children,
 }) => {
-  const [prompts, setPrompts] = useState(! commandValues && budFile.prompts ? budFile.prompts : null)
+  const [prompts, setPrompts] = useState(
+    !commandValues && budFile.prompts ? budFile.prompts : null,
+  )
   const [data, setData] = useState(null)
   const [message, setMessage] = useState(null)
 
   useEffect(() => {
     ;(async () => {
-      ! commandValues
+      !commandValues
         ? prompt(prompts).then(data => {
             setPrompts(null)
             setData(data)

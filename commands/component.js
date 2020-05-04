@@ -6,7 +6,10 @@ import BudCLI from '../src/components/BudCLI'
 /** Command: bud component */
 /// Create a new component
 const Component = props => {
-  const budFile = resolve(__dirname, `./../../src/budfiles/components/${props.componentName}/component.bud`)
+  const budFile = resolve(
+    __dirname,
+    `./../../src/budfiles/components/${props.componentName}/component.bud`,
+  )
 
   return (
     <BudCLI
