@@ -33,13 +33,6 @@ add_action('init', function () {
     public $host;
 
     /**
-     * URI
-     *
-     * @var string
-     */
-    public $uri;
-
-    /**
      * Plugin directory.
      *
      * @var string
@@ -52,9 +45,8 @@ add_action('init', function () {
     public function __construct()
     {
       $this->dir = dirname(__FILE__);
-      $this->dir = dirname(__FILE__);
-      $this->host = defined('WP_ENV') && WP_ENV == 'production' ? '{{devUrl}}' : 'http://localhost:3000';
-      $this->dist = $this->host . '/{{pluginsUri}}/' . basename($this->dir);
+      $this->host = defined('WP_ENV') && WP_ENV == 'production' ? get_option('home') : 'http://localhost:3000';
+      $this->dist = $this->host . '/app/plugins/' . basename($this->dir) . '/dist';
     }
 
     /**
@@ -98,11 +90,10 @@ add_action('init', function () {
     protected function registerBlockScripts(string $block): void
     {
         foreach (['editor', 'public'] as $script) {
-            if (realpath("{$this->dir}/dist/{$block}-{$script}.js")) {
-                wp_register_script(
+            if (realpath("{$this->dir}/dist/blocks/{$block}/scripts/{$script}.js")) {                wp_register_script(
                     "{$this->namespace}/{$block}/{$script}/js",
-                    "{$this->dist}/{$block}-{$script}.js",
-                    ...$this->getManifest("{$block}-{$script}")
+                    "{$this->dist}/blocks/{$block}/scripts/{$script}.js",
+                    ...$this->getManifest($block, $script)
                 );
             }
         }
@@ -113,9 +104,9 @@ add_action('init', function () {
      *
      * @return array
      */
-    protected function getManifest($block): array
+    protected function getManifest($block, $script): array
     {
-        if (!realpath($manifestFile = "{$this->dir}/dist/{$block}.asset.json")) {
+        if (!realpath($manifestFile = "{$this->dist}/blocks/{$block}/scripts/{$script}.asset.json")) {
             new \WP_Error(
                 __('manifest_not_found', '{{lowercase (dashcase namespace)}}'),
                 __('There was an issue with the {{name}} plugin', '{{lowercase (dashcase namespace)}}'),
@@ -136,10 +127,10 @@ add_action('init', function () {
     protected function registerBlockStyles(string $block): void
     {
         foreach (['editor', 'public'] as $style) {
-            if (realpath("{$this->dir}/dist/{$block}-{$style}.css")) {
+            if (realpath("{$this->dir}/dist/blocks/{$block}/styles/${style}.css")) {
                 wp_register_style(
                     "{$this->namespace}/{$block}/{$style}/css",
-                    "{$this->dist}/{$block}-{$style}.css",
+                    "{$this->dist}/blocks/{$block}/styles/{$style}.css",
                     [],
                     null
                 );
@@ -175,7 +166,7 @@ add_action('init', function () {
             wp_register_script(
                 "{$this->namespace}/{$extension}/js",
                 "{$this->dist}/{$extension}.js",
-                ...$this->getManifest($extension)
+                ...$this->getManifest($extension, 'scripts')
             );
 
             add_action('enqueue_block_editor_assets', function () use ($extension) {

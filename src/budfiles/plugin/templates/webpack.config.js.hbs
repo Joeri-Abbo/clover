@@ -35,35 +35,29 @@ const dirs = parentDir =>
  * @return {object}
  */
 const entry = () => {
-  let entryPoints = {}
+  let assets = {}
+  const blocks = dirs('src/blocks')
 
-  dirs('src/blocks').forEach(block => {
-    let assets = {
-      editor: [
+  blocks.forEach(block => {
+    assets = {
+      [`blocks/${block}/scripts/editor`]: [
         resolve(__dirname, `src/blocks/${block}/scripts/editor/block.js`),
         resolve(__dirname, `src/blocks/${block}/styles/editor.css`),
-        'webpack-hot-middleware/client',
       ],
-      public: [
+      [`blocks/${block}/scripts/public`]: [
         resolve(__dirname, `src/blocks/${block}/scripts/public/index.js`),
         resolve(__dirname, `src/blocks/${block}/styles/public.css`),
-        'webpack-hot-middleware/client',
       ],
     }
 
-    assets.editor = assets.editor.filter(file => existsSync(file))
-    assets.public = assets.public.filter(file => existsSync(file))
+    assets[`blocks/${block}/scripts/editor`] = assets[`blocks/${block}/scripts/editor`].filter(file => existsSync(file))
+    assets[`blocks/${block}/scripts/editor`].length <= 0 && delete assets[`blocks/${block}/scripts/editor`]
 
-    if (assets.editor.length > 0) {
-      entryPoints[`${block}-editor`] = assets.editor
-    }
-
-    if (assets.public.length > 0) {
-      entryPoints[`${block}-public`] = assets.public
-    }
+    assets[`blocks/${block}/scripts/public`] = assets[`blocks/${block}/scripts/public`].filter(file => existsSync(file))
+    assets[`blocks/${block}/scripts/public`].length <= 0 && delete assets[`blocks/${block}/scripts/public`]
   })
 
-  return entryPoints
+  return assets
 }
 
 /**
@@ -110,7 +104,7 @@ module.exports = {
         use: [
           {
             loader: 'file-loader',
-            options: {name: '[name].css'},
+            options: {name: '[path][name].[ext]'},
           },
           {loader: 'extract-loader'},
           {loader: 'css-loader'},
