@@ -6,7 +6,10 @@ const {concatMap} = require('rxjs/operators')
 const Handlebars = require('handlebars')
 const prettier = require('prettier')
 const basePrettierConfig = require('./../../prettier.config.js')
+const handlebarsHelpers = require('handlebars-helpers')
 const helpers = require('./helpers')
+
+const DEFAULT_BUDFILE = {actions: [], label: 'Budfile', prompts: []}
 
 /**
  * Bud Core
@@ -26,13 +29,12 @@ export const bud = {
    * @param {string} budFile
    * @param {bool}   skipInstall
    */
-  init: function ({outDir = './', data = {}, budFile, skipInstall = false}) {
+  init: function ({outDir = './', data = {}, budFile = DEFAULT_BUDFILE}) {
     this.outDir = outDir
     this.cwd = join(process.cwd(), this.outDir)
     this.runnerOptions = {cwd: this.cwd}
 
-    this.budFile = require(budFile)
-    this.skipInstall = skipInstall
+    this.budFile = budFile
     this.data = data
 
     this.registerHelpers()
@@ -63,6 +65,10 @@ export const bud = {
    * Register helpers
    */
   registerHelpers: function () {
+    handlebarsHelpers({
+      handlebars: this.engine,
+    })
+
     helpers(this.getData()).forEach(({helper, fn}) => {
       this.engine.registerHelper(helper, fn)
     })

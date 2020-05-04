@@ -50,14 +50,13 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 ## Usage
 
-| Command         | Description                           |
-| --------------- | ------------------------------------- |
-| `bud`           | General information                   |
-| `bud init`      | Create a new project                  |
-| `bud block`     | Create a new block                    |
-| `bud component` | Create a new component                |
-| `bud new`       | Scaffold functionality from a budfile |
-| `bud plugin`    | Create a new plugin                   |
+| Command        | Description                          |
+| -------------- | ------------------------------------ |
+| `bud block`    | Create a new block                   |
+| `bud generate` | Generate code described by a budfile |
+| `bud`          | Bud information                      |
+| `bud init`     | Create a new project                 |
+| `bud plugin`   | Create a new plugin                  |
 
 ### Dependencies
 
@@ -68,6 +67,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 - fs-extra
 - got
 - handlebars
+- handlebars-helpers
 - ink
 - ink-divider
 - ink-link

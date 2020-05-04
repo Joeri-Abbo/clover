@@ -1,17 +1,16 @@
 const {resolve} = require('path')
 
 /**
- * Budfile: Block
+ * Bud Block
  */
 module.exports = {
-  name: 'block',
-  type: 'block',
+  label: 'Generate block',
   path: resolve(__dirname, './templates'),
   default: {
-    namespace: '{{BUD_NAMESPACE}}',
-    name: '{{BUD_NAME}}',
-    title: '{{BUD_TITLE}}',
-    description: '{{BUD_DESCRIPTION}}',
+    namespace: 'bud-plugin',
+    name: 'block-name',
+    title: 'Block Name',
+    description: 'A newly scaffolded block',
     components: ['RichText', 'InnerBlocks', 'MediaUpload'],
     category: 'common',
     supports: ['align', 'alignWide', 'inserter', 'multiple', 'reusable'],
@@ -22,7 +21,6 @@ module.exports = {
       name: 'namespace',
       message: 'Namespace',
       initial: 'acme-co',
-      default: 'acme-co',
       required: true,
     },
     {
@@ -49,11 +47,7 @@ module.exports = {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
-      choices: [
-        {name: 'RichText'},
-        {name: 'InnerBlocks'},
-        {name: 'MediaUpload'},
-      ],
+      choices: ['RichText', 'InnerBlocks', 'MediaUpload'],
     },
     {
       type: 'select',
@@ -125,12 +119,6 @@ module.exports = {
       template: 'styles/public.css',
       path: 'src/blocks/{{name}}/styles/public.css',
       parser: 'css',
-    },
-    {
-      action: 'install',
-      npm: true,
-      composer: false,
-      build: true,
     },
   ],
 }

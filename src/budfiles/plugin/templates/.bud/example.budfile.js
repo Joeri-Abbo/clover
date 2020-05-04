@@ -5,6 +5,10 @@ const {resolve} = require('path')
  */
 module.exports = {
   /**
+   * Label
+   */
+  label: 'Example Component',
+  /**
    * Path to template files
    */
   path: resolve(__dirname, './templates'),
@@ -36,7 +40,7 @@ module.exports = {
     {
       action: 'template',
       template: 'Component.js.hbs',
-      path: 'src/components/{{componentName}}.js',
+      path: 'src/components/{{{{raw}}}}{{componentName}}{{{{/raw}}}}.js',
       parser: 'babel',
     },
   ],

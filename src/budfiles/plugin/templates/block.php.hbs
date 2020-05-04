@@ -1,15 +1,17 @@
 <?php
 /**
  * Plugin Name:  {{name}}
- * Plugin URI:   {{website}}
+ * Plugin URI:   {{lowercase website}}
  * Description:  {{description}}
- * Author:       {{author}} <{{email}}>
+ * Author:       {{titleize author}} <{{lowercase email}}>
  * License:      MIT
- * Text Domain:  {{namespace}}
+ * Text Domain:  {{lowercase (dashcase namespace)}}
  */
 
+namespace {{pascalcase namespace}}\\{{pascalcase name}};
+
 /**
- * Register {{namespace}} block assets
+ * Register {{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}} block assets
  *
  * @see Enqueueing Editor Assets <https://git.io/JvPHy>
  * @see Dependency Extraction Webpack Plugin <https://git.io/Jv1ll>
@@ -21,7 +23,7 @@ add_action('init', function () {
      *
      * @var string
      */
-    public $namespace = '{{namespace}}';
+    public $namespace = '{{lowercase (dashcase namespace)}}';
 
     /**
      * Plugin directory.
@@ -98,9 +100,9 @@ add_action('init', function () {
     {
         if (!realpath($manifestFile = "{$this->dir}/dist/{$block}.asset.json")) {
             new \WP_Error(
-                __('manifest_not_found', '{{namespace}}'),
-                __('There was an issue with the {{namespace}} plugin', '{{namespace}}'),
-                __('Please run the build scripts in the plugin directory.', '{{namespace}}')
+                __('manifest_not_found', '{{lowercase (dashcase namespace)}}'),
+                __('There was an issue with the {{name}} plugin', '{{lowercase (dashcase namespace)}}'),
+                __('Please run the build scripts in the plugin directory.', '{{lowercase (dashcase namespace)}}')
             );
         }
 

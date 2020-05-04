@@ -1,7 +1,7 @@
 {
-  "name": "{{name}}",
+  "name": "@{{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}}",
   "description": "{{description}}",
-  "homepage": "{{website}}",
+  "homepage": "{{lowercase website}}",
   "licenses": [
     {
       "type": "MIT",
@@ -10,8 +10,8 @@
   ],
   "authors": [
     {
-      "name": "{{author}}",
-      "email": "{{email}}"
+      "name": "{{capitalizeAll author}}",
+      "email": "{{lowercase email}}",
     }
   ],
   "private": true,
