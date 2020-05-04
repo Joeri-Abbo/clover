@@ -32,6 +32,7 @@ module.exports = {
     'react/prop-types': 0,
     'react/react-in-jsx-scope': 0,
     'react-hooks/rules-of-hooks': 'error',
+    'no-extra-semi': 0,
     quotes: [
       'error',
       'single',

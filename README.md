@@ -76,6 +76,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 - prettier
 - prop-types
 - react
+- rxjs
 
 ### Development dependencies
 

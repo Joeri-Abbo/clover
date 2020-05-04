@@ -70,11 +70,14 @@ export const bud = {
 
   /**
    * Actions
+   *
+   * @return {Observable}
    */
   actions: function () {
     const bud = {...this}
     return new Observable(observer => {
       observer.next('Templating..')
+      bud.budFile.actions.push({action: 'complete'})
       from(bud.budFile.actions)
         .pipe(concatMap(task => bud[task.action](task)))
         .subscribe(response => {
@@ -86,11 +89,13 @@ export const bud = {
   /**
    * Make directory
    *
-   * @param {string} path
+   * @param  {string} path
+   * @return {Observable}
    */
   dir: function ({path}) {
     return new Observable(observer => {
-      const dirPath = join(this.cwd, this.engine.compile(path)(this.getData()))
+      const pathTemplate = this.engine.compile(path)
+      const dirPath = join(this.cwd, pathTemplate(this.getData()))
 
       fs.ensureDir(dirPath).then(() => {
         observer.complete()
@@ -101,9 +106,10 @@ export const bud = {
   /**
    * Action: template
    *
-   * @param {string} parser
-   * @param {string} path
-   * @param {string} template
+   * @param  {string} parser
+   * @param  {string} path
+   * @param  {string} template
+   * @return {Observable}
    */
   template: function ({parser, path, template}) {
     return new Observable(async observer => {
@@ -126,8 +132,9 @@ export const bud = {
   /**
    * Action: NPM
    *
-   * @param {array} pkgs
-   * @param {bool}  dev
+   * @param  {array} pkgs
+   * @param  {bool}  dev
+   * @return {Observable}
    */
   npm: function ({pkgs, dev}) {
     return new Observable(observer => {
@@ -136,10 +143,10 @@ export const bud = {
       }
 
       observer.next('Installing node modules...')
-      const toInstall = pkgs.join(' ')
+
       this.runner
         .command(
-          dev ? `yarn add -D ${toInstall}` : `yarn add ${toInstall}`,
+          dev ? `yarn add -D ${pkgs.join(' ')}` : `yarn add ${pkgs.join(' ')}`,
           this.runnerOptions,
         )
         .then(() => {
@@ -152,9 +159,10 @@ export const bud = {
   /**
    * Install
    *
-   * @param {bool} npm
-   * @param {bool} composer
-   * @param {bool} build
+   * @param  {bool} npm
+   * @param  {bool} composer
+   * @param  {bool} build
+   * @return {Observable}
    */
   install: async function ({npm, composer, build}) {
     return new Observable(observer => {
@@ -175,6 +183,18 @@ export const bud = {
           observer.next(observer)
           observer.complete()
         })
+    })
+  },
+
+  /**
+   * Tasks complete emitter
+   *
+   * @return {Observable}
+   */
+  complete: function () {
+    return new Observable(observer => {
+      observer.next(`✨ All done`)
+      observer.complete()
     })
   },
 }
