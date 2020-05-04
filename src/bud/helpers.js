@@ -35,5 +35,11 @@ module.exports = data => {
         return uses ? options.fn(this) : options.inverse(this)
       },
     },
+    {
+      helper: 'raw',
+      fn: function (options) {
+        return options.fn()
+      },
+    },
   ]
 }

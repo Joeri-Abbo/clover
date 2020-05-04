@@ -1,44 +1,33 @@
 const {resolve} = require('path')
 
 /**
- * Bud generator
- * Block plugin base
+ * Bud Plugin
  */
 module.exports = {
-  name: 'plugin',
-  type: 'project',
+  label: 'Initialize new project',
   path: resolve(__dirname, './templates'),
   default: {
-    namespace: '{{BUD_NAMESPACE}}',
-    name: '{{BUD_NAME}}',
-    author: '{{BUD_AUTHOR_NAME}}',
-    email: '{{BUD_AUTHOR_EMAIL}}',
-    website: '{{BUD_WEBSITE}}',
-    title: '{{BUD_TITLE}}',
-    description: '{{BUD_DESCRIPTION}}',
-    componentName: '{{componentName}}',
+    name: 'Bud Plugin',
+    namespace: 'bud-namespace',
+    description: 'bud-description',
+    author: 'bud-author',
+    email: 'bud-email@roots.io',
+    website: 'https://roots.io/bud',
+    default: false,
   },
   prompts: [
+    {
+      type: 'input',
+      name: 'name',
+      message: 'Project name',
+      initial: 'ACME Blocks',
+      required: true,
+    },
     {
       type: 'input',
       name: 'namespace',
       message: 'Namespace',
       initial: 'acme-co',
-      default: 'acme-co',
-      required: true,
-    },
-    {
-      type: 'input',
-      name: 'name',
-      message: 'Name',
-      initial: 'acme-block',
-      required: true,
-    },
-    {
-      type: 'input',
-      name: 'title',
-      message: 'Title',
-      initial: 'ACME Co. Block',
       required: true,
     },
     {
@@ -200,7 +189,6 @@ module.exports = {
         'extract-loader',
         'file-loader',
         'friendly-errors-webpack-plugin',
-        'globby',
         'npm-run-all',
         'postcss-import',
         'postcss-loader',

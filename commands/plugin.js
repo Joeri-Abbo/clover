@@ -1,11 +1,11 @@
 import {resolve} from 'path'
 import React from 'react'
 import PropTypes from 'prop-types'
-import BudCLI from './../src/components/BudCLI'
+import BudCLI from '../src/components/BudCLI'
 
-/** Command: bud init */
-/// Create a new project
-const Init = props => (
+/** Command: bud plugin */
+/// Create a new plugin
+const Plugin = props => (
   <BudCLI
     label={require(props.budFile).label}
     budFile={require(props.budFile)}
@@ -14,18 +14,18 @@ const Init = props => (
   />
 )
 
-Init.propTypes = {
-  /// Project name
+Plugin.propTypes = {
+  /// Plugin name
   name: PropTypes.string,
-  /// Project namespace
+  /// Plugin namespace
   namespace: PropTypes.string,
-  /// Project description
+  /// Plugin description
   description: PropTypes.string,
-  /// Project author name
+  /// Plugin author name
   author: PropTypes.string,
-  /// Project author email
+  /// Plugin author email
   email: PropTypes.string,
-  /// Project website
+  /// Plugin website
   website: PropTypes.string,
   /// Output directory
   output: PropTypes.string,
@@ -33,7 +33,7 @@ Init.propTypes = {
   skip: PropTypes.bool,
 }
 
-Init.defaultProps = {
+Plugin.defaultProps = {
   name: 'Bud Plugin',
   namespace: 'bud-namespace',
   description: 'bud-description',
@@ -44,6 +44,6 @@ Init.defaultProps = {
   budFile: resolve(__dirname, './../../src/budfiles/plugin/plugin.bud'),
 }
 
-Init.positionalArgs = ['output']
+Plugin.positionalArgs = ['output']
 
-export default Init
+export default Plugin
