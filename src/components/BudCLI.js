@@ -17,26 +17,23 @@ const BudCLI = ({
   label,
   budFile = DEFAULT_BUDFILE,
   outDir,
-  command = null,
+  commandValues = null,
   children,
 }) => {
-  const interpolatedPrompts =
-    !command && budFile.prompts ? budFile.prompts : null
-  const [prompts, setPrompts] = useState(interpolatedPrompts)
-
+  const [prompts, setPrompts] = useState(! commandValues && budFile.prompts ? budFile.prompts : null)
   const [data, setData] = useState(null)
   const [message, setMessage] = useState(null)
 
   useEffect(() => {
     ;(async () => {
-      !command
-        ? prompt(prompts).then(answers => {
+      ! commandValues
+        ? prompt(prompts).then(data => {
             setPrompts(null)
-            setData(answers)
+            setData(data)
           })
         : (() => {
             setPrompts(null)
-            setData(command)
+            setData(commandValues)
           })()
     })()
   }, [])
@@ -61,7 +58,7 @@ const BudCLI = ({
     <Box flexDirection="column" justifyContent="flex-start">
       <ViewMast label={label} />
       {children && children}
-      {!command && message && (
+      {message && (
         <Box marginTop={1} marginBottom={1}>
           <Text>{message}</Text>
         </Box>

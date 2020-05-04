@@ -10,7 +10,7 @@ const Init = props => (
     label={require(props.budFile).label}
     budFile={require(props.budFile)}
     outDir={props.output}
-    command={props.skip ? props : null}
+    commandValues={props.skip ? props : null}
   />
 )
 

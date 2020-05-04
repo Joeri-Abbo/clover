@@ -2,8 +2,6 @@
  * Prettier config.
  */
 
-const prettierPluginPHP = require('@prettier/plugin-php')
-
 module.exports = {
   arrowParens: 'avoid',
   bracketSpacing: false,
@@ -14,13 +12,4 @@ module.exports = {
   useTabs: false,
   trailingComma: 'all',
   semi: false,
-  overrides: [
-    {
-      files: ['*.php'],
-      options: {
-        tabWidth: 4,
-        parser: prettierPluginPHP,
-      }
-    },
-  ]
 }

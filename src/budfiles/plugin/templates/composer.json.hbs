@@ -16,5 +16,10 @@
   ],
   "require": {
     "php": "^7.1"
+  },
+  "scripts": {
+    "lint": [
+      "phpcs --ignore=vendor,dist --extensions=php --standard=PSR12 ."
+    ]
   }
 }

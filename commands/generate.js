@@ -11,14 +11,16 @@ const Generate = props => {
   if (!props.budFileName) {
     return (
       <Text>
-        <Color red>You must specify a path to a valid budfile.</Color>
+        <Color red>You must specify a valid budfile.</Color>
       </Text>
     )
   }
 
   const budDir = join(process.cwd(), '.bud')
+  const projectFilePath = join(budDir, `${props.budFileName}.budfile.js`)
   const budFilePath = join(budDir, `${props.budFileName}.budfile.js`)
-  if (!existsSync(budFilePath)) {
+
+  if (!existsSync(projectFilePath)) {
     return (
       <Box flexDirection="column" width={50}>
         <Text>

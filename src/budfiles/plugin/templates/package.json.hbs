@@ -22,10 +22,13 @@
   "scripts": {
     "build": "cross-env NODE_ENV=development webpack --progress --colors --inline -p --config webpack.config.js",
     "build:production": "cross-env NODE_ENV=production webpack --progress --colors --inline -p --config webpack.config.js",
-    "lint": "npm-run-all lint:*",
+    "lint": "run-s -c lint:*",
     "lint:css": "stylelint ./src/**/*.css",
     "lint:js": "eslint ./src/**/*.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "translate": "run-s -c translate:*",
+    "translate:pot": "wp i18n make-pot . ./src/languages/{{lowercase (dashcase name)}}.pot --ignore-domain --include=\"./src\"",
+    "translate:js": "wp i18n make-json ./src/languages --no-purge --pretty-print"
   },
   "devDependencies": {},
   "dependencies": {}
