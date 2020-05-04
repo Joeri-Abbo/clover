@@ -26,6 +26,20 @@ add_action('init', function () {
     public $namespace = '{{lowercase (dashcase namespace)}}';
 
     /**
+     * Hostname
+     *
+     * @var string
+     */
+    public $host;
+
+    /**
+     * URI
+     *
+     * @var string
+     */
+    public $uri;
+
+    /**
      * Plugin directory.
      *
      * @var string
@@ -38,6 +52,11 @@ add_action('init', function () {
     public function __construct()
     {
       $this->dir = dirname(__FILE__);
+      $this->dir = dirname(__FILE__);
+      $this->uri = 'app/plugins/' . basename($this->dir);
+      $this->host = defined('WP_ENV') && WP_ENV == 'production'
+        ? '{{devUrl}}'
+        : 'http://localhost:3000';
     }
 
     /**
@@ -84,7 +103,7 @@ add_action('init', function () {
             if (realpath("{$this->dir}/dist/{$block}-{$script}.js")) {
                 wp_register_script(
                     "{$this->namespace}/{$block}/{$script}/js",
-                    plugins_url("dist/{$block}-{$script}.js", __FILE__),
+                    "{$this->host}/{$this->uri}/dist/{$block}-{$script}.js",
                     ...$this->getManifest("{$block}-{$script}")
                 );
             }
@@ -122,7 +141,7 @@ add_action('init', function () {
             if (realpath("{$this->dir}/dist/{$block}-{$style}.css")) {
                 wp_register_style(
                     "{$this->namespace}/{$block}/{$style}/css",
-                    plugins_url("dist/{$block}-{$style}.css", __FILE__),
+                    "{$this->host}/{$this->uri}/dist/{$block}-{$style}.css",
                     [],
                     null
                 );
@@ -157,7 +176,7 @@ add_action('init', function () {
         if (realpath("{$this->dir}/dist/{$extension}.js")) {
             wp_register_script(
                 "{$this->namespace}/{$extension}/js",
-                plugins_url("dist/{$extension}.js", __FILE__),
+                "{$this->host}/{$this->uri}/dist/{$extension}.js",
                 ...$this->getManifest($extension)
             );
 

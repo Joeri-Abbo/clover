@@ -5,7 +5,10 @@ const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extract
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const {HotModuleReplacementPlugin, NoEmitOnErrorsPlugin} = require('webpack')
 const WebpackBar = require('webpackbar')
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
+const WriteFilePlugin = require('write-file-webpack-plugin')
 
 /**
  * Webpack utilities
@@ -13,6 +16,7 @@ const WebpackBar = require('webpackbar')
  * @return {bool}
  */
 const isProduction = process.env.NODE_ENV === 'production'
+const isHMR = process.env.NODE_ENV === 'hmr'
 
 /**
  * Return array of directories
@@ -38,10 +42,12 @@ const entry = () => {
       editor: [
         resolve(__dirname, `src/blocks/${block}/scripts/editor/block.js`),
         resolve(__dirname, `src/blocks/${block}/styles/editor.css`),
+        'webpack-hot-middleware/client',
       ],
       public: [
         resolve(__dirname, `src/blocks/${block}/scripts/public/index.js`),
         resolve(__dirname, `src/blocks/${block}/styles/public.css`),
+        'webpack-hot-middleware/client',
       ],
     }
 
@@ -67,9 +73,11 @@ module.exports = {
   entry,
   output: {
     path: resolve(__dirname, 'dist'),
+    publicPath: isProduction ? '/' : `http://localhost:3000/app/plugins/{{lowercase (dashcase namespace)}}/`,
+    sourceMapFilename: '[file].map',
   },
   mode: isProduction ? 'production' : 'development',
-  devtool: 'inline-source-map',
+  devtool: isProduction ? false : 'inline-source-map',
   resolve: {
     alias: {
       '@blocks': resolve(__dirname, 'src/blocks'),
@@ -88,6 +96,8 @@ module.exports = {
     errors: true,
     timings: true,
   },
+  target: 'web',
+  watch: global.watch || false,
   module: {
     rules: [
       {
@@ -130,6 +140,15 @@ module.exports = {
       outputFormat: 'json',
     }),
     new FriendlyErrorsWebpackPlugin(),
-    new WebpackBar(),
+    ...(isHMR ? [
+        new HotModuleReplacementPlugin(),
+        new NoEmitOnErrorsPlugin(),
+        new WriteFilePlugin(),
+        new BrowserSyncPlugin({
+          host: 'localhost',
+          port: 3000,
+          proxy: '{{devUrl}}',
+        }),
+    ] : [new WebpackBar()])
   ],
 }
