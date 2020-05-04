@@ -51,8 +51,20 @@ module.exports = {
     {
       type: 'input',
       name: 'website',
-      message: 'Website',
+      message: 'Author website',
       initial: 'https://acme.co',
+    },
+    {
+      type: 'input',
+      name: 'devUrl',
+      message: 'Project development URL',
+      initial: 'http://acme.test',
+    },
+    {
+      type: 'input',
+      name: 'pluginsUri',
+      message: 'Plugins directory URI',
+      initial: 'app/plugins',
     },
   ],
   actions: [
