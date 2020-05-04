@@ -11,7 +11,7 @@ module.exports = {
     name: 'block-name',
     title: 'Block Name',
     description: 'A newly scaffolded block',
-    components: ['RichText', 'InnerBlocks', 'MediaUpload'],
+    components: ['RichText', 'InnerBlocks'],
     category: 'common',
     supports: ['align', 'alignWide', 'inserter', 'multiple', 'reusable'],
   },
@@ -47,7 +47,7 @@ module.exports = {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
-      choices: ['RichText', 'InnerBlocks', 'MediaUpload'],
+      choices: ['RichText', 'InnerBlocks'],
     },
     {
       type: 'select',

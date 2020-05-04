@@ -64,6 +64,12 @@ module.exports = {
     },
     {
       action: 'template',
+      template: 'LICENSE.md.hbs',
+      path: 'LICENSE.md',
+      parser: 'markdown',
+    },
+    {
+      action: 'template',
       template: 'block.php.hbs',
       path: 'block.php',
       parser: 'php',
@@ -170,7 +176,6 @@ module.exports = {
         '@babel/core',
         '@babel/preset-env',
         '@babel/preset-react',
-        '@prettier/plugin-php',
         '@wordpress/browserslist-config',
         '@wordpress/dependency-extraction-webpack-plugin',
         'autoprefixer',

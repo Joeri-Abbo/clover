@@ -9,7 +9,7 @@ const Block = props => (
   <BudCLI
     label={require(props.budFile).label}
     budFile={require(props.budFile)}
-    command={props.skip ? props : null}
+    commandValues={props.skip ? props : null}
   />
 )
 
@@ -37,7 +37,7 @@ Block.defaultProps = {
   name: 'block-name',
   title: 'Block Name',
   description: 'A newly scaffolded block',
-  components: ['RichText', 'InnerBlocks', 'MediaUpload'],
+  components: ['RichText', 'InnerBlocks'],
   category: 'common',
   supports: ['align', 'alignWide', 'inserter', 'multiple', 'reusable'],
   budFile: resolve(__dirname, './../../src/budfiles/block/block.bud'),
