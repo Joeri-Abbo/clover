@@ -1,0 +1,154 @@
+const {existsSync, readdirSync, statSync} = require('fs')
+const {join, resolve} = require('path')
+const {CleanWebpackPlugin} = require('clean-webpack-plugin')
+const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin')
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const {HotModuleReplacementPlugin, NoEmitOnErrorsPlugin} = require('webpack')
+const WebpackBar = require('webpackbar')
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
+const WriteFilePlugin = require('write-file-webpack-plugin')
+
+/**
+ * Webpack utilities
+ *
+ * @return {bool}
+ */
+const isProduction = process.env.NODE_ENV === 'production'
+const isHMR = process.env.NODE_ENV === 'hmr'
+
+/**
+ * Return array of directories
+ *
+ * @param  {string} parentDir
+ * @return {array}
+ */
+const dirs = parentDir =>
+  readdirSync(resolve(__dirname, parentDir)).filter(file =>
+    statSync(join(parentDir, file)).isDirectory(),
+  )
+
+/**
+ * Block webpack entries
+ *
+ * @return {object}
+ */
+const entry = () => {
+  let entryPoints = {}
+
+  dirs('src/blocks').forEach(block => {
+    let assets = {
+      editor: [
+        resolve(__dirname, `src/blocks/${block}/scripts/editor/block.js`),
+        resolve(__dirname, `src/blocks/${block}/styles/editor.css`),
+        'webpack-hot-middleware/client',
+      ],
+      public: [
+        resolve(__dirname, `src/blocks/${block}/scripts/public/index.js`),
+        resolve(__dirname, `src/blocks/${block}/styles/public.css`),
+        'webpack-hot-middleware/client',
+      ],
+    }
+
+    assets.editor = assets.editor.filter(file => existsSync(file))
+    assets.public = assets.public.filter(file => existsSync(file))
+
+    if (assets.editor.length > 0) {
+      entryPoints[`${block}-editor`] = assets.editor
+    }
+
+    if (assets.public.length > 0) {
+      entryPoints[`${block}-public`] = assets.public
+    }
+  })
+
+  return entryPoints
+}
+
+/**
+ * Webpack Configuration
+ */
+module.exports = {
+  entry,
+  output: {
+    path: resolve(__dirname, 'dist'),
+    publicPath: isProduction ? '/' : `http://localhost:3000/{{pluginsUri}}/{{lowercase (dashcase namespace)}}/`,
+    sourceMapFilename: '[file].map',
+  },
+  mode: isProduction ? 'production' : 'development',
+  devtool: isProduction ? false : 'inline-source-map',
+  resolve: {
+    alias: {
+      '@blocks': resolve(__dirname, 'src/blocks'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@extensions': resolve(__dirname, 'src/extensions'),
+    },
+    extensions: ['.js', '.json', '.jsx', '.css'],
+    modules: [resolve(__dirname, 'node_modules')],
+  },
+  optimization: {
+    minimizer: isProduction ? [new UglifyJsPlugin()] : [],
+  },
+  stats: {
+    all: false,
+    assets: true,
+    errors: true,
+    timings: true,
+  },
+  target: 'web',
+  watch: global.watch || false,
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: resolve(__dirname, 'node_modules'),
+        loaders: ['babel-loader', 'eslint-loader'],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {name: '[name].css'},
+          },
+          {loader: 'extract-loader'},
+          {loader: 'css-loader'},
+          {loader: 'postcss-loader'},
+        ],
+      },
+      {
+        test: /\.jpe?g$|\.gif$|\.png$/i,
+        loader: 'file-loader?name=/img/[name].[ext]',
+      },
+      {
+        test: /\.svg$/,
+        use: ['@svgr/webpack', 'url-loader'],
+      },
+    ],
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new ManifestPlugin({
+      output: {
+        publicPath: resolve(__dirname, 'dist'),
+      },
+    }),
+    new DependencyExtractionWebpackPlugin({
+      injectPolyfill: false,
+      useDefaults: true,
+      outputFormat: 'json',
+    }),
+    new FriendlyErrorsWebpackPlugin(),
+    ...(isHMR ? [
+        new HotModuleReplacementPlugin(),
+        new NoEmitOnErrorsPlugin(),
+        new WriteFilePlugin(),
+        new BrowserSyncPlugin({
+          host: 'localhost',
+          port: 3000,
+          proxy: '{{devUrl}}',
+        }),
+    ] : [new WebpackBar()])
+  ],
+}

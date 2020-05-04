@@ -50,62 +50,34 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 ## Usage
 
-| Command | Description               |
-| ------- | ------------------------- |
-| `bud`   | Create a new block plugin |
+| Command         | Description                          |
+| --------------- | ------------------------------------ |
+| `bud block`     | Create a new block                   |
+| `bud component` | Create a new component               |
+| `bud generate`  | Generate code described by a budfile |
+| `bud`           | Bud information                      |
+| `bud init`      | Create a new project                 |
+| `bud plugin`    | Create a new plugin                  |
 
-## Generated files
-
-A typical block that was created with Bud has the following structure:
-
-```sh
-bud-plugin
-├── blocks
-│   └── block
-│       ├── styles
-│       │   ├── public.css
-│       │   ├── editor.css
-│       │   └── common.css
-│       └── scripts
-│           ├── public
-│           │   └── index.js
-│           └── editor
-│               ├── containers
-│               │   ├── save.js
-│               │   └── edit.js
-│               ├── components
-│               │   └── Media.js
-│               ├── block.js
-│               └── attributes.json
-├── webpack.config.js
-├── prettierrc.json
-├── postcss.config.js
-├── package.json
-├── composer.json
-├── block.php
-├── README.md
-├── .stylelintrc
-├── .gitignore
-├── .eslintrc.js
-├── .eslintignore
-├── .editorconfig
-└── .babelrc.js
-```
-
-### Plugin Dependencies
+### Dependencies
 
 - @prettier/plugin-php
-- collect.js
 - enquirer
 - esm
 - execa
 - fs-extra
 - got
+- handlebars
+- handlebars-helpers
 - ink
+- ink-divider
+- ink-link
+- ink-use-stdout-dimensions
 - pastel
 - prettier
 - prop-types
 - react
+- rxjs
 
 ### Development dependencies
 

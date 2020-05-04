@@ -1,64 +1,41 @@
-import { cwd } from 'process'
-import { resolve, join } from 'path'
-import React, { useState, useMemo } from 'react'
-import PropTypes from 'prop-types'
-import { Box, Static, Text } from 'ink'
-import { prompt } from 'enquirer'
-import Bud from './../bud/Bud'
+import React from 'react'
+import {Box, Color, Text} from 'ink'
+import BudCLI from './../src/components/BudCLI'
 
-const DEFAULT_TEMPLATE = resolve(__dirname, './../../templates/plugin.js')
+/** Command: bud */
+/// Bud information
+const Bud = () => (
+  <BudCLI label={'Bud: Modern WordPress Scaffolding'}>
+    <Box flexDirection="column">
+      <Box marginBottom={1}>
+        <Text>
+          To get started run <Color green>bud init</Color> from the WP plugins
+          directory.
+        </Text>
+      </Box>
 
-/**
- * Plugin New
- */
-/// Create a new block plugin
-const BudPluginNew = props => {
-  const [data, setData] = useState(null)
+      <Box marginBottom={1}>
+        <Text bold>Additional commands:</Text>
+      </Box>
 
-  const output = props.inputArgs[2] ? join(cwd(), props.inputArgs[2]) : join(cwd(), props.output)
-
-  const definition = props.definition ? require(join(cwd(), props.definition)) : require(DEFAULT_TEMPLATE)
-
-  useMemo(() => {
-    !props.default ? prompt(definition.fields).then(data => setData(data)) : setData(definition.default)
-  }, [])
-
-  return (
-    <Box>
-      {!data ? (
-        <Box minHeight={2}>
-          <Text>Create new Block plugin</Text>
-        </Box>
-      ) : (
-        <Static>
-          <Box marginBottom={1}>
-            <Text>Creating {data.name}</Text>
-          </Box>
-
-          <Bud data={data} definition={definition} output={output} />
-        </Static>
-      )}
+      <Box flexDirection="column" marginLeft={2}>
+        <Text>
+          🌱{'   '}
+          <Color green>bud plugin</Color>
+          {'   '}create a new plugin
+        </Text>
+        <Text>
+          🌱{'   '}
+          <Color green>bud block</Color>
+          {'    '}create a new block
+        </Text>
+        <Text>
+          🌱{'   '}
+          <Color green>bud generate</Color> run a custom budfile
+        </Text>
+      </Box>
     </Box>
-  )
-}
+  </BudCLI>
+)
 
-BudPluginNew.propTypes = {
-  /// Output directory
-  output: PropTypes.string,
-  /// Path to bud template definition
-  definition: PropTypes.string,
-  /// Skip prompts; use defaults
-  default: PropTypes.bool,
-}
-
-BudPluginNew.shortFlags = {
-  output: 'o',
-  definition: 'd',
-}
-
-BudPluginNew.defaultProps = {
-  output: './bud-plugin',
-  default: false,
-}
-
-export default BudPluginNew
+export default Bud

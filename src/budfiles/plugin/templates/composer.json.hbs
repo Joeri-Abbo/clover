@@ -1,0 +1,25 @@
+{
+  "name": "{{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}}",
+  "type": "wordpress-plugin",
+  "license": "MIT",
+  "description": "{{description}}",
+  "homepage": "{{lowercase website}}",
+  "authors": [
+    {
+      "name": "{{capitalizeAll author}}",
+      "email": "{{lowercase email}}"
+    }
+  ],
+  "keywords": [
+    "wordpress",
+    "wordpress-block"
+  ],
+  "require": {
+    "php": "^7.1"
+  },
+  "scripts": {
+    "lint": [
+      "phpcs --ignore=vendor,dist --extensions=php --standard=PSR12 ."
+    ]
+  }
+}

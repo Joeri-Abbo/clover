@@ -1,0 +1,23 @@
+{
+  "attributes": {
+    {{#has 'components' 'MediaUpload'}}
+    "mediaId": {
+      "type": "number"
+    },
+    "mediaUrl": {
+      "type": "string",
+      "source": "attribute",
+      "selector": "img",
+      "attribute": "src"
+    },
+    {{/has}}
+
+    {{~#has 'components' 'RichText'}}
+    "text": {
+      "type": "array",
+      "source": "children",
+      "selector": "h2"
+    }
+    {{/has}}
+  }
+}

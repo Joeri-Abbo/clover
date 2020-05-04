@@ -1,4 +1,3 @@
-const execa = require('execa')
 const globby = require('globby')
 const fs = require('fs')
 const path = require('path')
@@ -31,42 +30,25 @@ module.exports = {
   block: (lang, code) => `\`\`\`${lang}\n${code}\n\`\`\``,
 
   /**
-   * Example plugin tree
-   */
-  pluginTree: () => {
-    execa.commandSync('./build/cli.js --default')
-
-    const tree = require('tree-node-cli')('bud-plugin', {
-      allFiles: true,
-      dirsFirst: true,
-      reverse: true,
-    })
-
-    execa.commandSync('rm -rf ./bud-plugin')
-
-    return tree
-  },
-
-  /**
    * Bud commands
    */
   commands: () => {
     const files = globby.sync(path.resolve(__dirname, '../../commands'), {
-      expandDirectories: { extensions: ['js'] },
+      expandDirectories: {extensions: ['js']},
     })
 
     const signatures = files.map(file => {
       const command = fs.readFileSync(file, 'utf-8')
-
       return {
         dir: path.basename(path.dirname(file)),
+        command: [...command.matchAll(/\/\*\* Command: (.*) \*\/\n/)][0][1],
         description: [...command.matchAll(/\/\/\/ (.*)\n/)][0][1],
       }
     })
 
     let output = ``
     signatures.forEach(sig => {
-      output += `| \`bud\` | ${sig.description} |\n`
+      output += `| \`${sig.command}\` | ${sig.description} |\n`
     })
 
     return output
