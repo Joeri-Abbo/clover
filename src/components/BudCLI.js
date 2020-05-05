@@ -34,10 +34,6 @@ const BudCLI = ({
    */
   const config = join(process.cwd(), '.bud/bud.config.json')
   const configData = existsSync(config) ? require(config) : null
-  const [project] = useState({
-    ...configData.project,
-    ...configData.dev,
-  })
 
   /**
    * Parse values from prompt
@@ -53,21 +49,23 @@ const BudCLI = ({
    * Assemble data from config files, prompt & cli args/flags.
    */
   useEffect(() => {
-    !commandValues && prompts
-      ? prompt(prompts).then(data => {
-          setPrompts(null)
-          setData({
-            ...project,
-            ...data,
-          })
+    prompts ? prompt(prompts).then(data => {
+        setPrompts(null)
+        setData({
+          ...configData.project,
+          ...configData.dev,
+          ...data,
+          ...commandValues,
         })
-      : (() => {
-          setPrompts(null)
-          setData({
-            ...project,
-            ...commandValues,
-          })
-        })()
+      })
+    : (() => {
+        setPrompts(null)
+        setData({
+          ...configData.project,
+          ...configData.dev,
+          ...commandValues,
+        })
+      })()
   }, [])
 
   /**

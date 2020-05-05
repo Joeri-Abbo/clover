@@ -1,41 +1,91 @@
-import {resolve, join} from 'path'
-import {existsSync} from 'fs'
-import React from 'react'
+import {join, resolve} from 'path'
+import {exists} from 'fs'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {Box, Color, Text} from 'ink'
+import {Color, Text} from 'ink'
 import BudCLI from '../src/components/BudCLI'
+import globby from 'globby'
+
+const getRootBudPath = budFile => resolve(__dirname, `./../../src/budfiles/**/${budFile}.bud.js`)
+const getModuleBudPath = budFile => join(process.cwd(), `node_modules/**/bud-plugin-*/**/${budFile}.bud.js`)
+const getProjectBudPath = budFile => join(process.cwd(), `.bud/budfiles/${budFile}/${budFile}.bud.js`)
 
 /** Command: bud generate */
 /// Generate code described by a budfile
 const Generate = props => {
-  if (!props.budFileName) {
-    return (
-      <Text>
-        <Color red>You must specify a valid budfile.</Color>
-      </Text>
-    )
-  }
+  const [budName] = useState(props.budFileName)
+  const [projectBud, setProjectBud] = useState(null)
+  const [projectBudPath, setProjectBudPath] = useState(null)
+  const [projectBudExists, setProjectBudExists] = useState(null)
+  useEffect(() => {
+    budName && setProjectBudPath(getProjectBudPath(props.budFileName))
+  }, [budName])
 
-  const budDir = join(process.cwd(), '.bud')
-  const projectFilePath = join(budDir, `${props.budFileName}.budfile.js`)
-  const budFilePath = join(budDir, `${props.budFileName}.budfile.js`)
+  useEffect(() => {
+    projectBudPath && (async () => {
+      exists(projectBudPath, res => {
+        res ? (() => {
+          setProjectBudExists(true)
+          setProjectBud(require(projectBudPath))
+        })()
+        : setProjectBudExists(false)
+      })
+    })()
+  }, [projectBudPath])
 
-  if (!existsSync(projectFilePath)) {
-    return (
-      <Box flexDirection="column" width={50}>
-        <Text>
-          <Color red>{`Budfile not found.`}</Color>
-        </Text>
-        <Text textWrap="truncate-end">{`${
-          budFilePath.split('/')[budFilePath.split('/').length]
-        } doesn't appear to be valid`}</Text>
-      </Box>
-    )
-  }
+  const [budModules, setBudModules] = useState([])
+  const [budModulesExist, setBudModulesExist] = useState(null)
+  useEffect(() => {
+    projectBudPath && projectBudExists === false && (async () => {
+      const modules = await globby([getModuleBudPath(budName)])
+      modules && modules.length > 0
+        ? (() => {
+          setBudModules(modules.map(module => require(module)))
+          setBudModulesExist(true)
+        })()
+        : setBudModulesExist(false)
+    })()
+  }, [projectBudPath, projectBudExists])
 
-  const budFile = resolve(budFilePath)
+  const [rootBud, setRootBud] = useState([])
+  const [rootBudExists, setRootBudExists] = useState(null)
+  useEffect(() => {
+    projectBudPath
+      && projectBudExists === false
+      && budModulesExist === false
+      && (async () => {
+      const coreBuds = await globby([getRootBudPath(budName)])
+      coreBuds
+        ? (() => {
+          setRootBud(coreBuds.map(bud => require(bud)))
+          setRootBudExists(true)
+        })()
+        : setRootBudExists(false)
+    })()
+  }, [projectBudPath, projectBudExists, budModulesExist, budModules])
 
-  return <BudCLI label={require(budFile).label} budFile={require(budFile)} />
+  const [budFile, setBudFile] = useState(false)
+  useEffect(() => {
+    if (projectBudExists) {
+      setBudFile(projectBud)
+    }
+
+    if (! projectBudExists && budModulesExist && budModules[0]) {
+      setBudFile(budModules[0])
+    }
+
+    if (! projectBudExists && ! budModulesExist && rootBudExists && rootBud[0]) {
+      setBudFile(rootBud[0])
+    }
+  }, [projectBudExists, projectBud, budModulesExist, budModules, rootBud, rootBudExists])
+
+  return budFile ? (
+    <BudCLI label={budFile.label} budFile={budFile} />
+  ) : (
+    <Text>
+      <Color yellow>Loading..</Color>
+    </Text>
+  )
 }
 
 Generate.propTypes = {
