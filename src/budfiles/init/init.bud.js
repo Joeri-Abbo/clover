@@ -1,8 +1,6 @@
-const {resolve} = require('path')
-
 module.exports = {
+  name: 'bud',
   label: 'Initialize Bud Project',
-  path: resolve(__dirname, './templates'),
   prompts: [
     {
       type: 'input',

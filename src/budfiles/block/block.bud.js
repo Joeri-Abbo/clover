@@ -1,11 +1,9 @@
-const {resolve} = require('path')
-
 /**
  * Bud Block
  */
 module.exports = {
+  name: 'bud/block',
   label: 'Generate block',
-  path: resolve(__dirname, './templates'),
   default: {
     name: 'block-name',
     title: 'Block Name',
@@ -36,6 +34,12 @@ module.exports = {
       initial: 'Short description of acme-block',
     },
     {
+      type: 'list',
+      name: 'keywords',
+      message: 'Keywords',
+      initial: [],
+    },
+    {
       type: 'multiselect',
       name: 'components',
       message: 'Components',
@@ -53,6 +57,7 @@ module.exports = {
       name: 'supports',
       message: 'Supports',
       choices: [
+        'anchor',
         'align',
         'alignWide',
         'customClassName',
@@ -60,6 +65,15 @@ module.exports = {
         'inserter',
         'multiple',
         'reusable',
+      ],
+    },
+    {
+      type: 'select',
+      name: 'styles',
+      message: 'Define styles (https://git.io/JfZTu)',
+      choices: [
+        'yes',
+        'no',
       ],
     },
   ],

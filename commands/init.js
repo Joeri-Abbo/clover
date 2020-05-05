@@ -7,10 +7,11 @@ import BudCLI from './../src/components/BudCLI'
 /// Create a new project
 const Init = props => (
   <BudCLI
-    label={require(props.budFile).label}
-    budFile={require(props.budFile)}
-    outDir={props.output}
-    commandValues={props.skip ? props : null}
+    label={require(`${props.budFileDir}/init.bud`).label}
+    sprout={require(`${props.budFileDir}/init.bud`)}
+    values={props.name ? props : null}
+    outDir={props.projectDir}
+    templateDir={`${props.budFileDir}`}
   />
 )
 
@@ -34,24 +35,13 @@ Init.propTypes = {
   /// Dev server port
   port: PropTypes.number,
   /// Output directory
-  output: PropTypes.string,
-  /// Use arguments and default values instead of prompt
-  skip: PropTypes.bool,
+  projectDir: PropTypes.string,
 }
 
 Init.defaultProps = {
-  name: 'Bud Plugin',
-  namespace: 'bud-namespace',
-  description: 'bud-description',
-  website: 'https://roots.io/bud',
-  author: 'bud-author',
-  email: 'bud-email@roots.io',
-  proxy: 'http://acme.test',
-  port: 3000,
-  skip: false,
-  budFile: resolve(__dirname, './../../src/budfiles/init/init.bud'),
+  budFileDir: resolve(__dirname, './../../src/budfiles/init'),
 }
 
-Init.positionalArgs = ['output']
+Init.positionalArgs = ['projectDir']
 
 export default Init

@@ -19,7 +19,7 @@
     "lint:eslint": "eslint .",
     "lint:prettier": "prettier --write ."
   },
-  "files": ["build"],
+  "files": ["build", "src"],
   "dependencies": {
     "@prettier/plugin-php": "^0.14.0",
     "enquirer": "^2.3.5",

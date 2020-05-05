@@ -9,8 +9,6 @@ const basePrettierConfig = require('./../../prettier.config.js')
 const handlebarsHelpers = require('handlebars-helpers')
 const helpers = require('./helpers')
 
-const DEFAULT_BUDFILE = {actions: [], label: 'Budfile', prompts: []}
-
 /**
  * Bud Core
  */
@@ -26,15 +24,17 @@ export const bud = {
    *
    * @param {string} outDir
    * @param {object} data
-   * @param {string} budFile
+   * @param {object} sprout
+   * @param {string} templateDir
    * @param {bool}   skipInstall
    */
-  init: function ({outDir = './', data = {}, budFile = DEFAULT_BUDFILE}) {
+  init: function ({outDir = './', data = {}, sprout, templateDir}) {
     this.outDir = outDir
-    this.cwd = join(process.cwd(), this.outDir)
+    this.cwd = this.outDir
     this.runnerOptions = {cwd: this.cwd}
 
-    this.budFile = budFile
+    this.templateDir = `${templateDir}/templates`,
+    this.sprout = sprout
     this.data = data
 
     this.registerHelpers()
@@ -82,9 +82,8 @@ export const bud = {
   actions: function () {
     const bud = {...this}
     return new Observable(observer => {
-      observer.next('Templating..')
-      bud.budFile.actions.push({action: 'complete'})
-      from(bud.budFile.actions)
+      bud.sprout.actions.push({action: 'complete'})
+      from(bud.sprout.actions)
         .pipe(concatMap(task => bud[task.action](task)))
         .subscribe(response => {
           observer.next(response)
@@ -136,7 +135,7 @@ export const bud = {
    */
   template: function ({parser, path, template}) {
     return new Observable(async observer => {
-      const src = join(this.budFile.path, template)
+      const src = join(this.templateDir, template)
       const dest = join(this.cwd, this.engine.compile(path)(this.getData()))
       const prettierConfig = {...basePrettierConfig, parser}
 
@@ -215,6 +214,15 @@ export const bud = {
    * @return {Observable}
    */
   complete: function () {
+    const budConfig = JSON.parse(fs.readFileSync(`${this.outDir}/.bud/bud.config.json`), 'utf8')
+    if (! budConfig.installed.includes(this.sprout.name)) {
+      budConfig.installed.push(this.sprout.name)
+      const output = prettier.format(
+        JSON.stringify(budConfig),
+        {...basePrettierConfig, parser: 'json'}
+      )
+      fs.writeFileSync(`${this.outDir}/.bud/bud.config.json`, output, 'utf8')
+    }
     return new Observable(observer => {
       observer.next(`✨ All done`)
       observer.complete()
