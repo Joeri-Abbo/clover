@@ -1,11 +1,6 @@
-const {resolve} = require('path')
-
-/**
- * bud plugin
- */
 module.exports = {
+  name: 'plugin',
   label: 'Generate new plugin',
-  path: resolve(__dirname, './templates'),
   actions: [
     {
       action: 'template',
@@ -94,20 +89,13 @@ module.exports = {
       parser: 'json',
     },
     {
-      action: 'dir',
-      path: 'src',
-    },
-    {
-      action: 'dir',
-      path: 'src/blocks',
-    },
-    {
-      action: 'dir',
-      path: 'src/components',
-    },
-    {
-      action: 'dir',
-      path: 'src/extensions',
+      action: 'dirs',
+      paths: [
+        'src',
+        'src/blocks',
+        'src/components',
+        'src/extensions',
+      ],
     },
     {
       action: 'npm',

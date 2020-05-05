@@ -1,6 +1,6 @@
 /** @wordpress */
 import {__} from '@wordpress/i18n'
-{{#hasAny 'components' (array 'InnerBlocks' 'RichText' 'MediaUpload')}}
+{{#hasAny 'components' (array 'InnerBlocks' 'RichText')}}
 import {
   {{#has 'components' 'InnerBlocks'}}InnerBlocks,{{/has}}
   {{#has 'components' 'RichText'}}RichText,{{/has}}
@@ -10,67 +10,38 @@ import {
 /** Modules */
 import PropTypes from 'prop-types'
 
-{{#has 'components' 'MediaUpload'}}
-/** Components */
-import MediaUpload from '@components/MediaUpload'
-{{/has}}
-
 /**
- * Edit: {{namespace}}/{{name}}
- *
-{{#hasAny 'components' (array 'MediaUpload' 'RichText')}}
-{{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaUrl {{/has}}
-{{#has 'components' 'MediaUpload'}} * @prop {string} attribute.mediaId {{/has}}
-{{#has 'components' 'RichText'}} * @prop {string} attribute.text {{/has}}
-{{/hasAny}}
- */
+  * The edit function describes the structure of your block in the context of the editor.
+  * This represents what the editor will render when the block is used.
+  *
+  * @see https://git.io/JfZJD
+  *
+  * @prop   {PropTypes.string} className
+  * @prop   {PropTypes.bool}   isSelected
+  * @prop   {PropTypes.func}   setAttributes
+  * @return {WPElement}        Element to render.
+  */
 const edit = ({attributes, className, setAttributes}) => {
-{{#hasAny 'components' (array 'RichText' 'MediaUpload')}}
-  const {
-    {{#has 'components' 'MediaUpload'}}mediaId,{{/has}}
-    {{#has 'components' 'MediaUpload'}}mediaUrl,{{/has}}
-    {{#has 'components' 'RichText'}} text, {{/has}}
-  } = attributes
-{{/hasAny}}
+{{#has 'components' 'RichText'}}
+  const {text} = attributes
+{{/has}}
 
   /**
    * Generic attribute handler.
    *
-   * @param {string} attribute key
-   * @param {mixed}  attribute value
+   * @param  {string} attribute key
+   * @param  {mixed}  attribute value
+   * @return {void}
    */
-  const onAttribute = (attr, value) => {
+  const setAttribute = (attr, value) => {
     setAttributes({[attr]: value})
   }
 
-{{#has 'components' 'MediaUpload'}}
   /**
-    * Media attribute handler.
-    *
-    * @param {number} mediaId
-    * @param {string} mediaUrl
-    */
-  const setMedia = media => {
-    setAttributes({
-      mediaId: media.id,
-      mediaUrl: media.url
-    })
-  }
-{{/has}}
-
-  /**
-   * Render the component.
+   * Return the block contents for rendering.
    */
   return (
     <div className={className}>
-    {{#has 'components' 'MediaUpload'}}
-      <MediaUpload
-        id={mediaId || ''}
-        url={mediaUrl || ''}
-        setMedia={setMedia}
-      />
-    {{/has}}
-
     {{#has 'components' 'RichText'}}
       <RichText
         placeholder={__('placeholder heading', '{{namespace}}')}
@@ -88,18 +59,14 @@ const edit = ({attributes, className, setAttributes}) => {
 }
 
 edit.propTypes = {
+  {{#has 'components' 'RichText'}}
   attributes: PropTypes.shape({
-    {{#has 'components' 'MediaUpload'}}
-      mediaId: PropTypes.number,
-      mediaUrl: PropTypes.string,
-    {{/has}}
-    {{#has 'components' 'RichText'}}
-      text: PropTypes.string,
-    {{/has}}
+    text: PropTypes.string,
   }),
+  {{/has}}
   className: PropTypes.string,
   isSelected: PropTypes.bool,
   setAttributes: PropTypes.func,
 }
 
-export { edit }
+export {edit}

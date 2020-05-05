@@ -40,13 +40,20 @@ add_action('init', function () {
     public $dir;
 
     /**
+     * Asset URL base
+     *
+     * @var string
+     */
+    public $baseAssetUrl;
+
+    /**
      * Class constructor.
      */
     public function __construct()
     {
       $this->dir = dirname(__FILE__);
-      $this->host = defined('WP_ENV') && WP_ENV == 'production' ? get_option('home') : 'http://localhost:3000';
-      $this->dist = $this->host . '/app/plugins/' . basename($this->dir) . '/dist';
+      $this->isProduction = defined('WP_ENV') && WP_ENV == 'production';
+      $this->baseAssetUrl = $this->host . '/app/plugins/' . basename($this->dir) . '/dist';
     }
 
     /**
@@ -82,6 +89,16 @@ add_action('init', function () {
     }
 
     /**
+     * Get hostname
+     *
+     * @return string
+     */
+     protected function getHost()
+     {
+         return $this->isProduction ? get_option('home') : '{{protocol}}://localhost:{{port}}';
+     }
+
+    /**
      * Register block scripts.
      *
      * @param  string
@@ -90,7 +107,8 @@ add_action('init', function () {
     protected function registerBlockScripts(string $block): void
     {
         foreach (['editor', 'public'] as $script) {
-            if (realpath("{$this->dir}/dist/blocks/{$block}/scripts/{$script}.js")) {                wp_register_script(
+            if (realpath("{$this->dir}/dist/blocks/{$block}/scripts/{$script}.js")) {
+                wp_register_script(
                     "{$this->namespace}/{$block}/{$script}/js",
                     "{$this->dist}/blocks/{$block}/scripts/{$script}.js",
                     ...$this->getManifest($block, $script)

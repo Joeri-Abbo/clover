@@ -19,63 +19,86 @@ const DEFAULT_BUDFILE = {
  * @prop {string} label
  * @prop {string} budFile
  * @prop {string} outDir
- * @prop {object} commandValues
+ * @prop {object} values
  * @prop {object} children
  */
 const BudCLI = ({
   label,
-  budFile = DEFAULT_BUDFILE,
+  templateDir,
+  sprout = DEFAULT_BUDFILE,
   outDir,
-  commandValues = null,
+  values = null,
+  inert = false,
   children,
 }) => {
   /**
    * Parse values from .bud/bud.config.json
    */
   const config = join(process.cwd(), '.bud/bud.config.json')
-  const configData = existsSync(config) ? require(config) : null
+  const [configData] = useState(existsSync(config) ? require(config) : null)
 
   /**
    * Parse values from prompt
    */
   const [prompts, setPrompts] = useState(
-    !commandValues && budFile.prompts ? budFile.prompts : null,
+    !values && sprout.prompts ? sprout.prompts : null,
   )
 
   const [data, setData] = useState(null)
   const [message, setMessage] = useState(null)
+  const [error, setError] = useState(null)
+
+  /**
+   * Eject early if bud dependencies have been declared
+   * but are not met.
+   */
+  useEffect(() => {
+    if (! sprout.dependsOn || configData.installed) {
+      return
+    }
+
+    sprout.dependsOn && sprout.dependsOn.forEach(dep => {
+      configData.installed && ! configData.installed.includes(dep)
+        && setError({
+          message: `Dependency not met.`,
+          details: `Run \`bud generate ${dep}\` in your project then re-run this command.`,
+        })
+    })
+  }, [sprout, configData])
 
   /**
    * Assemble data from config files, prompt & cli args/flags.
    */
   useEffect(() => {
-    prompts ? prompt(prompts).then(data => {
-        setPrompts(null)
-        setData({
-          ...configData.project,
-          ...configData.dev,
-          ...data,
-          ...commandValues,
+    prompts
+      ? prompt(prompts).then(data => {
+          setPrompts(null)
+          setData({
+            ...(configData && configData.project ? configData.project : []),
+            ...(configData && configData.dev ? configData.dev : []),
+            ...data,
+            ...(values ? values : []),
+          })
         })
-      })
-    : (() => {
-        setPrompts(null)
-        setData({
-          ...configData.project,
-          ...configData.dev,
-          ...commandValues,
-        })
-      })()
+      : (() => {
+          setPrompts(null)
+          setData({
+            ...(configData && configData.project ? configData.project : []),
+            ...(configData && configData.dev ? configData.dev : []),
+            ...(values ? values : []),
+          })
+        })()
   }, [])
 
   /**
    * Run the budfile actions
    */
   useEffect(() => {
-    data &&
+    data && !inert &&
       BudCore.init({
         data,
-        budFile,
+        templateDir,
+        sprout,
         outDir,
       })
         .actions()
@@ -91,12 +114,22 @@ const BudCLI = ({
   return (
     <Box flexDirection="column" justifyContent="flex-start">
       <ViewMast label={label} />
-      {children && children}
-      {message && (
-        <Box marginTop={1} marginBottom={1}>
-          <Text>{message}</Text>
-        </Box>
-      )}
+      {
+        error &&
+          <Box marginTop={1} marginBottom={1}>
+            <Text>{error.message}</Text>
+            <Text>{error.details}</Text>
+          </Box>
+      }
+      {
+        message &&
+          <Box marginTop={1} marginBottom={1}>
+            <Text>{message}</Text>
+          </Box>
+      }
+      {
+        children && children
+      }
     </Box>
   )
 }

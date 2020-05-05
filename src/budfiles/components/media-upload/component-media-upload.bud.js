@@ -1,11 +1,9 @@
-const {resolve} = require('path')
-
 /**
  * Generator: MediaUpload Component
  */
 module.exports = {
   label: 'Generate MediaUpload Component',
-  path: resolve(__dirname, './templates'),
+  dependsOn: ['bud/block'],
   actions: [
     {
       action: 'template',
