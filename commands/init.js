@@ -27,10 +27,12 @@ Init.propTypes = {
   email: PropTypes.string,
   /// Project website
   website: PropTypes.string,
-  /// Project development URL
-  devUrl: PropTypes.string,
-  /// Plugins URI
-  pluginsUri: PropTypes.string,
+  /// Project proxy URL
+  proxy: PropTypes.string,
+  /// Project uses SSL
+  protocol: PropTypes.string,
+  /// Dev server port
+  port: PropTypes.number,
   /// Output directory
   output: PropTypes.string,
   /// Use arguments and default values instead of prompt
@@ -41,13 +43,13 @@ Init.defaultProps = {
   name: 'Bud Plugin',
   namespace: 'bud-namespace',
   description: 'bud-description',
+  website: 'https://roots.io/bud',
   author: 'bud-author',
   email: 'bud-email@roots.io',
-  website: 'https://roots.io/bud',
-  devUrl: 'http://acme.test',
-  pluginsUri: 'app/plugins',
+  proxy: 'http://acme.test',
+  port: 3000,
   skip: false,
-  budFile: resolve(__dirname, './../../src/budfiles/plugin/plugin.bud'),
+  budFile: resolve(__dirname, './../../src/budfiles/init/init.bud'),
 }
 
 Init.positionalArgs = ['output']

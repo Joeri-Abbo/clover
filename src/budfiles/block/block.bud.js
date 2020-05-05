@@ -7,7 +7,6 @@ module.exports = {
   label: 'Generate block',
   path: resolve(__dirname, './templates'),
   default: {
-    namespace: 'bud-plugin',
     name: 'block-name',
     title: 'Block Name',
     description: 'A newly scaffolded block',
@@ -16,13 +15,6 @@ module.exports = {
     supports: ['align', 'alignWide', 'inserter', 'multiple', 'reusable'],
   },
   prompts: [
-    {
-      type: 'input',
-      name: 'namespace',
-      message: 'Namespace',
-      initial: 'acme-co',
-      required: true,
-    },
     {
       type: 'input',
       name: 'name',

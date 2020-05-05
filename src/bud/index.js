@@ -93,6 +93,23 @@ export const bud = {
   },
 
   /**
+   * Make directories
+   *
+   * @param {array} paths
+   * @return {Observable}
+   */
+  dirs: function ({paths}) {
+    return new Observable(observer => {
+      from(paths)
+        .pipe(concatMap(path => this.dir({path})))
+        .subscribe({
+          next: next => observer.next(next),
+          complete: () => observer.complete(),
+        })
+    })
+  },
+
+  /**
    * Make directory
    *
    * @param  {string} path

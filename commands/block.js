@@ -16,8 +16,6 @@ const Block = props => (
 Block.propTypes = {
   /// Block name
   name: PropTypes.string,
-  /// Block namespace
-  namespace: PropTypes.string,
   /// Block title
   title: PropTypes.string,
   /// Block description
@@ -33,7 +31,6 @@ Block.propTypes = {
 }
 
 Block.defaultProps = {
-  namespace: 'bud-plugin',
   name: 'block-name',
   title: 'Block Name',
   description: 'A newly scaffolded block',

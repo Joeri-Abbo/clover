@@ -1,3 +1,5 @@
+import {join} from 'path'
+import {existsSync} from 'fs'
 import React, {useState, useEffect} from 'react'
 import {Box, Static, Color, Text} from 'ink'
 import Divider from 'ink-divider'
@@ -5,13 +7,20 @@ import Link from 'ink-link'
 import {prompt} from 'enquirer'
 import {bud as BudCore} from './../bud'
 
-const DEFAULT_BUDFILE = {actions: [], label: 'Budfile', prompts: []}
+const DEFAULT_BUDFILE = {
+  actions: [],
+  label: 'Budfile',
+  prompts: [],
+}
 
 /**
  * Bud CLI
  *
+ * @prop {string} label
  * @prop {string} budFile
  * @prop {string} outDir
+ * @prop {object} commandValues
+ * @prop {object} children
  */
 const BudCLI = ({
   label,
@@ -20,42 +29,67 @@ const BudCLI = ({
   commandValues = null,
   children,
 }) => {
+  /**
+   * Parse values from .bud/bud.config.json
+   */
+  const config = join(process.cwd(), '.bud/bud.config.json')
+  const configData = existsSync(config) ? require(config) : null
+  const [project] = useState({
+    ...configData.project,
+    ...configData.dev,
+  })
+
+  /**
+   * Parse values from prompt
+   */
   const [prompts, setPrompts] = useState(
     !commandValues && budFile.prompts ? budFile.prompts : null,
   )
+
   const [data, setData] = useState(null)
   const [message, setMessage] = useState(null)
 
+  /**
+   * Assemble data from config files, prompt & cli args/flags.
+   */
   useEffect(() => {
-    ;(async () => {
-      !commandValues
-        ? prompt(prompts).then(data => {
-            setPrompts(null)
-            setData(data)
+    !commandValues && prompts
+      ? prompt(prompts).then(data => {
+          setPrompts(null)
+          setData({
+            ...project,
+            ...data,
           })
-        : (() => {
-            setPrompts(null)
-            setData(commandValues)
-          })()
-    })()
+        })
+      : (() => {
+          setPrompts(null)
+          setData({
+            ...project,
+            ...commandValues,
+          })
+        })()
   }, [])
 
+  /**
+   * Run the budfile actions
+   */
   useEffect(() => {
-    ;(async () => {
-      data &&
-        (await BudCore.init({
-          data,
-          budFile,
-          outDir,
+    data &&
+      BudCore.init({
+        data,
+        budFile,
+        outDir,
+      })
+        .actions()
+        .subscribe({
+          next: message => setMessage(message),
+          complete: message => setMessage(message),
         })
-          .actions()
-          .subscribe({
-            next: message => setMessage(message),
-            complete: message => setMessage(message),
-          }))
-    })()
   }, [data])
 
+  /**
+   * Render TTY
+   */
   return (
     <Box flexDirection="column" justifyContent="flex-start">
       <ViewMast label={label} />
