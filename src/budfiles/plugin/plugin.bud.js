@@ -1,72 +1,11 @@
 const {resolve} = require('path')
 
 /**
- * Bud Plugin
+ * bud plugin
  */
 module.exports = {
-  label: 'Initialize new project',
+  label: 'Generate new plugin',
   path: resolve(__dirname, './templates'),
-  default: {
-    name: 'Bud Plugin',
-    namespace: 'bud-namespace',
-    description: 'bud-description',
-    author: 'bud-author',
-    email: 'bud-email@roots.io',
-    website: 'https://roots.io/bud',
-    default: false,
-  },
-  prompts: [
-    {
-      type: 'input',
-      name: 'name',
-      message: 'Project name',
-      initial: 'ACME Blocks',
-      required: true,
-    },
-    {
-      type: 'input',
-      name: 'namespace',
-      message: 'Namespace',
-      initial: 'acme-co',
-      required: true,
-    },
-    {
-      type: 'input',
-      name: 'description',
-      message: 'Description',
-      initial: 'Short description of acme-block',
-    },
-    {
-      type: 'input',
-      name: 'author',
-      message: 'Author name',
-      initial: 'Wiley C.',
-    },
-    {
-      type: 'input',
-      name: 'email',
-      message: 'Author email',
-      initial: 'wiley@gmail.com',
-    },
-    {
-      type: 'input',
-      name: 'website',
-      message: 'Author website',
-      initial: 'https://acme.co',
-    },
-    {
-      type: 'input',
-      name: 'devUrl',
-      message: 'Project development URL',
-      initial: 'http://acme.test',
-    },
-    {
-      type: 'input',
-      name: 'pluginsUri',
-      message: 'Plugins directory URI',
-      initial: 'app/plugins',
-    },
-  ],
   actions: [
     {
       action: 'template',
@@ -153,16 +92,6 @@ module.exports = {
       template: 'package.json.hbs',
       path: 'package.json',
       parser: 'json',
-    },
-    {
-      action: 'template',
-      template: '.bud/templates/Component.js.hbs',
-      path: '.bud/templates/Component.js.hbs',
-    },
-    {
-      action: 'template',
-      template: '.bud/example.budfile.js',
-      path: '.bud/example.budfile.js',
     },
     {
       action: 'dir',
