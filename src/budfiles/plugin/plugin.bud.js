@@ -90,12 +90,7 @@ module.exports = {
     },
     {
       action: 'dirs',
-      paths: [
-        'src',
-        'src/blocks',
-        'src/components',
-        'src/extensions',
-      ],
+      paths: ['src', 'src/blocks', 'src/components', 'src/extensions'],
     },
     {
       action: 'npm',

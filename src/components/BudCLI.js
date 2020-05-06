@@ -53,17 +53,19 @@ const BudCLI = ({
    * but are not met.
    */
   useEffect(() => {
-    if (! sprout.dependsOn || configData.installed) {
+    if (!sprout.dependsOn || configData.installed) {
       return
     }
 
-    sprout.dependsOn && sprout.dependsOn.forEach(dep => {
-      configData.installed && ! configData.installed.includes(dep)
-        && setError({
-          message: `Dependency not met.`,
-          details: `Run \`bud generate ${dep}\` in your project then re-run this command.`,
-        })
-    })
+    sprout.dependsOn &&
+      sprout.dependsOn.forEach(dep => {
+        configData.installed &&
+          !configData.installed.includes(dep) &&
+          setError({
+            message: `Dependency not met.`,
+            details: `Run \`bud generate ${dep}\` in your project then re-run this command.`,
+          })
+      })
   }, [sprout, configData])
 
   /**
@@ -94,7 +96,8 @@ const BudCLI = ({
    * Run the budfile actions
    */
   useEffect(() => {
-    data && !inert &&
+    data &&
+      !inert &&
       BudCore.init({
         data,
         templateDir,
@@ -114,22 +117,18 @@ const BudCLI = ({
   return (
     <Box flexDirection="column" justifyContent="flex-start">
       <ViewMast label={label} />
-      {
-        error &&
-          <Box marginTop={1} marginBottom={1}>
-            <Text>{error.message}</Text>
-            <Text>{error.details}</Text>
-          </Box>
-      }
-      {
-        message &&
-          <Box marginTop={1} marginBottom={1}>
-            <Text>{message}</Text>
-          </Box>
-      }
-      {
-        children && children
-      }
+      {error && (
+        <Box marginTop={1} marginBottom={1}>
+          <Text>{error.message}</Text>
+          <Text>{error.details}</Text>
+        </Box>
+      )}
+      {message && (
+        <Box marginTop={1} marginBottom={1}>
+          <Text>{message}</Text>
+        </Box>
+      )}
+      {children && children}
     </Box>
   )
 }

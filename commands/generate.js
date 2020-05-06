@@ -94,12 +94,14 @@ const Generate = props => {
 
   return budFile ? (
     <BudCLI
-      label={require(budFile.replace('.js','')).label}
+      label={require(budFile.replace('.js', '')).label}
       outDir={process.cwd()}
       templateDir={dirname(budFile)}
-      sprout={require(`${budFile.replace('.js','')}`)}
+      sprout={require(`${budFile.replace('.js', '')}`)}
     />
-  ):[]
+  ) : (
+    []
+  )
 }
 
 Generate.propTypes = {
