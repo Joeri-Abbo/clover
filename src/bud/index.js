@@ -33,8 +33,7 @@ export const bud = {
     this.cwd = this.outDir
     this.runnerOptions = {cwd: this.cwd}
 
-    this.templateDir = `${templateDir}/templates`,
-    this.sprout = sprout
+    ;(this.templateDir = `${templateDir}/templates`), (this.sprout = sprout)
     this.data = data
 
     this.registerHelpers()
@@ -214,13 +213,16 @@ export const bud = {
    * @return {Observable}
    */
   complete: function () {
-    const budConfig = JSON.parse(fs.readFileSync(`${this.outDir}/.bud/bud.config.json`), 'utf8')
-    if (! budConfig.installed.includes(this.sprout.name)) {
+    const budConfig = JSON.parse(
+      fs.readFileSync(`${this.outDir}/.bud/bud.config.json`),
+      'utf8',
+    )
+    if (!budConfig.installed.includes(this.sprout.name)) {
       budConfig.installed.push(this.sprout.name)
-      const output = prettier.format(
-        JSON.stringify(budConfig),
-        {...basePrettierConfig, parser: 'json'}
-      )
+      const output = prettier.format(JSON.stringify(budConfig), {
+        ...basePrettierConfig,
+        parser: 'json',
+      })
       fs.writeFileSync(`${this.outDir}/.bud/bud.config.json`, output, 'utf8')
     }
     return new Observable(observer => {

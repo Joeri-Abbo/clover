@@ -71,10 +71,7 @@ module.exports = {
       type: 'select',
       name: 'styles',
       message: 'Define styles (https://git.io/JfZTu)',
-      choices: [
-        'yes',
-        'no',
-      ],
+      choices: ['yes', 'no'],
     },
   ],
   actions: [
