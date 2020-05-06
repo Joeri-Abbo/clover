@@ -177,32 +177,17 @@ export const bud = {
   },
 
   /**
-   * Install
-   *
-   * @param  {bool} npm
-   * @param  {bool} composer
-   * @param  {bool} build
-   * @return {Observable}
+   * packageFile
    */
-  install: async function ({npm, composer, build}) {
+  merge: function ({file, merge}) {
     return new Observable(observer => {
-      npm &&
-        this.runner.command(`yarn`, this.runnerOptions).then(() => {
-          observer.next(observer)
-          observer.complete()
-        })
-
-      composer &&
-        this.runner.command(`composer install`, this.runnerOptions).then(() => {
-          observer.next(observer)
-          observer.complete()
-        })
-
-      build &&
-        this.runner.command(`yarn build`, this.runnerOptions).then(() => {
-          observer.next(observer)
-          observer.complete()
-        })
+      const output = merge(require(`${this.outDir}/${file}`))
+      fs.outputFile(`${this.outDir}/${file}`, prettier.format(
+        JSON.stringify(output),
+        {...basePrettierConfig, parser: 'json'}
+      )).then(function () {
+        observer.complete()
+      })
     })
   },
 
@@ -222,6 +207,7 @@ export const bud = {
         ...basePrettierConfig,
         parser: 'json',
       })
+
       fs.writeFileSync(`${this.outDir}/.bud/bud.config.json`, output, 'utf8')
     }
     return new Observable(observer => {

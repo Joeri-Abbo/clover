@@ -2,8 +2,9 @@
  * Generator: MediaUpload Component
  */
 module.exports = {
+  name: 'component-media-upload',
   label: 'Generate MediaUpload Component',
-  dependsOn: ['bud/block'],
+  dependsOn: ['block'],
   actions: [
     {
       action: 'template',
