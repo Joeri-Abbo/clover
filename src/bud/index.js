@@ -32,7 +32,6 @@ export const bud = {
     this.outDir = outDir
     this.cwd = this.outDir
     this.runnerOptions = {cwd: this.cwd}
-
     ;(this.templateDir = `${templateDir}/templates`), (this.sprout = sprout)
     this.data = data
 

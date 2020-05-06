@@ -18,90 +18,67 @@ const Generate = props => {
   const [budName] = useState(props.budName)
   const [projectBud, setProjectBud] = useState(null)
   const [projectBudPath, setProjectBudPath] = useState(null)
-  const [projectBudExists, setProjectBudExists] = useState(null)
   useEffect(() => {
     budName && setProjectBudPath(getProjectBudPath(budName))
   }, [budName])
 
+  /**
+   * Local budfiles
+   */
   useEffect(() => {
     projectBudPath &&
       (async () => {
         exists(projectBudPath, res => {
-          res
-            ? (() => {
-                setProjectBudExists(true)
-                setProjectBud(projectBudPath)
-              })()
-            : setProjectBudExists(false)
+          res && setProjectBud(projectBudPath)
         })
       })()
   }, [projectBudPath])
 
-  const [budModules, setBudModules] = useState([])
-  const [budModulesExist, setBudModulesExist] = useState(null)
+  /**
+   * Module budfiles
+   */
+  const [budModules, setBudModules] = useState(null)
   useEffect(() => {
-    projectBudPath &&
-      projectBudExists === false &&
+    !projectBud &&
       (async () => {
         const modules = await globby([getModuleBudPath(budName)])
-        modules && modules.length > 0
-          ? (() => {
-              setBudModules(modules)
-              setBudModulesExist(true)
-            })()
-          : setBudModulesExist(false)
+        modules && modules.length > 0 && setBudModules(modules)
       })()
-  }, [projectBudPath, projectBudExists])
+  }, [projectBud])
 
+  /**
+   * Core budfiles
+   */
   const [rootBud, setRootBud] = useState([])
-  const [rootBudExists, setRootBudExists] = useState(null)
   useEffect(() => {
-    projectBudPath &&
-      projectBudExists === false &&
-      budModulesExist === false &&
+    !projectBud && !budModules &&
       (async () => {
         const coreBuds = await globby([getRootBudPath(budName)])
-        coreBuds
-          ? (() => {
-              setRootBud(coreBuds)
-              setRootBudExists(true)
-            })()
-          : setRootBudExists(false)
+        coreBuds && setRootBud(coreBuds)
       })()
-  }, [projectBudPath, projectBudExists, budModulesExist, budModules])
+  }, [projectBud, budModules])
 
+  /**
+   * Set final budfile
+   */
   const [budFile, setBudFile] = useState()
   useEffect(() => {
-    if (projectBudExists) {
-      setBudFile(projectBud)
-    }
+    if (projectBud) setBudFile(projectBud)
+    if (budModules && budModules[0]) setBudFile(budModules[0])
+    if (rootBud && rootBud[0]) setBudFile(rootBud[0])
+  }, [projectBud, budModules, rootBud])
 
-    if (!projectBudExists && budModulesExist && budModules[0]) {
-      setBudFile(budModules[0])
-    }
-
-    if (!projectBudExists && !budModulesExist && rootBudExists && rootBud[0]) {
-      setBudFile(rootBud[0])
-    }
-  }, [
-    projectBudExists,
-    projectBud,
-    budModulesExist,
-    budModules,
-    rootBud,
-    rootBudExists,
-  ])
-
+  /**
+   * Render
+   */
   return budFile ? (
     <BudCLI
-      label={require(budFile.replace('.js', '')).label}
+      label={require(budFile).label}
       outDir={process.cwd()}
       templateDir={dirname(budFile)}
-      sprout={require(`${budFile.replace('.js', '')}`)}
+      sprout={require(budFile)}
     />
-  ) : (
-    []
-  )
+  ) : []
 }
 
 Generate.propTypes = {
