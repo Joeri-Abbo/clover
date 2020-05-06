@@ -1,14 +1,20 @@
 import {join, resolve, dirname} from 'path'
 import {exists} from 'fs'
 import React, {useState, useEffect} from 'react'
+import {Text, Color} from 'ink'
 import PropTypes from 'prop-types'
 import BudCLI from '../src/components/BudCLI'
 import globby from 'globby'
 
+/**
+ * Resolvers for different budfile locations
+ */
 const getRootBudPath = name =>
   resolve(__dirname, `../../src/budfiles/**/${name}.bud.js`)
+
 const getModuleBudPath = name =>
   join(process.cwd(), `node_modules/**/bud-plugin-*/**/${name}.bud.js`)
+
 const getProjectBudPath = name =>
   join(process.cwd(), `.bud/budfiles/${name}/${name}.bud.js`)
 
@@ -42,30 +48,31 @@ const Generate = props => {
     !projectBud &&
       (async () => {
         const modules = await globby([getModuleBudPath(budName)])
-        modules && modules.length > 0 && setBudModules(modules)
+        modules && modules.length > 0 && setBudModules(modules[0])
       })()
   }, [projectBud])
 
   /**
    * Core budfiles
    */
-  const [rootBud, setRootBud] = useState([])
+  const [rootBud, setRootBud] = useState(null)
   useEffect(() => {
-    !projectBud && !budModules &&
+    !projectBud &&
+      !budModules &&
       (async () => {
         const coreBuds = await globby([getRootBudPath(budName)])
-        coreBuds && setRootBud(coreBuds)
+        coreBuds && setRootBud(coreBuds[0])
       })()
   }, [projectBud, budModules])
 
   /**
    * Set final budfile
    */
-  const [budFile, setBudFile] = useState()
+  const [budFile, setBudFile] = useState(null)
   useEffect(() => {
-    if (projectBud) setBudFile(projectBud)
-    if (budModules && budModules[0]) setBudFile(budModules[0])
-    if (rootBud && rootBud[0]) setBudFile(rootBud[0])
+    projectBud && setBudFile(projectBud)
+    !projectBud && budModules && setBudFile(budModules)
+    !projectBud && !budModules && rootBud && setBudFile(rootBud)
   }, [projectBud, budModules, rootBud])
 
   /**
@@ -78,7 +85,9 @@ const Generate = props => {
       templateDir={dirname(budFile)}
       sprout={require(budFile)}
     />
-  ) : []
+  ) : (
+    <Text><Color green>Searching...</Color></Text>
+  )
 }
 
 Generate.propTypes = {
