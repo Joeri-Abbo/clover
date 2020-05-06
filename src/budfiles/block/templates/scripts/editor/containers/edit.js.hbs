@@ -26,6 +26,7 @@ const edit = ({attributes, className, setAttributes}) => {
   const {text} = attributes
 {{/has}}
 
+{{#has 'components' 'RichText'}}
   /**
    * Generic attribute handler.
    *
@@ -36,6 +37,7 @@ const edit = ({attributes, className, setAttributes}) => {
   const setAttribute = (attr, value) => {
     setAttributes({[attr]: value})
   }
+{{/has}}
 
   /**
    * Return the block contents for rendering.
@@ -47,7 +49,7 @@ const edit = ({attributes, className, setAttributes}) => {
         placeholder={__('placeholder heading', '{{namespace}}')}
         tagName={'h2'}
         value={text || ''}
-        onChange={value => onAttribute('text', value)}
+        onChange={value => setAttribute('text', value)}
       />
     {{/has}}
 

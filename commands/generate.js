@@ -86,7 +86,9 @@ const Generate = props => {
       sprout={require(budFile)}
     />
   ) : (
-    <Text><Color green>Searching...</Color></Text>
+    <Text>
+      <Color green>Searching...</Color>
+    </Text>
   )
 }
 

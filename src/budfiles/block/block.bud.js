@@ -2,7 +2,7 @@
  * Bud Block
  */
 module.exports = {
-  name: 'bud/block',
+  name: 'block',
   label: 'Generate block',
   default: {
     name: 'block-name',
