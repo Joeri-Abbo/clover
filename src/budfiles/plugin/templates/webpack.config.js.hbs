@@ -40,21 +40,21 @@ const entry = () => {
 
   blocks.forEach(block => {
     assets = {
-      [`blocks/${block}/scripts/editor`]: [
-        resolve(__dirname, `src/blocks/${block}/scripts/editor/block.js`),
+      ...assets,
+      [`blocks/${block}/editor`]: [
+        resolve(__dirname, `src/blocks/${block}/editor.js`),
         resolve(__dirname, `src/blocks/${block}/styles/editor.css`),
       ],
-      [`blocks/${block}/scripts/public`]: [
-        resolve(__dirname, `src/blocks/${block}/scripts/public/index.js`),
+      [`blocks/${block}/public`]: [
+        resolve(__dirname, `src/blocks/${block}/public.js`),
         resolve(__dirname, `src/blocks/${block}/styles/public.css`),
       ],
     }
 
-    assets[`blocks/${block}/scripts/editor`] = assets[`blocks/${block}/scripts/editor`].filter(file => existsSync(file))
-    assets[`blocks/${block}/scripts/editor`].length <= 0 && delete assets[`blocks/${block}/scripts/editor`]
-
-    assets[`blocks/${block}/scripts/public`] = assets[`blocks/${block}/scripts/public`].filter(file => existsSync(file))
-    assets[`blocks/${block}/scripts/public`].length <= 0 && delete assets[`blocks/${block}/scripts/public`]
+    assets[`blocks/${block}/editor`] = assets[`blocks/${block}/editor`].filter(file => existsSync(file))
+    assets[`blocks/${block}/editor`].length <= 0 && delete assets[`blocks/${block}/editor`]
+    assets[`blocks/${block}/public`] = assets[`blocks/${block}/public`].filter(file => existsSync(file))
+    assets[`blocks/${block}/public`].length <= 0 && delete assets[`blocks/${block}/public`]
   })
 
   return assets
@@ -65,6 +65,7 @@ const entry = () => {
  */
 module.exports = {
   entry,
+  context: join(__dirname, 'src'),
   output: {
     path: resolve(__dirname, 'dist'),
     publicPath: isProduction ? '/' : `http://localhost:3000/app/plugins/{{lowercase (dashcase namespace)}}/`,

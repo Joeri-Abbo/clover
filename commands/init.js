@@ -7,11 +7,11 @@ import BudCLI from './../src/components/BudCLI'
 /// Create a new project
 const Init = props => (
   <BudCLI
-    label={require(`${props.budFileDir}/init.bud`).label}
-    sprout={require(`${props.budFileDir}/init.bud`)}
     values={props.name ? props : null}
     outDir={props.projectDir}
-    templateDir={`${props.budFileDir}`}
+    label={require(`${props.budFileDir}/init.bud`).label}
+    sprout={require(`${props.budFileDir}/init.bud`)}
+    templateDir={`${props.budFileDir}/templates`}
   />
 )
 

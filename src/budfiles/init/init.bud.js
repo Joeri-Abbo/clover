@@ -1,6 +1,6 @@
 module.exports = {
   name: 'bud',
-  label: 'Initialize Bud Project',
+  description: 'Initialize a new project',
   prompts: [
     {
       type: 'input',

@@ -110,8 +110,28 @@ add_action('init', function () {
             if (realpath("{$this->dir}/dist/blocks/{$block}/scripts/{$script}.js")) {
                 wp_register_script(
                     "{$this->namespace}/{$block}/{$script}/js",
-                    "{$this->dist}/blocks/{$block}/scripts/{$script}.js",
+                    "{$this->dist}/blocks/{$block}/{$script}.js",
                     ...$this->getManifest($block, $script)
+                );
+            }
+        }
+    }
+
+    /**
+     * Register block styles.
+     *
+     * @param  string
+     * @return void
+     */
+    protected function registerBlockStyles(string $block): void
+    {
+        foreach (['editor', 'public'] as $style) {
+            if (realpath("{$this->dir}/dist/blocks/{$block}/styles/${style}.css")) {
+                wp_register_style(
+                    "{$this->namespace}/{$block}/{$style}/css",
+                    "{$this->dist}/blocks/{$block}/styles/{$style}.css",
+                    [],
+                    null
                 );
             }
         }
@@ -134,26 +154,6 @@ add_action('init', function () {
 
         $manifest = file_get_contents($manifestFile);
         return array_values(json_decode($manifest, true));
-    }
-
-    /**
-     * Register block styles.
-     *
-     * @param  string
-     * @return void
-     */
-    protected function registerBlockStyles(string $block): void
-    {
-        foreach (['editor', 'public'] as $style) {
-            if (realpath("{$this->dir}/dist/blocks/{$block}/styles/${style}.css")) {
-                wp_register_style(
-                    "{$this->namespace}/{$block}/{$style}/css",
-                    "{$this->dist}/blocks/{$block}/styles/{$style}.css",
-                    [],
-                    null
-                );
-            }
-        }
     }
 
     /**

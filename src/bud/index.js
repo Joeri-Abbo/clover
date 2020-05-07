@@ -47,11 +47,11 @@ export const bud = {
    * @param {bool}   skipInstall
    */
   init: function ({outDir = './', data = {}, sprout, templateDir}) {
-    this.sprout = sprout
     this.data = data
+    this.sprout = sprout
     this.projectDir = outDir
     this.runnerOptions = {cwd: this.projectDir}
-    this.templateDir = `${templateDir}/templates`
+    this.templateDir = templateDir
 
     this.registerHelpers()
 
@@ -241,6 +241,9 @@ export const bud = {
       })
   },
 
+  /**
+   * Work with composer
+   */
   composer: async function (task, observer) {
     console.log(task)
     observer.next('composer not quite implemented.')
@@ -248,7 +251,7 @@ export const bud = {
   },
 
   /**
-   * manipulate json obj
+   * Expose project JSON
    */
   json: async function ({file, merge}, observer) {
     await fs.outputFile(
