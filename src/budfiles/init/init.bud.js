@@ -62,7 +62,7 @@ module.exports = {
   ],
   actions: [
     {
-      action: 'dirs',
+      action: 'scaffold',
       paths: [
         '.bud',
         '.bud/budfiles',
@@ -78,6 +78,12 @@ module.exports = {
     },
     {
       action: 'template',
+      template: 'package.json.hbs',
+      path: 'package.json',
+      parser: 'json',
+    },
+    {
+      action: 'template',
       template: 'budfiles/example/example.bud.js.hbs',
       path: '.bud/budfiles/example/example.bud.js',
     },
@@ -85,6 +91,12 @@ module.exports = {
       action: 'template',
       template: 'budfiles/example/templates/Component.js.hbs',
       path: '.bud/budfiles/example/templates/Component.js.hbs',
+    },
+    {
+      action: 'addDependencies',
+      repo: 'npm',
+      dev: true,
+      pkgs: ['@roots/bud'],
     },
   ],
 }

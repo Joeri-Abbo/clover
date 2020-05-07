@@ -83,17 +83,12 @@ module.exports = {
       parser: 'babel',
     },
     {
-      action: 'template',
-      template: 'package.json.hbs',
-      path: 'package.json',
-      parser: 'json',
-    },
-    {
-      action: 'dirs',
+      action: 'scaffold',
       paths: ['src', 'src/blocks', 'src/components', 'src/extensions'],
     },
     {
-      action: 'npm',
+      action: 'addDependencies',
+      repo: 'npm',
       dev: true,
       pkgs: [
         '@babel/cli',
@@ -140,6 +135,32 @@ module.exports = {
         'webpackbar',
         'write-file-webpack-plugin',
       ],
+    },
+    {
+      action: 'json',
+      file: 'package.json',
+      merge: pkg => ({
+        ...pkg,
+        browserslist: ['extends @wordpress/browserslist-config'],
+        scripts: {
+          ...pkg.scripts,
+          dev:
+            'cross-env NODE_ENV=hmr webpack-dev-server --colors --watch --config webpack.config.js',
+          build:
+            'cross-env NODE_ENV=development webpack --progress --colors --inline -p --config webpack.config.js',
+          'build:production':
+            'cross-env NODE_ENV=production webpack --progress --colors --inline -p --config webpack.config.js',
+          lint: 'run-s -c lint:*',
+          'lint:css': 'stylelint ./src/**/*.css',
+          'lint:js': 'eslint ./src/**/*.js',
+          format: 'prettier --write .',
+          translate: 'run-s -c translate:*',
+          'translate:pot':
+            'wp i18n make-pot . ./src/languages/plugin.pot --ignore-domain --include="./src"',
+          'translate:js':
+            'wp i18n make-json ./src/languages --no-purge --pretty-print',
+        },
+      }),
     },
   ],
 }
