@@ -3,7 +3,7 @@
  */
 module.exports = {
   name: 'component-media-upload',
-  label: 'Generate MediaUpload Component',
+  description: 'Generate MediaUpload Component',
   dependsOn: ['block'],
   actions: [
     {

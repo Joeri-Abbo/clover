@@ -3971,6 +3971,13 @@ ink-link@^1.1.0:
     prop-types "^15.7.2"
     terminal-link "^2.1.1"
 
+ink-table@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/ink-table/-/ink-table-2.0.1.tgz#22ed3485b8ddaee9f45e6cb13c505a06463827e7"
+  integrity sha512-YZcgRZERnIdwJ1Eue9efiCVl07BF+f9vH2k+wh+ZPNaGQGplRTAyybJlk0gIWV8qr1pxBm2c66FvqQXoTinq0w==
+  dependencies:
+    prop-types "^15.7.2"
+
 ink-use-stdout-dimensions@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/ink-use-stdout-dimensions/-/ink-use-stdout-dimensions-1.0.5.tgz#7739876c00284840601c4150aa84eb7adc143de2"

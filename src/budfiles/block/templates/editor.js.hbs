@@ -39,7 +39,7 @@ registerBlockType('{{namespace}}/{{name}}', {
     * nested within the specified blocks.
     * @type {string}
     */
-  parent: '',
+  parent: {{#if parent}}'{{parent}}'{{else}}null{{/if}},
 
   {{#if keywords.[0]}}
   /**

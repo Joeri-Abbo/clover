@@ -1,6 +1,6 @@
 module.exports = {
   name: 'plugin',
-  label: 'Generate new plugin',
+  description: 'Generate a new plugin',
   actions: [
     {
       action: 'template',
@@ -16,8 +16,8 @@ module.exports = {
     },
     {
       action: 'template',
-      template: 'block.php.hbs',
-      path: 'block.php',
+      template: 'plugin.php.hbs',
+      path: 'plugin.php',
       parser: 'php',
     },
     {

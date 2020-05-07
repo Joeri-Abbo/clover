@@ -3,7 +3,7 @@
  */
 module.exports = {
   name: 'block',
-  label: 'Generate block',
+  description: 'Generate a new block',
   default: {
     name: 'block-name',
     title: 'Block Name',
@@ -77,32 +77,32 @@ module.exports = {
   actions: [
     {
       action: 'template',
-      template: 'scripts/editor/attributes.json.hbs',
-      path: 'src/blocks/{{name}}/scripts/editor/attributes.json',
+      template: 'attributes.json.hbs',
+      path: 'src/blocks/{{name}}/attributes.json',
       parser: 'json',
     },
     {
       action: 'template',
-      template: 'scripts/editor/block.js.hbs',
-      path: 'src/blocks/{{name}}/scripts/editor/block.js',
+      template: 'editor.js.hbs',
+      path: 'src/blocks/{{name}}/editor.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: 'scripts/editor/containers/edit.js.hbs',
-      path: 'src/blocks/{{name}}/scripts/editor/containers/edit.js',
+      template: 'containers/edit.js.hbs',
+      path: 'src/blocks/{{name}}/containers/edit.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: 'scripts/editor/containers/save.js.hbs',
-      path: 'src/blocks/{{name}}/scripts/editor/containers/save.js',
+      template: 'containers/save.js.hbs',
+      path: 'src/blocks/{{name}}/containers/save.js',
       parser: 'babel',
     },
     {
       action: 'template',
-      template: 'scripts/public/index.js.hbs',
-      path: 'src/blocks/{{name}}/scripts/public/index.js',
+      template: 'public.js.hbs',
+      path: 'src/blocks/{{name}}/public.js',
       parser: 'babel',
     },
     {
