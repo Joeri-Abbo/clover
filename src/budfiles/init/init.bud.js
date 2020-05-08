@@ -92,11 +92,5 @@ module.exports = {
       template: 'budfiles/example/templates/Component.js.hbs',
       path: '.bud/budfiles/example/templates/Component.js.hbs',
     },
-    {
-      action: 'addDependencies',
-      repo: 'npm',
-      dev: true,
-      pkgs: ['@roots/bud'],
-    },
   ],
 }

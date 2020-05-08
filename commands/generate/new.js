@@ -1,5 +1,4 @@
 import {join, resolve, dirname} from 'path'
-import {exists} from 'fs'
 import React, {useState, useEffect} from 'react'
 import {Text, Color} from 'ink'
 import PropTypes from 'prop-types'
@@ -10,55 +9,60 @@ import globby from 'globby'
  * Resolvers for different budfile locations
  */
 const getRootBudPath = name =>
-  resolve(__dirname, `../../../src/budfiles/**/${name}.bud.js`)
+  resolve(__dirname, `../../../src/**/${name}.bud.js`)
 
 const getModuleBudPath = name =>
   join(process.cwd(), `node_modules/**/bud-plugin-*/**/${name}.bud.js`)
 
 const getProjectBudPath = name =>
-  join(process.cwd(), `.bud/budfiles/${name}/${name}.bud.js`)
+  join(process.cwd(), `.bud/**/${name}.bud.js`)
 
 /** Command: bud generate new */
 /// Generate code described by a budfile
 const GenerateNew = props => {
   const [budName] = useState(props.budName)
-  const [sprout, setSprout] = useState(null)
+  const [sprout, setSprout] = useState(false)
+  const [checked, setChecked] = useState({
+    project: false,
+    modules: false,
+    roots: false,
+  })
 
   /**
    * Local budfiles
    */
   useEffect(() => {
-    console.log(budName)
-    budName &&
+    budName && !checked.project &&
       (async () => {
-        const budPath = getProjectBudPath(budName)
-        exists(budPath, res => {
-          res && setSprout(budPath)
-        })
+        const buds = await globby([getProjectBudPath(budName)])
+        buds && buds.length > 0 && setSprout(buds[0])
+        setChecked({...checked, project: true})
       })()
-  }, [budName])
+  }, [budName, checked])
 
   /**
    * Module budfiles
    */
   useEffect(() => {
-    !sprout &&
+    !sprout && checked.project &&
       (async () => {
-        const modules = await globby([getModuleBudPath(budName)])
-        modules && modules.length > 0 && setSprout(modules[0])
+        const buds = await globby([getModuleBudPath(budName)])
+        buds && buds.length > 0 && setSprout(buds[0])
+        setChecked({...checked, modules: true})
       })()
-  }, [sprout])
+  }, [sprout, checked])
 
   /**
    * Core budfiles
    */
   useEffect(() => {
-    !sprout &&
+    !sprout && checked.modules &&
       (async () => {
-        const coreBuds = await globby([getRootBudPath(budName)])
-        coreBuds && setSprout(coreBuds[0])
+        const buds = await globby([getRootBudPath(budName)])
+        buds && buds.length > 0 && setSprout(buds[0])
+        setChecked({...checked, roots: true})
       })()
-  }, [sprout])
+  }, [sprout, checked])
 
   /**
    * Render
