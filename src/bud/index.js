@@ -13,29 +13,9 @@ const helpers = require('./helpers')
  * Bud Core
  */
 export const bud = {
-  /**
-   * Templating
-   */
-  engine: Handlebars,
-
-  /**
-   * CLI runner
-   */
   runner: execa,
-
-  /**
-   * Format
-   *
-   * @param  {object|string} content
-   * @param  {parser} string
-   * @return {string}
-   */
-  format: function (content, parser) {
-    return prettier.format(JSON.stringify(content), {
-      ...basePrettierConfig,
-      parser: parser || 'babel',
-    })
-  },
+  templater: Handlebars,
+  formatter: prettier,
 
   /**
    * Initialize
@@ -53,6 +33,7 @@ export const bud = {
     this.runnerOptions = {cwd: this.projectDir}
     this.templateDir = templateDir
 
+    this.registerActions()
     this.registerHelpers()
 
     return this
@@ -78,13 +59,47 @@ export const bud = {
   },
 
   /**
+   * Register actions
+   */
+  registerActions: function () {
+    this.sprout.addActions
+      && this.sprout.addActions.length > 0
+      && this.sprout.addActions.forEach(action => {
+        this[action.handle] = action.callback
+      })
+  },
+
+  /**
    * Register helpers
    */
   registerHelpers: function () {
-    handlebarsHelpers({handlebars: this.engine})
+    // lib helpers
+    handlebarsHelpers({handlebars: this.templater})
 
+    // plugin registered helpers
+    this.sprout.registerHelpers
+      && this.sprout.registerHelpers.length > 0
+      && this.sprout.registerHelpers.forEach(helper => {
+      helpers.push(helper)
+    })
+
+    // roots/bud helpers
     helpers(this.getData()).forEach(({helper, fn}) => {
-      this.engine.registerHelper(helper, fn)
+      this.templater.registerHelper(helper, fn)
+    })
+  },
+
+  /**
+   * Format
+   *
+   * @param  {object|string} content
+   * @param  {parser} string
+   * @return {string}
+   */
+  format: function (content, parser) {
+    return prettier.format(typeof content !== 'string' ? JSON.stringify(content) : content, {
+      ...basePrettierConfig,
+      parser: parser || 'babel',
     })
   },
 
@@ -97,8 +112,6 @@ export const bud = {
     const bud = {...this}
 
     return new Observable(function (observer) {
-      bud.sprout.actions.push({action: 'finalize'})
-
       from(bud.sprout.actions)
         .pipe(
           concatMap(function (task) {
@@ -107,41 +120,11 @@ export const bud = {
             })
           }),
         )
-        .subscribe(response => {
-          observer.next(response)
+        .subscribe({
+          next: response => observer.next(response),
+          complete: () => observer.complete(),
         })
     })
-  },
-
-  /**
-   * Finalize
-   *
-   * @return {Observable}
-   */
-  finalize: async function (task, observer) {
-    const budConfigRaw = await fs.readFile(
-      `${this.projectDir}/.bud/bud.config.json`,
-    )
-    const budConfig = JSON.parse(budConfigRaw, 'utf8')
-
-    await fs.writeFile(
-      `${this.projectDir}/.bud/bud.config.json`,
-      this.format(
-        {
-          ...JSON.parse(budConfigRaw, 'utf8'),
-          installed: [
-            ...(!budConfig.installed.includes(this.sprout.name)
-              ? [...budConfig.installed, this.sprout.name]
-              : budConfig.installed),
-          ],
-        },
-        'json',
-      ),
-      'utf8',
-    )
-
-    observer.next(`✨ All done`)
-    observer.complete()
   },
 
   /**
@@ -173,7 +156,7 @@ export const bud = {
    * @return {Observable}
    */
   mkDir: async function ({path}, observer) {
-    const pathTemplate = this.engine.compile(path)
+    const pathTemplate = this.templater.compile(path)
     const dirPath = join(this.projectDir, pathTemplate(this.getData()))
 
     await fs.ensureDir(dirPath).then(() => {
@@ -193,15 +176,12 @@ export const bud = {
     const src = join(this.templateDir, template)
     const dest = join(
       this.projectDir,
-      this.engine.compile(path)(this.getData()),
+      this.templater.compile(path)(this.getData()),
     )
-    const prettierConfig = {...basePrettierConfig, parser}
 
     const contents = fs.readFileSync(src, 'utf8')
-    const compiled = this.engine.compile(contents)(this.getData())
-    const outputContents = parser
-      ? prettier.format(compiled, prettierConfig)
-      : compiled
+    const compiled = this.templater.compile(contents)(this.getData())
+    const outputContents = parser ? this.format(compiled, parser) : compiled
 
     await fs.outputFile(dest, outputContents).then(() => observer.complete())
   },
@@ -213,26 +193,12 @@ export const bud = {
    * @param  {bool}  dev
    * @return {Observable}
    */
-  addDependencies: async function ({repo, pkgs, dev}, observer) {
-    switch (repo) {
-      case 'npm':
-        await this.yarn({action: 'add', pkgs, dev}, observer)
-        break
-      case 'composer':
-        await this.composer({action: 'require', pkgs, dev}, observer)
-        break
-    }
-  },
-
-  /**
-   * Work with yarn
-   */
-  yarn: async function ({action, pkgs, dev}, observer) {
+  addDependencies: async function ({pkgs, dev}, observer) {
     observer.next('Installing node modules...')
 
     this.runner
       .command(
-        `yarn ${action} ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
+        `yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
         this.runnerOptions,
       )
       .then(() => {
@@ -242,23 +208,21 @@ export const bud = {
   },
 
   /**
-   * Work with composer
-   */
-  composer: async function (task, observer) {
-    console.log(task)
-    observer.next('composer not quite implemented.')
-    observer.complete()
-  },
-
-  /**
    * Expose project JSON
    */
   json: async function ({file, merge}, observer) {
-    await fs.outputFile(
-      `${this.projectDir}/${file}`,
-      this.format(merge(require(`${this.projectDir}/${file}`)), 'json'),
-    )
+    const json = require(`${this.projectDir}/${file}`)
 
-    observer.complete()
+    try {
+      const output = merge(json)
+      await fs.outputFileSync(
+        `${this.projectDir}/${file}`,
+        this.format(output, 'json'),
+      )
+
+      observer.complete()
+    } catch(err) {
+      console.error(err)
+    }
   },
 }

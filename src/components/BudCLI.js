@@ -1,7 +1,7 @@
 import {join} from 'path'
 import {existsSync} from 'fs'
 import React, {useState, useEffect} from 'react'
-import {Box, Static, Color, Text} from 'ink'
+import {Box, Static, Color, Text, useApp} from 'ink'
 import Divider from 'ink-divider'
 import Link from 'ink-link'
 import {prompt} from 'enquirer'
@@ -44,29 +44,12 @@ const BudCLI = ({
     !values && sprout.prompts ? sprout.prompts : null,
   )
 
+  const {exit} = useApp()
   const [data, setData] = useState(null)
   const [message, setMessage] = useState(null)
   const [error, setError] = useState(null)
-
-  /**
-   * Eject early if bud dependencies have been declared
-   * but are not met.
-   */
-  useEffect(() => {
-    if (!sprout.dependsOn || configData.installed) {
-      return
-    }
-
-    sprout.dependsOn &&
-      sprout.dependsOn.forEach(dep => {
-        configData.installed &&
-          !configData.installed.includes(dep) &&
-          setError({
-            message: `Dependency not met.`,
-            details: `Run \`bud generate ${dep}\` in your project then re-run this command.`,
-          })
-      })
-  }, [sprout, configData])
+  const [complete, setComplete] = useState(false)
+  const [budSubscription, setBudSubscription] = useState(false)
 
   /**
    * Assemble data from config files, prompt & cli args/flags.
@@ -96,39 +79,50 @@ const BudCLI = ({
    * Run the budfile actions
    */
   useEffect(() => {
-    data &&
-      !inert &&
+    data && !inert && !budSubscription &&
+    setBudSubscription(
       BudCore.init({
         data,
         templateDir,
         sprout,
         outDir,
       })
-        .actions()
-        .subscribe({
-          next: message => setMessage(message),
-          complete: message => setMessage(message),
-        })
+      .actions()
+      .subscribe({
+        next: message => setMessage(message),
+        error: error => setError(error),
+        complete: () => setComplete(true),
+      })
+    )
   }, [data])
+
+  useEffect(() => {
+    complete && (async () => {
+      await budSubscription.unsubscribe()
+      exit()
+    })()
+  }, [complete, budSubscription])
 
   /**
    * Render TTY
    */
   return (
     <Box flexDirection="column" justifyContent="flex-start">
-      <ViewMast label={label} />
+      <Static>
+        <ViewMast label={label} />
+      </Static>
       {error && (
         <Box marginTop={1} marginBottom={1}>
           <Text>{error.message}</Text>
           <Text>{error.details}</Text>
         </Box>
       )}
+      {children && children}
       {message && (
         <Box marginTop={1} marginBottom={1}>
           <Text>{message}</Text>
         </Box>
       )}
-      {children && children}
     </Box>
   )
 }
@@ -139,35 +133,33 @@ const BudCLI = ({
  * @prop {string} label
  */
 const ViewMast = ({label}) => (
-  <Static>
-    <Box flexDirection="column">
-      <Box
-        width={50}
-        marginTop={1}
-        flexDirection="row"
-        justifyContent="space-between">
-        {label && (
-          <Box>
-            <Text>{label}</Text>
-          </Box>
-        )}
-        <Box flexDirection="row">
-          <Box>
-            <Text>{`🌱`}</Text>
-          </Box>
+  <Box flexDirection="column">
+    <Box
+      width={50}
+      marginTop={1}
+      flexDirection="row"
+      justifyContent="space-between">
+      {label && (
+        <Box>
+          <Text>{label}</Text>
+        </Box>
+      )}
+      <Box flexDirection="row">
+        <Box>
+          <Text>{`🌱`}</Text>
+        </Box>
 
-          <Box marginLeft={1}>
-            <Text bold>
-              <Link url="https://roots.io/bud">
-                <Color green>{'Bud'}</Color>
-              </Link>
-            </Text>
-          </Box>
+        <Box marginLeft={1}>
+          <Text bold>
+            <Link url="https://roots.io/bud">
+              <Color green>{'Bud'}</Color>
+            </Link>
+          </Text>
         </Box>
       </Box>
-      <Divider padding={0} />
     </Box>
-  </Static>
+    <Divider padding={0} />
+  </Box>
 )
 
 export default BudCLI
