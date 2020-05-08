@@ -124,8 +124,9 @@ export const bud = {
           }),
         )
         .subscribe({
-          next: response => observer.next(response),
-          complete: () => observer.complete(),
+          next: next => observer.next(next),
+          error: error => observer.error(error),
+          complete: complete => observer.complete(complete),
         })
     })
   },
@@ -137,6 +138,8 @@ export const bud = {
    * @return {Observable}
    */
   scaffold: function ({paths}, observer) {
+    observer.next(`Creating directories`)
+
     from(paths)
       .pipe(
         concatMap(path => {
@@ -182,11 +185,13 @@ export const bud = {
       this.templater.compile(path)(this.getData()),
     )
 
-    const contents = fs.readFileSync(src, 'utf8')
+    observer.next(`Writing ${dest.split('/')[dest.split('/').length - 1]}`)
+
+    const contents = await fs.readFile(src, 'utf8')
     const compiled = this.templater.compile(contents)(this.getData())
     const outputContents = parser ? this.format(compiled, parser) : compiled
 
-    await fs.outputFile(dest, outputContents).then(() => observer.complete())
+    fs.outputFile(dest, outputContents).then(() => observer.complete())
   },
 
   /**
@@ -197,17 +202,18 @@ export const bud = {
    * @return {Observable}
    */
   addDependencies: async function ({pkgs, dev}, observer) {
-    observer.next('Installing node modules...')
+    observer.next(`Installing packages...`)
 
-    this.runner
-      .command(
-        `yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
-        this.runnerOptions,
-      )
-      .then(() => {
-        observer.next('Node modules installed.')
-        observer.complete()
-      })
+    const installation = this.runner.command(
+      `yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
+      this.runnerOptions,
+    )
+
+    installation.stdout.on('data', status => {
+      observer.next(status)
+    })
+
+    installation.then(() => observer.complete())
   },
 
   /**
@@ -215,17 +221,19 @@ export const bud = {
    */
   json: async function ({file, merge}, observer) {
     const json = require(`${this.projectDir}/${file}`)
+    observer.next(`Writing JSON to ${file}`)
 
     try {
       const output = merge(json)
-      await fs.outputFileSync(
+
+      await fs.outputFile(
         `${this.projectDir}/${file}`,
         this.format(output, 'json'),
       )
 
       observer.complete()
     } catch (err) {
-      console.error(err)
+      observer.error(`There was a problem writing to ${file}`)
     }
   },
 }

@@ -22,17 +22,17 @@ module.exports = data => {
     {
       helper: 'hasAny',
       fn: function (object, components, options) {
-        let uses = false
+        let hasInstance = false
 
         if (components) {
           components.forEach(component => {
             if (data[object].indexOf(component) > -1) {
-              uses = true
+              hasInstance = true
             }
           })
         }
 
-        return uses ? options.fn(this) : options.inverse(this)
+        return hasInstance ? options.fn(this) : options.inverse(this)
       },
     },
     {

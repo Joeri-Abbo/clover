@@ -1,9 +1,9 @@
 import {join} from 'path'
 import {existsSync} from 'fs'
 import React, {useState, useEffect} from 'react'
-import {Box, Static, Color, Text, useApp} from 'ink'
-import Divider from 'ink-divider'
+import {Box, Color, Text, useApp, useStdout} from 'ink'
 import Link from 'ink-link'
+import Spinner from 'ink-spinner'
 import {prompt} from 'enquirer'
 import {bud as BudCore} from './../bud'
 
@@ -46,8 +46,7 @@ const BudCLI = ({
 
   const {exit} = useApp()
   const [data, setData] = useState(null)
-  const [message, setMessage] = useState(null)
-  const [error, setError] = useState(null)
+  const [status, setStatus] = useState(null)
   const [complete, setComplete] = useState(false)
   const [budSubscription, setBudSubscription] = useState(false)
 
@@ -91,12 +90,11 @@ const BudCLI = ({
         })
           .actions()
           .subscribe({
-            next: message => setMessage(message),
-            error: error => setError(error),
+            next: next => setStatus(next),
             complete: () => setComplete(true),
           }),
       )
-  }, [data])
+  }, [data, status])
 
   useEffect(() => {
     complete &&
@@ -110,49 +108,11 @@ const BudCLI = ({
    * Render TTY
    */
   return (
-    <Box flexDirection="column" justifyContent="flex-start">
-      <Static>
-        <ViewMast label={label} />
-      </Static>
-      {error && (
-        <Box marginTop={1} marginBottom={1}>
-          <Text>{error.message}</Text>
-          <Text>{error.details}</Text>
-        </Box>
-      )}
-      {children && children}
-      {message && (
-        <Box marginTop={1} marginBottom={1}>
-          <Text>{message}</Text>
-        </Box>
-      )}
-    </Box>
-  )
-}
-
-/**
- * Application Mast
- *
- * @prop {string} label
- */
-const ViewMast = ({label}) => (
-  <Box flexDirection="column">
-    <Box
-      width={50}
-      marginTop={1}
-      flexDirection="row"
-      justifyContent="space-between">
-      {label && (
-        <Box>
-          <Text>{label}</Text>
-        </Box>
-      )}
-      <Box flexDirection="row">
-        <Box>
+    <Box flexDirection="column" justifyContent="flex-start" padding={1}>
+      <Box marginBottom={1} flexDirection="row" justifyContent="space-between">
+        {label && <Text>{label}</Text>}
+        <Box flexDirection="row">
           <Text>{`🌱`}</Text>
-        </Box>
-
-        <Box marginLeft={1}>
           <Text bold>
             <Link url="https://roots.io/bud">
               <Color green>{'Bud'}</Color>
@@ -160,9 +120,36 @@ const ViewMast = ({label}) => (
           </Text>
         </Box>
       </Box>
+
+      <Tasks data={data} status={status} complete={complete} />
+
+      {children && children}
     </Box>
-    <Divider padding={0} />
-  </Box>
-)
+  )
+}
+
+const Tasks = ({data, status, complete}) => {
+  const {stdout} = useStdout()
+  useEffect(() => {
+    data && stdout.write('\x1B[2J\x1B[0f')
+  }, [data])
+
+  return status ? (
+    <Box>
+      {complete ? (
+        <Color green>⚡️ All set.</Color>
+      ) : (
+        <Text>
+          <Color green>
+            <Spinner type="dots" />
+          </Color>
+          {` ${status}`}
+        </Text>
+      )}
+    </Box>
+  ) : (
+    []
+  )
+}
 
 export default BudCLI
