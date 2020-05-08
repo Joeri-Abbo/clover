@@ -27,8 +27,8 @@ module.exports = {
     },
     {
       action: 'template',
-      template: '.babelrc.js',
-      path: '.babelrc.js',
+      template: 'babel.config.js',
+      path: 'babel.config.js',
       parser: 'babel',
     },
     {
