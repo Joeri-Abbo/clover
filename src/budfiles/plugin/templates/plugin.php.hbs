@@ -26,13 +26,6 @@ add_action('init', function () {
     public $namespace = '{{lowercase (dashcase namespace)}}';
 
     /**
-     * Hostname
-     *
-     * @var string
-     */
-    public $host;
-
-    /**
      * Plugin directory.
      *
      * @var string
@@ -40,20 +33,12 @@ add_action('init', function () {
     public $dir;
 
     /**
-     * Asset URL base
-     *
-     * @var string
-     */
-    public $baseAssetUrl;
-
-    /**
      * Class constructor.
      */
     public function __construct()
     {
       $this->dir = dirname(__FILE__);
-      $this->isProduction = defined('WP_ENV') && WP_ENV == 'production';
-      $this->baseAssetUrl = $this->host . '/app/plugins/' . basename($this->dir) . '/dist';
+      $this->assetManifest = $this->getAssetManifest();
     }
 
     /**
@@ -65,15 +50,15 @@ add_action('init', function () {
     public function __invoke(): void
     {
         foreach ($this->getAssetsOfType('blocks') as $block) {
-            $blockName = basename($block);
-            $this->registerBlockScripts($blockName);
-            $this->registerBlockStyles($blockName);
-            $this->registerBlockType($blockName);
+            $name = ltrim(basename($block), '/');
+            $this->registerBlockScripts($name);
+            $this->registerBlockStyles($name);
+            $this->registerBlockType($name);
         }
 
         foreach ($this->getAssetsOfType('extensions') as $extension) {
-            $extensionName = basename($extension);
-            $this->registerExtension($extensionName);
+            $name = ltrim(basename($extension), '/');
+            $this->registerExtension($name);
         }
     }
 
@@ -89,16 +74,6 @@ add_action('init', function () {
     }
 
     /**
-     * Get hostname
-     *
-     * @return string
-     */
-     protected function getHost()
-     {
-         return $this->isProduction ? get_option('home') : '{{protocol}}://localhost:{{port}}';
-     }
-
-    /**
      * Register block scripts.
      *
      * @param  string
@@ -106,14 +81,12 @@ add_action('init', function () {
      */
     protected function registerBlockScripts(string $block): void
     {
-        foreach (['editor', 'public'] as $script) {
-            if (realpath("{$this->dir}/dist/blocks/{$block}/scripts/{$script}.js")) {
-                wp_register_script(
-                    "{$this->namespace}/{$block}/{$script}/js",
-                    "{$this->dist}/blocks/{$block}/{$script}.js",
-                    ...$this->getManifest($block, $script)
-                );
-            }
+        foreach (['editor', 'public'] as $context) {
+            wp_register_script(
+                "{$this->namespace}/{$block}/{$context}/js",
+                $this->assetManifest["blocks/{$block}/{$context}.js"],
+                ...$this->getDependencyManifest($block, $context)
+            );
         }
     }
 
@@ -125,15 +98,13 @@ add_action('init', function () {
      */
     protected function registerBlockStyles(string $block): void
     {
-        foreach (['editor', 'public'] as $style) {
-            if (realpath("{$this->dir}/dist/blocks/{$block}/styles/${style}.css")) {
-                wp_register_style(
-                    "{$this->namespace}/{$block}/{$style}/css",
-                    "{$this->dist}/blocks/{$block}/styles/{$style}.css",
-                    [],
-                    null
-                );
-            }
+        foreach (['editor', 'public'] as $context) {
+            wp_register_style(
+                "{$this->namespace}/{$block}/{$context}/css",
+                $this->assetManifest["blocks/{$block}/styles/{$context}.css"],
+                [],
+                null
+            );
         }
     }
 
@@ -142,13 +113,32 @@ add_action('init', function () {
      *
      * @return array
      */
-    protected function getManifest($block, $script): array
+    protected function getAssetManifest(): array
     {
-        if (!realpath($manifestFile = "{$this->dist}/blocks/{$block}/scripts/{$script}.asset.json")) {
+        if (!realpath($manifestFile = "{$this->dir}/dist/manifest.json")) {
             new \WP_Error(
-                __('manifest_not_found', '{{lowercase (dashcase namespace)}}'),
-                __('There was an issue with the {{name}} plugin', '{{lowercase (dashcase namespace)}}'),
-                __('Please run the build scripts in the plugin directory.', '{{lowercase (dashcase namespace)}}')
+                __('asset_manifest_not_found', '{{lowercase (dashcase namespace)}}'),
+                __('There was an issue with the acme-project plugin', '{{lowercase (dashcase namespace)}}'),
+                __('Asset manifest not found. Please run the plugin build scripts.', '{{lowercase (dashcase namespace)}}')
+            );
+        }
+
+        $manifest = file_get_contents($manifestFile);
+        return json_decode($manifest, true);
+    }
+
+    /**
+     * Get webpack dependency manifest.
+     *
+     * @return array
+     */
+    protected function getDependencyManifest($block, $script): array
+    {
+        if (!realpath("{$this->dir}/dist/blocks/{$block}/{$script}.asset.json")) {
+            new \WP_Error(
+                __('dependency_manifest_not_found', '{{lowercase (dashcase namespace)}}'),
+                __('There was an issue with the acme-project plugin', '{{lowercase (dashcase namespace)}}'),
+                __('Asset manifest not found. Please run the plugin build scripts.', '{{lowercase (dashcase namespace)}}')
             );
         }
 
@@ -180,17 +170,15 @@ add_action('init', function () {
      */
     protected function registerExtension($extension): void
     {
-        if (realpath("{$this->dir}/dist/{$extension}.js")) {
-            wp_register_script(
-                "{$this->namespace}/{$extension}/js",
-                "{$this->dist}/{$extension}.js",
-                ...$this->getManifest($extension, 'scripts')
-            );
+        wp_register_script(
+            "{$this->namespace}/{$extension}/js",
+            "{$this->getHost()}/{$extension}.js",
+            ...$this->getDependencyManifest($extension, 'scripts')
+        );
 
-            add_action('enqueue_block_editor_assets', function () use ($extension) {
-                wp_enqueue_script("{$this->namespace}/{$extension}/js");
-            });
-        }
+        add_action('enqueue_block_editor_assets', function () use ($extension) {
+            wp_enqueue_script("{$this->namespace}/{$extension}/js");
+        });
     }
   })();
 });

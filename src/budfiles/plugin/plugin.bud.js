@@ -1,3 +1,7 @@
+/**
+ * bud generate new plugin
+ */
+
 module.exports = {
   name: 'plugin',
   description: 'Generate a new plugin',
