@@ -9,11 +9,9 @@ import globby from 'globby'
  * Resolvers for different budfile locations
  */
 const getRootBudPath = name =>
-  resolve(__dirname, `../../../src/**/${name}.bud.js`)
-
+  resolve(__dirname, `../../../src/budfiles/**/${name}.bud.js`)
 const getModuleBudPath = name =>
   join(process.cwd(), `node_modules/**/bud-plugin-*/**/${name}.bud.js`)
-
 const getProjectBudPath = name => join(process.cwd(), `.bud/**/${name}.bud.js`)
 
 /** Command: bud generate new */
@@ -38,7 +36,7 @@ const GenerateNew = props => {
         buds && buds.length > 0 && setSprout(buds[0])
         setChecked({...checked, project: true})
       })()
-  }, [budName, checked])
+  }, [budName, checked.project])
 
   /**
    * Module budfiles
@@ -51,7 +49,7 @@ const GenerateNew = props => {
         buds && buds.length > 0 && setSprout(buds[0])
         setChecked({...checked, modules: true})
       })()
-  }, [sprout, checked])
+  }, [sprout, checked.project])
 
   /**
    * Core budfiles
@@ -64,7 +62,7 @@ const GenerateNew = props => {
         buds && buds.length > 0 && setSprout(buds[0])
         setChecked({...checked, roots: true})
       })()
-  }, [sprout, checked])
+  }, [sprout, checked.modules])
 
   /**
    * Render

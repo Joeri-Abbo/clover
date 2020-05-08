@@ -115,7 +115,7 @@ const BudCLI = ({
           <Text>{`🌱`}</Text>
           <Text bold>
             <Link url="https://roots.io/bud">
-              <Color green>{'Bud'}</Color>
+              <Color green>{'  Bud'}</Color>
             </Link>
           </Text>
         </Box>
