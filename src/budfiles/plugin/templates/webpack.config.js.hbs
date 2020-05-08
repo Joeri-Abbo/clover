@@ -68,7 +68,7 @@ module.exports = {
   context: join(__dirname, 'src'),
   output: {
     path: resolve(__dirname, 'dist'),
-    publicPath: isProduction ? '/' : `http://localhost:3000/app/plugins/{{lowercase (dashcase namespace)}}/`,
+    publicPath: !isHMR ? '/app/plugins/{{lowercase (dashcase name)}}/dist/' : `http://localhost:{{port}}/app/plugins/{{lowercase (dashcase namespace)}}/dist/`,
     sourceMapFilename: '[file].map',
   },
   mode: isProduction ? 'production' : 'development',

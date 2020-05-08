@@ -70,6 +70,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 - ink
 - ink-divider
 - ink-link
+- ink-spinner
 - ink-table
 - ink-use-stdout-dimensions
 - pastel

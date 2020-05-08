@@ -19,21 +19,15 @@
     "lint:eslint": "eslint .",
     "lint:prettier": "prettier --write ."
   },
-  "files": [
-    "build",
-    "src"
-  ],
+  "files": ["build", "src"],
   "dependencies": {
-    "@prettier/plugin-php": "^0.14.0",
     "enquirer": "^2.3.5",
     "esm": "^3.2.25",
     "execa": "^4.0.0",
     "fs-extra": "^9.0.0",
-    "got": "^11.0.2",
     "handlebars": "^4.7.6",
     "handlebars-helpers": "^0.10.0",
     "ink": "^2.7.1",
-    "ink-divider": "^2.0.1",
     "ink-link": "^1.1.0",
     "ink-spinner": "^3.0.1",
     "ink-table": "^2.0.1",

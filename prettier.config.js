@@ -10,13 +10,6 @@ module.exports = {
   semi: false,
   overrides: [
     {
-      files: ['*.php'],
-      options: {
-        tabWidth: 4,
-        parser: 'plugin-php',
-      },
-    },
-    {
       files: ['*.md'],
       options: {
         parser: 'markdown',
