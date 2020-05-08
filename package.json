@@ -19,7 +19,10 @@
     "lint:eslint": "eslint .",
     "lint:prettier": "prettier --write ."
   },
-  "files": ["build", "src"],
+  "files": [
+    "build",
+    "src"
+  ],
   "dependencies": {
     "@prettier/plugin-php": "^0.14.0",
     "enquirer": "^2.3.5",
@@ -32,6 +35,7 @@
     "ink": "^2.7.1",
     "ink-divider": "^2.0.1",
     "ink-link": "^1.1.0",
+    "ink-spinner": "^3.0.1",
     "ink-table": "^2.0.1",
     "ink-use-stdout-dimensions": "^1.0.5",
     "pastel": "^1.0.3",
