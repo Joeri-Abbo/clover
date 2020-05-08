@@ -14,8 +14,7 @@ const getRootBudPath = name =>
 const getModuleBudPath = name =>
   join(process.cwd(), `node_modules/**/bud-plugin-*/**/${name}.bud.js`)
 
-const getProjectBudPath = name =>
-  join(process.cwd(), `.bud/**/${name}.bud.js`)
+const getProjectBudPath = name => join(process.cwd(), `.bud/**/${name}.bud.js`)
 
 /** Command: bud generate new */
 /// Generate code described by a budfile
@@ -32,7 +31,8 @@ const GenerateNew = props => {
    * Local budfiles
    */
   useEffect(() => {
-    budName && !checked.project &&
+    budName &&
+      !checked.project &&
       (async () => {
         const buds = await globby([getProjectBudPath(budName)])
         buds && buds.length > 0 && setSprout(buds[0])
@@ -44,7 +44,8 @@ const GenerateNew = props => {
    * Module budfiles
    */
   useEffect(() => {
-    !sprout && checked.project &&
+    !sprout &&
+      checked.project &&
       (async () => {
         const buds = await globby([getModuleBudPath(budName)])
         buds && buds.length > 0 && setSprout(buds[0])
@@ -56,7 +57,8 @@ const GenerateNew = props => {
    * Core budfiles
    */
   useEffect(() => {
-    !sprout && checked.modules &&
+    !sprout &&
+      checked.modules &&
       (async () => {
         const buds = await globby([getRootBudPath(budName)])
         buds && buds.length > 0 && setSprout(buds[0])

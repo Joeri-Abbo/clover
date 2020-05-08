@@ -79,28 +79,31 @@ const BudCLI = ({
    * Run the budfile actions
    */
   useEffect(() => {
-    data && !inert && !budSubscription &&
-    setBudSubscription(
-      BudCore.init({
-        data,
-        templateDir,
-        sprout,
-        outDir,
-      })
-      .actions()
-      .subscribe({
-        next: message => setMessage(message),
-        error: error => setError(error),
-        complete: () => setComplete(true),
-      })
-    )
+    data &&
+      !inert &&
+      !budSubscription &&
+      setBudSubscription(
+        BudCore.init({
+          data,
+          templateDir,
+          sprout,
+          outDir,
+        })
+          .actions()
+          .subscribe({
+            next: message => setMessage(message),
+            error: error => setError(error),
+            complete: () => setComplete(true),
+          }),
+      )
   }, [data])
 
   useEffect(() => {
-    complete && (async () => {
-      await budSubscription.unsubscribe()
-      exit()
-    })()
+    complete &&
+      (async () => {
+        await budSubscription.unsubscribe()
+        exit()
+      })()
   }, [complete, budSubscription])
 
   /**
