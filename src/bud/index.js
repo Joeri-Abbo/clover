@@ -62,9 +62,9 @@ export const bud = {
    * Register actions
    */
   registerActions: function () {
-    this.sprout.addActions
-      && this.sprout.addActions.length > 0
-      && this.sprout.addActions.forEach(action => {
+    this.sprout.addActions &&
+      this.sprout.addActions.length > 0 &&
+      this.sprout.addActions.forEach(action => {
         this[action.handle] = action.callback
       })
   },
@@ -77,11 +77,11 @@ export const bud = {
     handlebarsHelpers({handlebars: this.templater})
 
     // plugin registered helpers
-    this.sprout.registerHelpers
-      && this.sprout.registerHelpers.length > 0
-      && this.sprout.registerHelpers.forEach(helper => {
-      helpers.push(helper)
-    })
+    this.sprout.registerHelpers &&
+      this.sprout.registerHelpers.length > 0 &&
+      this.sprout.registerHelpers.forEach(helper => {
+        helpers.push(helper)
+      })
 
     // roots/bud helpers
     helpers(this.getData()).forEach(({helper, fn}) => {
@@ -97,10 +97,13 @@ export const bud = {
    * @return {string}
    */
   format: function (content, parser) {
-    return prettier.format(typeof content !== 'string' ? JSON.stringify(content) : content, {
-      ...basePrettierConfig,
-      parser: parser || 'babel',
-    })
+    return prettier.format(
+      typeof content !== 'string' ? JSON.stringify(content) : content,
+      {
+        ...basePrettierConfig,
+        parser: parser || 'babel',
+      },
+    )
   },
 
   /**
@@ -221,7 +224,7 @@ export const bud = {
       )
 
       observer.complete()
-    } catch(err) {
+    } catch (err) {
       console.error(err)
     }
   },
