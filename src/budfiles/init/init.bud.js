@@ -72,7 +72,7 @@ module.exports = {
           (await bud.fs.exists(`${wordPress}/index.php`)) &&
           (await bud.fs.exists(`${wordPress}/wp-config.php`))
 
-        !isWordPress
+        ! isWordPress
           ? observer.next('WordPress not detected.. moving on.')
           : (async () => {
               /** Backup index.php */
@@ -92,7 +92,7 @@ module.exports = {
                 .then(res => res.json())
                 .then(async function (json) {
                   if (json.bud == true && json.path) {
-                    config.data.dev.dir = json.path
+                    config.data.dev.path = json.path
 
                     await bud.fs.writeFile(
                       config.path,

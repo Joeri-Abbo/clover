@@ -82,8 +82,8 @@ module.exports = {
   output: {
     path: resolve(__dirname, 'dist'),
     publicPath: !isHMR
-      ? '{{protocol}}://{{proxy}}/app/plugins/{{lowercase (dashcase name)}}/dist/'
-      : `{{protocol}}://localhost:{{port}}/app/plugins/{{lowercase (dashcase name)}}/dist/`,
+      ? '{{protocol}}://{{proxy}}/{{path}}/{{lowercase (dashcase name)}}/dist/'
+      : `{{protocol}}://localhost:{{port}}/{{path}}/{{lowercase (dashcase name)}}/dist/`,
     sourceMapFilename: '[file].map',
   },
   mode: isProduction ? 'production' : 'development',
