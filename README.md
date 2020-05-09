@@ -59,16 +59,13 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 ### Dependencies
 
-- @prettier/plugin-php
 - enquirer
 - esm
 - execa
 - fs-extra
-- got
 - handlebars
 - handlebars-helpers
 - ink
-- ink-divider
 - ink-link
 - ink-spinner
 - ink-table

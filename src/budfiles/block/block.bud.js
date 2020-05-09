@@ -4,14 +4,6 @@
 module.exports = {
   name: 'block',
   description: 'Generate a new block',
-  default: {
-    name: 'block-name',
-    title: 'Block Name',
-    description: 'A newly scaffolded block',
-    components: ['RichText', 'InnerBlocks'],
-    category: 'common',
-    supports: ['align', 'alignWide', 'inserter', 'multiple', 'reusable'],
-  },
   prompts: [
     {
       type: 'input',
@@ -56,6 +48,7 @@ module.exports = {
       type: 'multiselect',
       name: 'supports',
       message: 'Supports',
+      initial: ['align','inserter','multiple','reusable'],
       choices: [
         'anchor',
         'align',

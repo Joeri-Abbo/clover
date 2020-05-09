@@ -48,6 +48,7 @@
     "ink-spinner": "^3.0.1",
     "ink-table": "^2.0.1",
     "ink-use-stdout-dimensions": "^1.0.5",
+    "node-fetch": "^2.6.0",
     "pastel": "^1.0.3",
     "prettier": "2.0.5",
     "prop-types": "^15.7.2",

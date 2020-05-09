@@ -63,14 +63,14 @@ add_action('init', function () {
     }
 
     /**
-     * Glob assets from src directory
+     * Glob assets
      *
      * @param  string
      * @return array
      */
     protected function getAssetsOfType(string $type): array
     {
-        return glob("{$this->dir}/src/{$type}/*", GLOB_ONLYDIR);
+        return glob("{$this->dir}/dist/{$type}/*", GLOB_ONLYDIR);
     }
 
     /**
@@ -134,7 +134,7 @@ add_action('init', function () {
      */
     protected function getDependencyManifest($block, $script): array
     {
-        if (!realpath("{$this->dir}/dist/blocks/{$block}/{$script}.asset.json")) {
+        if (!realpath($manifestFile = "{$this->dir}/dist/blocks/{$block}/{$script}.asset.json")) {
             new \WP_Error(
                 __('dependency_manifest_not_found', '{{lowercase (dashcase namespace)}}'),
                 __('There was an issue with the acme-project plugin', '{{lowercase (dashcase namespace)}}'),
