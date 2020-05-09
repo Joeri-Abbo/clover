@@ -63,42 +63,55 @@ module.exports = {
   registerActions: [
     {
       handle: 'env',
-      callback: async (task, observer, {fs, fetch, format, projectDir, data}) => {
-        const config = {
-          path: `${process.cwd()}/${projectDir}/.bud/bud.config.json`,
-          obj: require(`${process.cwd()}/${projectDir}/.bud/bud.config.json`),
-        }
+      callback: async (
+        task,
+        observer,
+        bud,
+      ) => {
+        observer.next('Gathering WP info.')
+        const config = bud.getConfig()
+
         const wordPress = require('path').resolve(process.cwd(), '../../')
-
         const isWordPress =
-          await fs.exists(`${wordPress}/index.php`)
-            && fs.exists(`${wordPress}/wp-config.php`)
+          await bud.fs.exists(`${wordPress}/index.php`) &&
+          await bud.fs.exists(`${wordPress}/wp-config.php`)
 
-        isWordPress && (async () => {
-          await fs.copyFile(`${wordPress}/index.php`, `${wordPress}/index.bak`)
-          await fs.writeFile(`${wordPress}/index.php`, `\
-  <?php
-  require __DIR__ . '/wp/wp-blog-header.php';
-  print json_encode((object) [
-    'bud' => true,
-    'path' => str_replace(__DIR__ . '/', '', WP_PLUGIN_DIR),
-  ]);
-  die();
-  `)
-          process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
-          await fetch(`${data.protocol}://${data.proxy}`)
-            .then(res => res.json())
-            .then(async function(json) {
-              if (json.bud == true && json.path) {
-                config.obj.dev.dir = json.path
-                this.projectUriIdentified = true
-                await fs.writeFile(config.path, format(config, 'json'))
-              }
-            })
+        isWordPress &&
+          (async () => {
+            /** Backup index.php */
+            await bud.fs.copyFile(
+              `${wordPress}/index.php`,
+              `${wordPress}/index.bak`,
+            )
 
-          await fs.copyFile(`${wordPress}/index.bak`, `${wordPress}/index.php`)
-          await fs.remove(`${wordPress}/index.bak`)
-        })()
+            /** Write tmp replacement for index.php */
+            const {contents} = await bud.getTemplate('index.php.hbs')
+            await bud.fs.writeFile(`${wordPress}/index.php`, contents)
+
+            /** Request it */
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
+            await bud.fetch(`${bud.data.protocol}://${bud.data.proxy}`)
+              .then(res => res.json())
+              .then(async function (json) {
+                if (json.bud == true && json.path) {
+                  config.data.dev.dir = json.path
+
+                  await bud.fs.writeFile(
+                    config.path,
+                    bud.format(config.data, 'json')
+                  )
+                }
+              })
+
+            /** Restore original */
+            await bud.fs.copyFile(
+              `${wordPress}/index.bak`,
+              `${wordPress}/index.php`,
+            )
+
+            /** Delete backup */
+            await bud.fs.remove(`${wordPress}/index.bak`)
+          })()
 
         observer.next(`Config file updated.`)
         observer.complete()

@@ -1,11 +1,12 @@
 const {join} = require('path')
 const fs = require('fs-extra')
+const fetch = require('node-fetch')
 const execa = require('execa')
+const handlebars = require('handlebars')
+const prettier = require('prettier')
 const {Observable, from} = require('rxjs')
 const {concatMap} = require('rxjs/operators')
-const Handlebars = require('handlebars')
-const prettier = require('prettier')
-const fetch = require('node-fetch')
+
 const basePrettierConfig = require('./../../prettier.config.js')
 const handlebarsHelpers = require('handlebars-helpers')
 const helpers = require('./helpers')
@@ -16,9 +17,9 @@ const helpers = require('./helpers')
 export const bud = {
   fs,
   fetch,
-  runner: execa,
-  templater: Handlebars,
-  formatter: prettier,
+  execa,
+  prettier,
+  handlebars,
 
   /**
    * Initialize
@@ -33,13 +34,25 @@ export const bud = {
     this.data = data
     this.sprout = sprout
     this.projectDir = outDir
-    this.runnerOptions = {cwd: this.projectDir}
+    this.execaOptions = {cwd: this.projectDir}
     this.templateDir = templateDir
 
     this.registerActions()
     this.registerHelpers()
 
     return this
+  },
+
+  /**
+   * Get config.
+   *
+   * @return {object}
+   */
+  getConfig: function () {
+    return {
+      path: `${process.cwd()}/${this.projectDir}/.bud/bud.config.json`,
+      data: require(`${process.cwd()}/${this.projectDir}/.bud/bud.config.json`),
+    }
   },
 
   /**
@@ -62,11 +75,24 @@ export const bud = {
   },
 
   /**
+   * Get template contents.
+   *
+   * @param  {string} template
+   * @return {array}
+   */
+  getTemplate: async function (template) {
+    const path = join(this.templateDir, template)
+    const contents = await fs.readFile(path, 'utf8')
+
+    return {path, contents}
+  },
+
+  /**
    * Register actions
    */
   registerActions: function () {
-    this.sprout.registerActions
-      && this.sprout.registerActions.forEach(action => {
+    this.sprout.registerActions &&
+      this.sprout.registerActions.forEach(action => {
         this[`${action.handle}`] = action.callback
       })
   },
@@ -76,7 +102,7 @@ export const bud = {
    */
   registerHelpers: function () {
     // lib helpers
-    handlebarsHelpers({handlebars: this.templater})
+    handlebarsHelpers({handlebars: this.handlebars})
 
     // plugin registered helpers
     this.sprout.registerHelpers &&
@@ -87,7 +113,7 @@ export const bud = {
 
     // roots/bud helpers
     helpers(this.getData()).forEach(({helper, fn}) => {
-      this.templater.registerHelper(helper, fn)
+      this.handlebars.registerHelper(helper, fn)
     })
   },
 
@@ -99,7 +125,7 @@ export const bud = {
    * @return {string}
    */
   format: function (content, parser) {
-    return prettier.format(
+    return this.prettier.format(
       typeof content !== 'string' ? JSON.stringify(content) : content,
       {
         ...basePrettierConfig,
@@ -164,7 +190,7 @@ export const bud = {
    * @return {Observable}
    */
   mkDir: async function ({path}, observer) {
-    const pathTemplate = this.templater.compile(path)
+    const pathTemplate = this.handlebars.compile(path)
     const dirPath = join(this.projectDir, pathTemplate(this.getData()))
 
     await fs.ensureDir(dirPath).then(() => {
@@ -181,16 +207,15 @@ export const bud = {
    * @return {Observable}
    */
   template: async function ({parser, path, template}, observer) {
-    const src = join(this.templateDir, template)
+    const {contents} = await this.getTemplate(template)
     const dest = join(
       this.projectDir,
-      this.templater.compile(path)(this.getData()),
+      this.handlebars.compile(path)(this.getData()),
     )
 
     observer.next(`Writing ${dest.split('/')[dest.split('/').length - 1]}`)
 
-    const contents = await fs.readFile(src, 'utf8')
-    const compiled = this.templater.compile(contents)(this.getData())
+    const compiled = this.handlebars.compile(contents)(this.getData())
     const outputContents = parser ? this.format(compiled, parser) : compiled
 
     fs.outputFile(dest, outputContents).then(() => observer.complete())
@@ -206,9 +231,9 @@ export const bud = {
   addDependencies: async function ({pkgs, dev}, observer) {
     observer.next(`Installing packages...`)
 
-    const installation = this.runner.command(
+    const installation = this.execa.command(
       `yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
-      this.runnerOptions,
+      this.execaOptions,
     )
 
     installation.stdout.on('data', status => {
