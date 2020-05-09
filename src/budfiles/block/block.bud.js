@@ -48,7 +48,7 @@ module.exports = {
       type: 'multiselect',
       name: 'supports',
       message: 'Supports',
-      initial: ['align','inserter','multiple','reusable'],
+      initial: ['align', 'inserter', 'multiple', 'reusable'],
       choices: [
         'anchor',
         'align',
