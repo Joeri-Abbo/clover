@@ -5,15 +5,17 @@ import BudCLI from './../src/components/BudCLI'
 
 /** Command: bud init */
 /// Create a new project
-const Init = props => (
-  <BudCLI
-    values={props.name ? props : null}
-    outDir={props.projectDir}
-    label={require(`${props.budFileDir}/init.bud`).label}
-    sprout={require(`${props.budFileDir}/init.bud`)}
-    templateDir={`${props.budFileDir}/templates`}
-  />
-)
+const Init = props => {
+  return (
+    <BudCLI
+      values={props.name ? props : null}
+      outDir={props.projectDir}
+      label={require(`${props.budFileDir}/init.bud`).label}
+      sprout={require(`${props.budFileDir}/init.bud`)}
+      templateDir={`${props.budFileDir}/templates`}
+    />
+  )
+}
 
 Init.propTypes = {
   /// Project name

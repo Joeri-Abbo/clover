@@ -5,6 +5,7 @@ const {Observable, from} = require('rxjs')
 const {concatMap} = require('rxjs/operators')
 const Handlebars = require('handlebars')
 const prettier = require('prettier')
+const fetch = require('node-fetch')
 const basePrettierConfig = require('./../../prettier.config.js')
 const handlebarsHelpers = require('handlebars-helpers')
 const helpers = require('./helpers')
@@ -13,6 +14,8 @@ const helpers = require('./helpers')
  * Bud Core
  */
 export const bud = {
+  fs,
+  fetch,
   runner: execa,
   templater: Handlebars,
   formatter: prettier,
@@ -62,10 +65,9 @@ export const bud = {
    * Register actions
    */
   registerActions: function () {
-    this.sprout.addActions &&
-      this.sprout.addActions.length > 0 &&
-      this.sprout.addActions.forEach(action => {
-        this[action.handle] = action.callback
+    this.sprout.registerActions
+      && this.sprout.registerActions.forEach(action => {
+        this[`${action.handle}`] = action.callback
       })
   },
 
@@ -119,7 +121,7 @@ export const bud = {
         .pipe(
           concatMap(function (task) {
             return new Observable(async function (observer) {
-              return bud[task.action](task, observer)
+              return bud[task.action](task, observer, bud)
             })
           }),
         )

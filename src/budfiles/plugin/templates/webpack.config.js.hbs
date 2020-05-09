@@ -51,10 +51,23 @@ const entry = () => {
       ],
     }
 
-    assets[`blocks/${block}/editor`] = assets[`blocks/${block}/editor`].filter(file => existsSync(file))
-    assets[`blocks/${block}/editor`].length <= 0 && delete assets[`blocks/${block}/editor`]
-    assets[`blocks/${block}/public`] = assets[`blocks/${block}/public`].filter(file => existsSync(file))
-    assets[`blocks/${block}/public`].length <= 0 && delete assets[`blocks/${block}/public`]
+    assets = {
+      [`blocks/${block}/editor`]: (() => (
+        assets[`blocks/${block}/editor`].filter(file =>
+          existsSync(file)
+        )
+      ))(),
+      [`blocks/${block}/public`]: (() => (
+        assets[`blocks/${block}/public`].filter(file =>
+          existsSync(file)
+        )
+      ))()
+    }
+
+    assets[`blocks/${block}/editor`].length <= 0
+      && delete assets[`blocks/${block}/editor`]
+    assets[`blocks/${block}/public`].length <= 0
+      && delete assets[`blocks/${block}/public`]
   })
 
   return assets
@@ -68,7 +81,9 @@ module.exports = {
   context: join(__dirname, 'src'),
   output: {
     path: resolve(__dirname, 'dist'),
-    publicPath: !isHMR ? '/app/plugins/{{lowercase (dashcase name)}}/dist/' : `http://localhost:{{port}}/app/plugins/{{lowercase (dashcase namespace)}}/dist/`,
+    publicPath: !isHMR
+      ? '{{protocol}}://{{proxy}}/app/plugins/{{lowercase (dashcase name)}}/dist/'
+      : `{{protocol}}://localhost:{{port}}/app/plugins/{{lowercase (dashcase name)}}/dist/`,
     sourceMapFilename: '[file].map',
   },
   mode: isProduction ? 'production' : 'development',
