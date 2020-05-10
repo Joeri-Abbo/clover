@@ -1,0 +1,124 @@
+<?php
+
+namespace {{pascalcase namespace}}\Plugin;
+
+use Psr\Container\ContainerInterface;
+
+/**
+ * Manifest class.
+ */
+class Manifest
+{
+    /** @var ContainerInterface */
+    protected $bud;
+
+    /** @var array */
+    protected $entries;
+
+    /** @var array */
+    protected $types = [
+        'js' => 'script',
+        'css' => 'style',
+        'json' => 'object',
+    ];
+
+    /**
+     * Class constructor.
+     */
+    public function __construct(ContainerInterface $bud)
+    {
+        $this->bud = $bud;
+        $this->collection = $bud->get('util.collection');
+        $this->namespace = $bud->get('config.namespace');
+        $this->blocksDir = $bud->get('config.dir') . "/dist/blocks";
+
+        $this->entries = $this->collection::make([]);
+    }
+
+    /**
+     * Load manifest entries from container.plugin.manifest
+     */
+    public function load()
+    {
+        if (! file_exists($manifestPath = $this->bud->get('config.manifest'))) {
+            return;
+        }
+
+        $entries = $this->collection::make(
+            json_decode(file_get_contents($manifestPath))
+        );
+
+        $entries->each(function ($url, $handle) {
+            $nameParts = $this->collection::make(explode('/', $handle));
+            $fileParts = $this->collection::make(explode('.', $nameParts[count($nameParts) - 1]));
+            $name = $nameParts[1];
+            $basename = $fileParts[0];
+            $type = $this->types[$fileParts[1]];
+
+            $entry = $this->collection::make([
+                'url' => $url,
+                'type' => $type,
+                'name' => $name,
+                'group' => $this->namespace . '/' . $name,
+                'location' => explode('.', $nameParts[2])[0],
+                'registration' => (function ($basename, $type) {
+                    if ($basename == 'public') {
+                        return $type;
+                    }
+
+                    return "{$basename}_{$type}";
+                })($basename, $type),
+            ]);
+
+            $entry->put('dependencies', $this->getDependencies(
+                $entry->get('name'),
+                $entry->get('location')
+            ));
+
+            $entry->put('handle', join('/', [
+                $this->namespace,
+                $entry->get('name'),
+                $entry->get('registration')
+            ]));
+
+            /**
+             * Create a new group if it doesn't yet exist.
+             */
+            if (! $this->entries->has($entry->get('group'))) {
+                $this->entries->put($entry->get('group'), $this->collection::make());
+            }
+
+            /**
+             * Load asset into repository.
+             */
+            $this->entries->get($entry->get('group'))->push((object) $entry->toArray());
+        });
+    }
+
+    /**
+     * Get webpack dependency manifest.
+     *
+     * @return array
+     */
+    protected function getDependencies($name, $location): array
+    {
+        if (! realpath($manifestSrc = $this->blocksDir . "/{$name}/{$location}.asset.json")) {
+            return [];
+        }
+
+        return ((object) json_decode(file_get_contents($manifestSrc), true))->dependencies;
+    }
+
+    /**
+     * Get entries of type.
+     *
+     * @param  string
+     * @return array
+     */
+    public function getBlockAssets(string $handle)
+    {
+        return $this->entries->get($handle)
+            ? $this->entries->get($handle)
+            : $this->collection::make([]);
+    }
+}

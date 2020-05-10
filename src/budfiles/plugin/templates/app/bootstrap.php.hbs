@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * The bootstrap file creates and returns the container.
+ */
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use function DI\create;
+use DI\ContainerBuilder;
+use Psr\Container\ContainerInterface;
+use Illuminate\Support\Collection;
+use {{pascalcase namespace}}\Plugin\Block;
+use {{pascalcase namespace}}\Plugin\BlockRepository;
+use {{pascalcase namespace}}\Plugin\Manifest;
+
+$builder = new ContainerBuilder;
+
+$builder->addDefinitions([
+    'config.dir' => realpath(__DIR__ . '/..'),
+    'config.manifest' => realpath(__DIR__ . '/../dist/manifest.json'),
+    'config.namespace' => {{lowercase (dashcase namespace)}},
+    'block' => function (ContainerInterface $bud) {
+        return new Block($bud, $bud->get('util.collection'));
+    },
+    'blocks' => function (ContainerInterface $bud) {
+        return new BlockRepository($bud);
+    },
+    'manifest' => function (ContainerInterface $bud) {
+        $manifest = new Manifest($bud);
+        $manifest->load();
+        return $manifest;
+    },
+    'util.collection' => create(Collection::class),
+]);
+
+return $builder->build();

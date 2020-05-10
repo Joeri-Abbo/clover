@@ -1,0 +1,24 @@
+<?php
+
+namespace {{pascalcase namespace}}\Plugin;
+
+/**
+ * Block repository.
+ */
+interface BlockInterface
+{
+    /**
+     * Get handle.
+     *
+     * @return string
+     */
+    public function getHandle(): string;
+
+    /**
+     * Set handle.
+     *
+     * @param  string $handle
+     * @return Block
+     */
+    public function setHandle(string $handle): void;
+}
