@@ -1,0 +1,30 @@
+/**
+ * Starter Budfile
+ *
+ * Invoke: `yarn bud generate new example`
+ */
+
+module.exports = {
+  name: 'example',
+  description: 'Customize in .bud/budfiles',
+  default: {
+    componentName: 'ComponentName',
+  },
+  prompts: [
+    {
+      type: 'input',
+      name: 'componentName',
+      message: 'ComponentName',
+      initial: 'ExampleComponent',
+      required: true,
+    },
+  ],
+  actions: [
+    {
+      action: 'template',
+      template: 'Component.js.hbs',
+      path: 'src/components/{{{{raw}}}}{{componentName}}{{{{/raw}}}}.js',
+      parser: 'babel',
+    },
+  ],
+}

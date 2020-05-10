@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" height="100">
+  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
 </p>
 
 <p align="center">
@@ -50,62 +50,32 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 ## Usage
 
-| Command | Description               |
-| ------- | ------------------------- |
-| `bud`   | Create a new block plugin |
+| Command            | Description                          |
+| ------------------ | ------------------------------------ |
+| `bud`              | Bud information                      |
+| `bud init`         | Create a new project                 |
+| `bud generate`     | List available budfiles              |
+| `bud generate new` | Generate code described by a budfile |
 
-## Generated files
+### Dependencies
 
-A typical block that was created with Bud has the following structure:
-
-```sh
-bud-plugin
-├── blocks
-│   └── block
-│       ├── styles
-│       │   ├── public.css
-│       │   ├── editor.css
-│       │   └── common.css
-│       └── scripts
-│           ├── public
-│           │   └── index.js
-│           └── editor
-│               ├── containers
-│               │   ├── save.js
-│               │   └── edit.js
-│               ├── components
-│               │   └── Media.js
-│               ├── block.js
-│               └── attributes.json
-├── webpack.config.js
-├── prettierrc.json
-├── postcss.config.js
-├── package.json
-├── composer.json
-├── block.php
-├── README.md
-├── .stylelintrc
-├── .gitignore
-├── .eslintrc.js
-├── .eslintignore
-├── .editorconfig
-└── .babelrc.js
-```
-
-### Plugin Dependencies
-
-- @prettier/plugin-php
-- collect.js
 - enquirer
 - esm
 - execa
 - fs-extra
-- got
+- handlebars
+- handlebars-helpers
 - ink
+- ink-link
+- ink-spinner
+- ink-table
+- ink-use-stdout-dimensions
+- node-fetch
 - pastel
 - prettier
 - prop-types
 - react
+- rxjs
 
 ### Development dependencies
 
@@ -136,7 +106,7 @@ We have [contributing guidelines](https://github.com/roots/guidelines/blob/maste
 
 Help support our open-source development efforts by [becoming a patron](https://www.patreon.com/rootsdev).
 
-<a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="200" height="150"></a> <a href="https://k-m.com/"><img src="https://cdn.roots.io/app/uploads/km-digital.svg" alt="KM Digital" width="200" height="150"></a>
+<a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="200" height="150"></a> <a href="https://k-m.com/"><img src="https://cdn.roots.io/app/uploads/km-digital.svg" alt="KM Digital" width="200" height="150"></a> <a href="https://nestify.io/?utm_source=roots&utm_medium=banner&utm_campaign=footer"><img src="https://cdn.roots.io/app/uploads/nestify.svg" alt="Nestify" width="200" height="150"></a>
 
 ## Community
 

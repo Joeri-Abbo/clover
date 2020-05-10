@@ -1,0 +1,57 @@
+<?php
+
+namespace {{pascalcase namespace}}\Plugin;
+
+use Psr\Container\ContainerInterface;
+use Tightenco\Collect\Support\Collection;
+use {{pascalcase namespace}}\Plugin\Block;
+use {{pascalcase namespace}}\Plugin\BlockRepositoryInterface;
+
+/**
+ * Block repository implementation class.
+ */
+class BlockRepository implements BlockRepositoryInterface
+{
+    /** @var Collection */
+    private $blocks;
+
+    /**
+     * Construct.
+     */
+    public function __construct(ContainerInterface $bud)
+    {
+        $this->blocks = $bud->get('util.collection')::make([]);
+    }
+
+    /**
+     * Get blocks.
+     *
+     * @return Block[]
+     */
+    public function getBlocks()
+    {
+        return $this->blocks;
+    }
+
+    /**
+     * Get block.
+     *
+     * @param  string
+     * @return Block
+     */
+    public function getBlock(string $handle): Block
+    {
+        return $this->blocks[$handle];
+    }
+
+    /**
+     * Add block.
+     *
+     * @param  Block
+     * @return void
+     */
+    public function addBlock(Block $block): void
+    {
+        $this->blocks->push($block);
+    }
+}

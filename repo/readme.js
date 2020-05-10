@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 
-const { resolve } = require('path')
-const { writeFileSync } = require('fs')
-const { format } = require('prettier')
+const {resolve} = require('path')
+const {writeFileSync} = require('fs')
+const {format} = require('prettier')
 
 /** Util */
-const { block, listKeys, pluginTree, commands } = require('./components/helpers')
+const {listKeys, commands} = require('./components/helpers')
 
 /** Data */
-const { name, licenses, dependencies, devDependencies, engines } = require('./../package.json')
+const {
+  name,
+  licenses,
+  dependencies,
+  devDependencies,
+  engines,
+} = require('./../package.json')
 
 /** Target */
 const readme = resolve(__dirname, '../README.md')
@@ -18,21 +24,28 @@ const readme = resolve(__dirname, '../README.md')
  */
 writeFileSync(
   readme,
-  format(
-    `
+  format(`
 <p align="center">
-  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="150">
+  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="100">
 </p>
 
 <p align="center">
-  <img alt="${licenses.shift().type || ''} License" src="https://img.shields.io/github/license/${name.replace(
+  <img alt="${
+    licenses.shift().type || ''
+  } License" src="https://img.shields.io/github/license/${name.replace(
       '@',
       '',
     )}?color=%23525ddc&style=flat-square">
 
-  <img alt="devDependency Status" src="https://img.shields.io/david/dev/${name.replace('@', '')}.svg?style=flat-square">
+  <img alt="devDependency Status" src="https://img.shields.io/david/dev/${name.replace(
+    '@',
+    '',
+  )}.svg?style=flat-square">
 
-  <img alt="Build Status" src="https://img.shields.io/circleci/project/github/${name.replace('@', '')}/master.svg?style=flat-square">
+  <img alt="Build Status" src="https://img.shields.io/circleci/project/github/${name.replace(
+    '@',
+    '',
+  )}/master.svg?style=flat-square">
 
   <a href="https://twitter.com/rootswp">
     <img alt="Follow Roots" src="https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2" />
@@ -79,13 +92,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 | --- | --- |
 ${commands()}
 
-## Generated files
-
-A typical block that was created with Bud has the following structure:
-
-${block('sh', pluginTree())}
-
-### Plugin Dependencies
+### Dependencies
 
 ${listKeys(dependencies)}
 
@@ -109,7 +116,7 @@ We have [contributing guidelines](https://github.com/roots/guidelines/blob/maste
 
 Help support our open-source development efforts by [becoming a patron](https://www.patreon.com/rootsdev).
 
-<a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="200" height="150"></a> <a href="https://k-m.com/"><img src="https://cdn.roots.io/app/uploads/km-digital.svg" alt="KM Digital" width="200" height="150"></a> <a href="https://nestify.io/?utm_source=roots&utm_medium=banner&utm_campaign=footer"><img src="https://cdn.roots.io/app/uploads/nestify.svg" alt="Nestify" width="200" height="150"></a>
+<a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="200" height="150"></a> <a href="https://k-m.com/"><img src="https://cdn.roots.io/app/uploads/km-digital.svg" alt="KM Digital" width="200" height="150"></a>
 
 ## Community
 
@@ -122,7 +129,7 @@ Keep track of development and community news.
 - Listen to the [Roots Radio podcast](https://roots.io/podcast/)
 
 `,
-    { parser: 'markdown' },
+    {parser: 'markdown'},
   ),
   'utf8',
 )

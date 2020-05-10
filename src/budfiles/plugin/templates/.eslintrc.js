@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  extends: ['eslint:recommended', 'plugin:react/recommended'],
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:jsx-a11y/recommended'],
   plugins: ['react', 'react-hooks', 'jsx-a11y'],
   globals: {
     wp: true,
@@ -29,10 +29,12 @@ module.exports = {
   rules: {
     strict: 0,
     'no-console': 0,
-    'react/prop-types': 0,
+    'no-unused-vars': 'warn',
+    'jsx-a11y/alt-text': 'warn',
+    'react/prop-types': 'warn',
     'react/react-in-jsx-scope': 0,
     'react-hooks/rules-of-hooks': 'error',
-    'no-extra-semi': 0,
+    'react-hooks/exhaustive-deps': 'warn',
     quotes: [
       'error',
       'single',

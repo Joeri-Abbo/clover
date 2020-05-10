@@ -1,64 +1,54 @@
-import { cwd } from 'process'
-import { resolve, join } from 'path'
-import React, { useState, useMemo } from 'react'
-import PropTypes from 'prop-types'
-import { Box, Static, Text } from 'ink'
-import { prompt } from 'enquirer'
-import Bud from './../bud/Bud'
+import React from 'react'
+import {Box, Color, Text} from 'ink'
+import BudCLI from './../src/components/BudCLI'
 
-const DEFAULT_TEMPLATE = resolve(__dirname, './../../templates/plugin.js')
+/** Command: bud */
+/// Bud information
+const Bud = () => (
+  <BudCLI label={'Bud: Modern WordPress Scaffolding'} inert={true}>
+    <Box flexDirection="column">
+      <Box marginBottom={1}>
+        <Text>
+          To get started run <Color green>bud init {`{project-dir}`}</Color>
+        </Text>
+      </Box>
 
-/**
- * Plugin New
- */
-/// Create a new block plugin
-const BudPluginNew = props => {
-  const [data, setData] = useState(null)
+      <Box marginBottom={2}>
+        <Text bold>Now you can run some generators ⚡️</Text>
+      </Box>
 
-  const output = props.inputArgs[2] ? join(cwd(), props.inputArgs[2]) : join(cwd(), props.output)
+      <Box marginBottom={1}>
+        <Text bold>Swiftness-quick block plugin recipe:</Text>
+      </Box>
 
-  const definition = props.definition ? require(join(cwd(), props.definition)) : require(DEFAULT_TEMPLATE)
-
-  useMemo(() => {
-    !props.default ? prompt(definition.fields).then(data => setData(data)) : setData(definition.default)
-  }, [])
-
-  return (
-    <Box>
-      {!data ? (
-        <Box minHeight={2}>
-          <Text>Create new Block plugin</Text>
-        </Box>
-      ) : (
-        <Static>
-          <Box marginBottom={1}>
-            <Text>Creating {data.name}</Text>
-          </Box>
-
-          <Bud data={data} definition={definition} output={output} />
-        </Static>
-      )}
+      <Box flexDirection="column" marginLeft={2}>
+        {/* prettier-ignore */}
+        <Text>🌱{'  '}<Color green>bud init bud-project</Color>{'                 '}create a new plugin in ./bud-project</Text>
+        {/* prettier-ignore */}
+        <Text>🌱{'  '}<Color green>cd bud-project</Color>{'                      '}change directory to your bud project root</Text>
+        {/* prettier-ignore */}
+        <Text>🌱{'  '}<Color green>bud generate plugin</Color>{'                 '}generate a block-editor focused plugin scaffold</Text>
+        {/* prettier-ignore */}
+        <Text>🌱{'  '}<Color green>bud generate block</Color>{'                  '}generate a starter block</Text>
+        {/* prettier-ignore */}
+        <Text>🌱{'  '}<Color green>bud generate component-media-upload</Color>{' '}generate a reusable media upload component</Text>
+        {/* prettier-ignore */}
+        <Text>🌱{'  '}<Color green>yarn build</Color>{'                          '}build your new block</Text>
+        {/* prettier-ignore */}
+        <Text>🌱{'  '}<Color green>yarn dev</Color>{'                            '}code your block with HMR and live-reload</Text>
+        {/* prettier-ignore */}
+        <Text>✨{'  '}<Color yellow>template with blade</Color></Text>
+        {/* prettier-ignore */}
+        <Text>✨{'  '}<Color yellow>write a custom generator</Color></Text>
+        {/* prettier-ignore */}
+        <Text>✨{'  '}<Color yellow>extend bud with a bud-plugin</Color></Text>
+        {/* prettier-ignore */}
+        <Box>&nbsp;</Box>
+        {/* prettier-ignore */}
+        <Text>💅🏽{'  '}<Color magenta>get hype.</Color></Text>
+      </Box>
     </Box>
-  )
-}
+  </BudCLI>
+)
 
-BudPluginNew.propTypes = {
-  /// Output directory
-  output: PropTypes.string,
-  /// Path to bud template definition
-  definition: PropTypes.string,
-  /// Skip prompts; use defaults
-  default: PropTypes.bool,
-}
-
-BudPluginNew.shortFlags = {
-  output: 'o',
-  definition: 'd',
-}
-
-BudPluginNew.defaultProps = {
-  output: './bud-plugin',
-  default: false,
-}
-
-export default BudPluginNew
+export default Bud
