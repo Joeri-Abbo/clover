@@ -187,6 +187,7 @@ module.exports = {
         ...pkg,
         browserslist: ['extends @wordpress/browserslist-config'],
         scripts: {
+          ...pkg.scripts,
           dev:
             'cross-env NODE_ENV=hmr webpack-dev-server --colors --watch --config webpack.config.js',
           build:
