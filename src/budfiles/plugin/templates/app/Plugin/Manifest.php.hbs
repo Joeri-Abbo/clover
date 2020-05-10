@@ -30,7 +30,6 @@ class Manifest
         $this->bud = $bud;
         $this->collection = $bud->get('util.collection');
         $this->namespace = $bud->get('config.namespace');
-        $this->blocksDir = $bud->get('config.dir') . "/dist/blocks";
 
         $this->entries = $this->collection::make([]);
     }
@@ -71,23 +70,6 @@ class Manifest
             ]);
 
             /**
-             * Match with block handle
-             */
-            $entry->put('handle', join('/', [
-                $this->namespace,
-                $entry->get('name'),
-                $entry->get('registration')
-            ]));
-
-            /**
-             * Process WordPress dependency manifest plugin
-             */
-            $entry->put('dependencies', $this->getDependencies(
-                $entry->get('name'),
-                $entry->get('location')
-            ));
-
-            /**
              * Asset key used when registering blocks
              */
             $entry->put('registration', (
@@ -102,6 +84,23 @@ class Manifest
                     ]);
                 }
             )());
+
+            /**
+             * Matched against Block handle property.
+             */
+            $entry->put('handle', join('/', [
+                $this->namespace,
+                $entry->get('name'),
+                $entry->get('registration')
+            ]));
+
+            /**
+             * Process WordPress dependency manifest plugin
+             */
+            $entry->put('dependencies', $this->getDependencies(
+                $entry->get('name'),
+                $entry->get('location')
+            ));
 
             /**
              * Create a new collection key if it doesn't yet exist.
@@ -129,7 +128,8 @@ class Manifest
      */
     protected function getDependencies($name, $location): array
     {
-        if (! realpath($manifestSrc = $this->blocksDir . "/{$name}/{$location}.asset.json")) {
+        $blocksDir = $bud->get('config.dir') . "/dist/blocks";
+        if (! realpath($manifestSrc = $blocksDir . "/{$name}/{$location}.asset.json")) {
             return [];
         }
 
@@ -144,8 +144,6 @@ class Manifest
      */
     public function getBlockAssets(string $handle)
     {
-        return $this->entries->get($handle)
-            ? $this->entries->get($handle)
-            : $this->collection::make([]);
+        return $this->entries->get($handle);
     }
 }
