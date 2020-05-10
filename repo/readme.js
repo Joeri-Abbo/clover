@@ -24,7 +24,8 @@ const readme = resolve(__dirname, '../README.md')
  */
 writeFileSync(
   readme,
-  format(`
+  format(
+    `
 <p align="center">
   <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="100">
 </p>

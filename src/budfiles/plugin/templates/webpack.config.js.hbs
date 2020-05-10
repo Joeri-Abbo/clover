@@ -24,10 +24,9 @@ const isHMR = process.env.NODE_ENV === 'hmr'
  * @param  {string} parentDir
  * @return {array}
  */
-const dirs = parentDir =>
-  readdirSync(resolve(__dirname, parentDir)).filter(file =>
-    statSync(join(parentDir, file)).isDirectory(),
-  )
+const dirs = parentDir => readdirSync(
+  resolve(__dirname, parentDir)
+).filter(file => statSync(join(parentDir, file)).isDirectory())
 
 /**
  * Block webpack entries
