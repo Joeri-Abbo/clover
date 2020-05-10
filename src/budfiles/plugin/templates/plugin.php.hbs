@@ -6,9 +6,9 @@
  * Author:       {{titleize author}} <{{lowercase email}}>
  * License:      MIT
  * Text Domain:  {{lowercase (dashcase namespace)}}
+ *
+ * @package {{namespace}}
  */
-
-namespace {{pascalcase namespace}}\\{{pascalcase name}};
 
 /**
  * Register {{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}} block assets
@@ -18,27 +18,19 @@ namespace {{pascalcase namespace}}\\{{pascalcase name}};
  */
 add_action('init', function () {
   (new class {
-    /**
-     * Namespace
-     *
-     * @var string
-     */
-    public $namespace = '{{lowercase (dashcase namespace)}}';
-
-    /**
-     * Plugin directory.
-     *
-     * @var string
-     */
-    public $dir;
+   /** @var DI\Container */
+    public $bud;
 
     /**
      * Class constructor.
      */
     public function __construct()
     {
-      $this->dir = dirname(__FILE__);
-      $this->assetManifest = $this->getAssetManifest();
+        $this->bud = require __DIR__ . '/app/bootstrap.php';
+
+        $this->collection = $this->bud->get('util.collection');
+        $this->blocks = $this->bud->get('blocks');
+        $this->manifest = $this->bud->get('manifest');
     }
 
     /**
@@ -49,136 +41,78 @@ add_action('init', function () {
      */
     public function __invoke(): void
     {
-        foreach ($this->getAssetsOfType('blocks') as $block) {
-            $name = ltrim(basename($block), '/');
-            $this->registerBlockScripts($name);
-            $this->registerBlockStyles($name);
-            $this->registerBlockType($name);
-        }
-
-        foreach ($this->getAssetsOfType('extensions') as $extension) {
-            $name = ltrim(basename($extension), '/');
-            $this->registerExtension($name);
-        }
+        $this->loadBlocks();
+        $this->registerAssets();
     }
 
     /**
-     * Glob assets
-     *
-     * @param  string
-     * @return array
+     * Load blocks repository.
      */
-    protected function getAssetsOfType(string $type): array
+    public function loadBlocks()
     {
-        return glob("{$this->dir}/dist/{$type}/*", GLOB_ONLYDIR);
+        /** Glob src for blocks */
+        $blocks = $this->collection::make(
+            glob(__DIR__ . '/src/blocks/*', GLOB_ONLYDIR)
+        /** Discard base paths */
+        )->map(function ($path) {
+            return str_replace(__DIR__ . '/src/blocks/', '', $path);
+        });
+
+        /**
+         * Add blocks to repository and parse manifest for assets.
+         */
+        $blocks->each(function ($handle) {
+            $block = $this->bud->make('block');
+            $block->setHandle($handle);
+
+            $this->manifest->getBlockAssets($block->getHandle())
+                ->filter(function ($asset) use ($block) {
+                    return $asset->group == $block->getHandle();
+                })
+                ->each(function ($asset) use ($block) {
+                    $block->addAsset($asset);
+                });
+
+            $this->blocks->addBlock($block);
+        });
     }
 
     /**
-     * Register block scripts.
+     * Register assets.
      *
-     * @param  string
      * @return void
      */
-    protected function registerBlockScripts(string $block): void
+    public function registerAssets(): void
     {
-        foreach (['editor', 'public'] as $context) {
-            wp_register_script(
-                "{$this->namespace}/{$block}/{$context}/js",
-                $this->assetManifest["blocks/{$block}/{$context}.js"],
-                ...$this->getDependencyManifest($block, $context)
+        $this->blocks->getBlocks()->each(function ($block) {
+            $registration = [];
+
+            $block->getAssets()
+                /** Filter out manifest objects */
+                ->filter(function ($asset) {
+                    return $asset->type !== 'object';
+                })
+                /** Register asset with WordPress */
+                ->each(function ($asset) use (&$registration) {
+                    $registerCall = "wp_register_{$asset->type}";
+
+                    $registerCall(
+                        $asset->handle,
+                        $asset->url,
+                        $asset->dependencies,
+                        null,
+                    );
+
+                    /** Add to array to associate with block. */
+                    $registration[$asset->registration] = $asset->handle;
+                });
+
+            register_block_type(
+                $block->getHandle(),
+                $registration
             );
-        }
-    }
-
-    /**
-     * Register block styles.
-     *
-     * @param  string
-     * @return void
-     */
-    protected function registerBlockStyles(string $block): void
-    {
-        foreach (['editor', 'public'] as $context) {
-            wp_register_style(
-                "{$this->namespace}/{$block}/{$context}/css",
-                $this->assetManifest["blocks/{$block}/styles/{$context}.css"],
-                [],
-                null
-            );
-        }
-    }
-
-    /**
-     * Get webpack dependency manifest.
-     *
-     * @return array
-     */
-    protected function getAssetManifest(): array
-    {
-        if (!realpath($manifestFile = "{$this->dir}/dist/manifest.json")) {
-            new \WP_Error(
-                __('asset_manifest_not_found', '{{lowercase (dashcase namespace)}}'),
-                __('There was an issue with the acme-project plugin', '{{lowercase (dashcase namespace)}}'),
-                __('Asset manifest not found. Please run the plugin build scripts.', '{{lowercase (dashcase namespace)}}')
-            );
-        }
-
-        $manifest = file_get_contents($manifestFile);
-        return json_decode($manifest, true);
-    }
-
-    /**
-     * Get webpack dependency manifest.
-     *
-     * @return array
-     */
-    protected function getDependencyManifest($block, $script): array
-    {
-        if (!realpath($manifestFile = "{$this->dir}/dist/blocks/{$block}/{$script}.asset.json")) {
-            new \WP_Error(
-                __('dependency_manifest_not_found', '{{lowercase (dashcase namespace)}}'),
-                __('There was an issue with the acme-project plugin', '{{lowercase (dashcase namespace)}}'),
-                __('Asset manifest not found. Please run the plugin build scripts.', '{{lowercase (dashcase namespace)}}')
-            );
-        }
-
-        $manifest = file_get_contents($manifestFile);
-        return array_values(json_decode($manifest, true));
-    }
-
-    /**
-     * Register block assets.
-     *
-     * @param  string
-     * @return void
-     */
-    protected function registerBlockType(string $block): void
-    {
-        register_block_type("{$this->namespace}/{$block}", [
-            'editor_script' => "{$this->namespace}/{$block}/editor/js",
-            'editor_style' => "{$this->namespace}/{$block}/editor/css",
-            'script' => "{$this->namespace}/{$block}/public/js",
-            'style' => "{$this->namespace}/{$block}/public/css",
-        ]);
-    }
-
-    /**
-     * Register extension scripts.
-     *
-     * @param  string
-     * @return void
-     */
-    protected function registerExtension($extension): void
-    {
-        wp_register_script(
-            "{$this->namespace}/{$extension}/js",
-            "{$this->getHost()}/{$extension}.js",
-            ...$this->getDependencyManifest($extension, 'scripts')
-        );
-
-        add_action('enqueue_block_editor_assets', function () use ($extension) {
-            wp_enqueue_script("{$this->namespace}/{$extension}/js");
         });
     }
   })();
 });
+

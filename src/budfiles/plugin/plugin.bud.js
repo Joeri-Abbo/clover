@@ -86,8 +86,48 @@ module.exports = {
       parser: 'babel',
     },
     {
+      action: 'template',
+      template: 'app/bootstrap.php.hbs',
+      path: 'app/bootstrap.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/Block.php.hbs',
+      path: 'app/Plugin/Block.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/BlockInterface.php.hbs',
+      path: 'app/Plugin/BlockInterface.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/BlockRepository.php.hbs',
+      path: 'app/Plugin/BlockRepository.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/BlockRepositoryInterface.php.hbs',
+      path: 'app/Plugin/BlockRepositoryInterface.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/Manifest.php.hbs',
+      path: 'app/Plugin/Manifest.php',
+    },
+    {
       action: 'scaffold',
       paths: ['src', 'src/blocks', 'src/components', 'src/extensions'],
+    },
+    {
+      action: 'addDependencies',
+      repo: 'packagist',
+      dev: false,
+      pkgs: [
+        'php-di/php-di',
+        'tightenco/collect',
+        'roots/support',
+      ],
     },
     {
       action: 'addDependencies',

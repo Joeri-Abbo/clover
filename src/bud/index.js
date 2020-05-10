@@ -228,13 +228,27 @@ export const bud = {
    * @param  {bool}  dev
    * @return {Observable}
    */
-  addDependencies: async function ({pkgs, dev}, observer) {
-    observer.next(`Installing packages...`)
+  addDependencies: async function ({repo, pkgs, dev}, observer) {
+    let installation
+    observer.next(`Installing packages from ${repo}...`)
 
-    const installation = this.execa.command(
-      `yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
-      this.execaOptions,
-    )
+    if (repo !== 'npm' && repo !== 'packagist') {
+      observer.error(`Incorrect package repo specified.`)
+    }
+
+    if (repo == 'npm') {
+      installation = this.execa.command(
+        `yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
+        this.execaOptions,
+      )
+    }
+
+    if (repo == 'packagist') {
+      installation = this.execa.command(
+        `composer require ${pkgs.join(' ')} ${dev ? `--development` : ``}`,
+        this.execaOptions,
+      )
+    }
 
     installation.stdout.on('data', status => {
       observer.next(status)
