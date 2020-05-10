@@ -5,12 +5,13 @@ const {writeFileSync} = require('fs')
 const {format} = require('prettier')
 
 /** Util */
-const {listKeys, commands} = require('./components/helpers')
+const {listKeys, block, commands} = require('./components/helpers')
 
 /** Data */
 const {
   name,
   licenses,
+  version,
   dependencies,
   devDependencies,
   engines,
@@ -84,10 +85,28 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 
 | Requirement | Version |
 | ---- | --- |
-| PHP  | >=7.1 |
+| PHP  | >=7.2 |
 | Node | ${engines.node} |
 
 ## Usage
+
+Bud is currently pre-release. But, you can try it out now:
+
+${block('sh', `npx @roots/bud@${version} init [project-dir]`)}
+
+This will initialize your project and install \`@roots/bud\` as a local dev dependency.
+
+After initializing, you might try additional generators to kick-start your dev process:
+
+${block('sh', `yarn generate plugin`)}
+
+${block('sh', `yarn generate block`)}
+
+But, you can also write your own custom generators, or install/share them by writing a \`bud-plugin\`.
+
+Documentation forthcoming. For now, you can run \`yarn generate:list\` to see what is available out-of-the-box.
+
+## All commands:
 
 | Command | Description |
 | --- | --- |

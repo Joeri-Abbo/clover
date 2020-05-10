@@ -1,3 +1,13 @@
-### 0.0.1: March xy, 2020
+## 1.0.0
+
+### Added
+
+- ...
+
+### Changed
+
+- ...
+
+## 0.0.1
 
 - Initial release
