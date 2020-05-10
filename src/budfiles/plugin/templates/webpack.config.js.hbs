@@ -24,10 +24,9 @@ const isHMR = process.env.NODE_ENV === 'hmr'
  * @param  {string} parentDir
  * @return {array}
  */
-const dirs = parentDir =>
-  readdirSync(resolve(__dirname, parentDir)).filter(file =>
-    statSync(join(parentDir, file)).isDirectory(),
-  )
+const dirs = parentDir => readdirSync(
+  resolve(__dirname, parentDir)
+).filter(file => statSync(join(parentDir, file)).isDirectory())
 
 /**
  * Block webpack entries
@@ -36,9 +35,8 @@ const dirs = parentDir =>
  */
 const entry = () => {
   let assets = {}
-  const blocks = dirs('src/blocks')
 
-  blocks.forEach(block => {
+  dirs('src/blocks').forEach(block => {
     assets = {
       ...assets,
       [`blocks/${block}/editor`]: [
@@ -52,22 +50,17 @@ const entry = () => {
     }
 
     assets = {
-      [`blocks/${block}/editor`]: (() => (
-        assets[`blocks/${block}/editor`].filter(file =>
-          existsSync(file)
-        )
-      ))(),
-      [`blocks/${block}/public`]: (() => (
-        assets[`blocks/${block}/public`].filter(file =>
-          existsSync(file)
-        )
-      ))()
+      ...assets,
+      [`blocks/${block}/editor`]: (() =>
+        assets[`blocks/${block}/editor`].filter(file => existsSync(file)))(),
+      [`blocks/${block}/public`]: (() =>
+        assets[`blocks/${block}/public`].filter(file => existsSync(file)))(),
     }
 
-    assets[`blocks/${block}/editor`].length <= 0
-      && delete assets[`blocks/${block}/editor`]
-    assets[`blocks/${block}/public`].length <= 0
-      && delete assets[`blocks/${block}/public`]
+    assets[`blocks/${block}/editor`].length <= 0 &&
+      delete assets[`blocks/${block}/editor`]
+    assets[`blocks/${block}/public`].length <= 0 &&
+      delete assets[`blocks/${block}/public`]
   })
 
   return assets

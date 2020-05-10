@@ -25,27 +25,11 @@ const Bud = () => (
         {/* prettier-ignore */}
         <Text>🌱{'  '}<Color green>bud init bud-project</Color>{'                 '}create a new plugin in ./bud-project</Text>
         {/* prettier-ignore */}
-        <Text>🌱{'  '}<Color green>cd bud-project</Color>{'                      '}change directory to your bud project root</Text>
-        {/* prettier-ignore */}
         <Text>🌱{'  '}<Color green>bud generate plugin</Color>{'                 '}generate a block-editor focused plugin scaffold</Text>
         {/* prettier-ignore */}
         <Text>🌱{'  '}<Color green>bud generate block</Color>{'                  '}generate a starter block</Text>
         {/* prettier-ignore */}
         <Text>🌱{'  '}<Color green>bud generate component-media-upload</Color>{' '}generate a reusable media upload component</Text>
-        {/* prettier-ignore */}
-        <Text>🌱{'  '}<Color green>yarn build</Color>{'                          '}build your new block</Text>
-        {/* prettier-ignore */}
-        <Text>🌱{'  '}<Color green>yarn dev</Color>{'                            '}code your block with HMR and live-reload</Text>
-        {/* prettier-ignore */}
-        <Text>✨{'  '}<Color yellow>template with blade</Color></Text>
-        {/* prettier-ignore */}
-        <Text>✨{'  '}<Color yellow>write a custom generator</Color></Text>
-        {/* prettier-ignore */}
-        <Text>✨{'  '}<Color yellow>extend bud with a bud-plugin</Color></Text>
-        {/* prettier-ignore */}
-        <Box>&nbsp;</Box>
-        {/* prettier-ignore */}
-        <Text>💅🏽{'  '}<Color magenta>get hype.</Color></Text>
       </Box>
     </Box>
   </BudCLI>
