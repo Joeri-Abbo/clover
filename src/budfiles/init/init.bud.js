@@ -68,11 +68,12 @@ module.exports = {
         const config = bud.getConfig()
 
         const wordPress = require('path').resolve(process.cwd(), '../../')
-        const isWordPress =
-          (await bud.fs.exists(`${wordPress}/index.php`)) &&
-          (await bud.fs.exists(`${wordPress}/wp-config.php`))
+        const isWordPress = await (
+          bud.fs.exists(`${wordPress}/index.php`) &&
+          bud.fs.exists(`${wordPress}/wp-config.php`)
+        )
 
-        !isWordPress
+        ! isWordPress
           ? observer.next('WordPress not detected.. moving on.')
           : (async () => {
               /** Backup index.php */

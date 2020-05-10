@@ -35,9 +35,8 @@ const dirs = parentDir => readdirSync(
  */
 const entry = () => {
   let assets = {}
-  const blocks = dirs('src/blocks')
 
-  blocks.forEach(block => {
+  dirs('src/blocks').forEach(block => {
     assets = {
       ...assets,
       [`blocks/${block}/editor`]: [
@@ -51,22 +50,17 @@ const entry = () => {
     }
 
     assets = {
-      [`blocks/${block}/editor`]: (() => (
-        assets[`blocks/${block}/editor`].filter(file =>
-          existsSync(file)
-        )
-      ))(),
-      [`blocks/${block}/public`]: (() => (
-        assets[`blocks/${block}/public`].filter(file =>
-          existsSync(file)
-        )
-      ))()
+      ...assets,
+      [`blocks/${block}/editor`]: (() =>
+        assets[`blocks/${block}/editor`].filter(file => existsSync(file)))(),
+      [`blocks/${block}/public`]: (() =>
+        assets[`blocks/${block}/public`].filter(file => existsSync(file)))(),
     }
 
-    assets[`blocks/${block}/editor`].length <= 0
-      && delete assets[`blocks/${block}/editor`]
-    assets[`blocks/${block}/public`].length <= 0
-      && delete assets[`blocks/${block}/public`]
+    assets[`blocks/${block}/editor`].length <= 0 &&
+      delete assets[`blocks/${block}/editor`]
+    assets[`blocks/${block}/public`].length <= 0 &&
+      delete assets[`blocks/${block}/public`]
   })
 
   return assets
