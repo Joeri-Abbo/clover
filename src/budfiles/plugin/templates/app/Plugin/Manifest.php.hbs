@@ -36,45 +36,43 @@ class Manifest
     }
 
     /**
-     * Load manifest entries from container.plugin.manifest
+     * Load manifest assets
      */
     public function load()
     {
-        if (! file_exists($manifestPath = $this->bud->get('config.manifest'))) {
-            return;
-        }
-
+        /**
+         * Collect assets from manifest
+         */
         $entries = $this->collection::make(
-            json_decode(file_get_contents($manifestPath))
+            json_decode(file_get_contents($this->bud->get('config.manifest')))
         );
 
+        /**
+         * Process manifest entries.
+         */
         $entries->each(function ($url, $handle) {
-            $nameParts = $this->collection::make(explode('/', $handle));
-            $fileParts = $this->collection::make(explode('.', $nameParts[count($nameParts) - 1]));
-            $name = $nameParts[1];
-            $basename = $fileParts[0];
-            $type = $this->types[$fileParts[1]];
+            $handleParts = $this->collection::make(
+                explode('/', $handle)
+            );
+
+            $fileParts = $this->collection::make(
+                explode('.', $handleParts[count($handleParts) - 1])
+            );
 
             $entry = $this->collection::make([
                 'url' => $url,
-                'type' => $type,
-                'name' => $name,
-                'group' => $this->namespace . '/' . $name,
-                'location' => explode('.', $nameParts[2])[0],
-                'registration' => (function ($basename, $type) {
-                    if ($basename == 'public') {
-                        return $type;
-                    }
-
-                    return "{$basename}_{$type}";
-                })($basename, $type),
+                'type' => $this->types[$fileParts[1]],
+                'name' => $handleParts[1],
+                'location' => $fileParts[0],
+                'group' => join('/', [
+                    $this->namespace,
+                    $handleParts[1],
+                ]),
             ]);
 
-            $entry->put('dependencies', $this->getDependencies(
-                $entry->get('name'),
-                $entry->get('location')
-            ));
-
+            /**
+             * Match with block handle
+             */
             $entry->put('handle', join('/', [
                 $this->namespace,
                 $entry->get('name'),
@@ -82,16 +80,45 @@ class Manifest
             ]));
 
             /**
-             * Create a new group if it doesn't yet exist.
+             * Process WordPress dependency manifest plugin
+             */
+            $entry->put('dependencies', $this->getDependencies(
+                $entry->get('name'),
+                $entry->get('location')
+            ));
+
+            /**
+             * Asset key used when registering blocks
+             */
+            $entry->put('registration', (
+                function () use ($entry) {
+                    if ($entry->get('location') == 'public') {
+                        return $entry->get('type');
+                    }
+
+                    return join('_', [
+                        $entry->get('location'),
+                        $entry->get('type')
+                    ]);
+                }
+            )());
+
+            /**
+             * Create a new collection key if it doesn't yet exist.
              */
             if (! $this->entries->has($entry->get('group'))) {
-                $this->entries->put($entry->get('group'), $this->collection::make());
+                $this->entries->put(
+                    $entry->get('group'),
+                    $this->collection::make()
+                );
             }
 
             /**
              * Load asset into repository.
              */
-            $this->entries->get($entry->get('group'))->push((object) $entry->toArray());
+            $this->entries
+                ->get($entry->get('group'))
+                ->push((object) $entry->toArray());
         });
     }
 

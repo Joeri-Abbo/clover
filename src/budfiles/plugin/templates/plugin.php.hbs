@@ -17,102 +17,104 @@
  * @see Dependency Extraction Webpack Plugin <https://git.io/Jv1ll>
  */
 add_action('init', function () {
-  (new class {
-   /** @var DI\Container */
-    public $bud;
-
-    /**
-     * Class constructor.
-     */
-    public function __construct()
-    {
-        $this->bud = require __DIR__ . '/app/bootstrap.php';
-
-        $this->collection = $this->bud->get('util.collection');
-        $this->blocks = $this->bud->get('blocks');
-        $this->manifest = $this->bud->get('manifest');
-    }
-
-    /**
-     * Class invocation.
-     *
-     * @throws \WP_Error
-     * @return void
-     */
-    public function __invoke(): void
-    {
-        $this->loadBlocks();
-        $this->registerAssets();
-    }
-
-    /**
-     * Load blocks repository.
-     */
-    public function loadBlocks()
-    {
-        /** Glob src for blocks */
-        $blocks = $this->collection::make(
-            glob(__DIR__ . '/src/blocks/*', GLOB_ONLYDIR)
-        /** Discard base paths */
-        )->map(function ($path) {
-            return str_replace(__DIR__ . '/src/blocks/', '', $path);
-        });
+    (new class {
+        /** @var DI\Container */
+        public $bud;
 
         /**
-         * Add blocks to repository and parse manifest for assets.
+         * Class constructor.
          */
-        $blocks->each(function ($handle) {
-            $block = $this->bud->make('block');
-            $block->setHandle($handle);
+        public function __construct()
+        {
+            $this->bud = require __DIR__ . '/app/bootstrap.php';
+            $this->collection = $this->bud->get('util.collection');
 
-            $this->manifest->getBlockAssets($block->getHandle())
-                ->filter(function ($asset) use ($block) {
-                    return $asset->group == $block->getHandle();
-                })
-                ->each(function ($asset) use ($block) {
-                    $block->addAsset($asset);
-                });
+            $this->blocks = $this->bud->get('blocks');
+            $this->manifest = $this->bud->get('manifest');
+        }
 
-            $this->blocks->addBlock($block);
-        });
-    }
+        /**
+         * Class invocation.
+         *
+         * @throws \WP_Error
+         * @return void
+         */
+        public function __invoke(): void
+        {
+            if (! file_exists($this->bud->get('config.manifest'))) {
+                return;
+            }
 
-    /**
-     * Register assets.
-     *
-     * @return void
-     */
-    public function registerAssets(): void
-    {
-        $this->blocks->getBlocks()->each(function ($block) {
-            $registration = [];
+            $this->loadBlocks();
+            $this->registerBlocks();
+        }
 
-            $block->getAssets()
-                /** Filter out manifest objects */
-                ->filter(function ($asset) {
-                    return $asset->type !== 'object';
-                })
-                /** Register asset with WordPress */
-                ->each(function ($asset) use (&$registration) {
-                    $registerCall = "wp_register_{$asset->type}";
+        /**
+         * Load blocks repository.
+         */
+        public function loadBlocks()
+        {
+            $blocks = $this->collection::make(
+                glob(__DIR__ . '/src/blocks/*', GLOB_ONLYDIR)
+            )->map(function ($path) {
+                return str_replace(__DIR__ . '/src/blocks/', '', $path);
+            });
 
-                    $registerCall(
-                        $asset->handle,
-                        $asset->url,
-                        $asset->dependencies,
-                        null,
-                    );
+            /**
+             * Add blocks to repository and parse manifest for assets.
+             */
+            $blocks->each(function ($handle) {
+                $block = $this->bud->make('block');
+                $block->setHandle($handle);
 
-                    /** Add to array to associate with block. */
-                    $registration[$asset->registration] = $asset->handle;
-                });
+                $this->manifest->getBlockAssets($block->getHandle())
+                    ->filter(function ($asset) use ($block) {
+                        return $asset->group == $block->getHandle();
+                    })
+                    ->each(function ($asset) use ($block) {
+                        $block->addAsset($asset);
+                    });
 
-            register_block_type(
-                $block->getHandle(),
-                $registration
-            );
-        });
-    }
-  })();
+                $this->blocks->addBlock($block);
+            });
+        }
+
+        /**
+         * Register block collection entries and their assets
+         * with WordPress.
+         *
+         * @return void
+         */
+        public function registerBlocks(): void
+        {
+            $this->blocks->getBlocks()->each(function ($block) {
+                $blockAssets = $this->bud->get('util.collection')::make([]);
+
+                $block->getAssets()
+                    ->filter(function ($asset) {
+                        return $asset->type !== 'object';
+                    })
+                    ->each(function ($asset) use (&$blockAssets) {
+                        $registerCallable = "wp_register_{$asset->type}";
+
+                        $registerCallable(
+                            $asset->handle,
+                            $asset->url,
+                            $asset->dependencies,
+                            null
+                        );
+
+                        $blockAssets->put(
+                            $asset->registration,
+                            $asset->handle
+                        );
+                    });
+
+                register_block_type(
+                    $block->getHandle(),
+                    $blockAssets->toArray()
+                );
+            });
+        }
+    })();
 });
-
