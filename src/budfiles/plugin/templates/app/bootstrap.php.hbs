@@ -19,7 +19,7 @@ $builder = new ContainerBuilder;
 $builder->addDefinitions([
     'config.dir' => realpath(__DIR__ . '/..'),
     'config.manifest' => realpath(__DIR__ . '/../dist/manifest.json'),
-    'config.namespace' => {{lowercase (dashcase namespace)}},
+    'config.namespace' => '{{lowercase (dashcase namespace)}}',
     'block' => function (ContainerInterface $bud) {
         return new Block($bud, $bud->get('util.collection'));
     },

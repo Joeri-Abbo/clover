@@ -128,7 +128,7 @@ class Manifest
      */
     protected function getDependencies($name, $location): array
     {
-        $blocksDir = $bud->get('config.dir') . "/dist/blocks";
+        $blocksDir = $this->bud->get('config.dir') . "/dist/blocks";
         if (! realpath($manifestSrc = $blocksDir . "/{$name}/{$location}.asset.json")) {
             return [];
         }
