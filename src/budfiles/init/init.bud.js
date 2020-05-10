@@ -73,7 +73,7 @@ module.exports = {
         isWordPress = await bud.fs.exists(`${wpPath}/index.php`)
         isWordPress = await bud.fs.exists(`${wpPath}/wp-config.php`)
 
-        ! isWordPress
+        !isWordPress
           ? observer.next('wpPath not detected.. moving on.')
           : (async () => {
               /** Copy index.php */
