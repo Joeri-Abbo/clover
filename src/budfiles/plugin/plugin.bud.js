@@ -87,6 +87,11 @@ module.exports = {
     },
     {
       action: 'template',
+      template: 'uninstall.php.hbs',
+      path: 'uninstall.php',
+    },
+    {
+      action: 'template',
       template: 'app/bootstrap.php.hbs',
       path: 'app/bootstrap.php',
     },
@@ -123,11 +128,7 @@ module.exports = {
       action: 'addDependencies',
       repo: 'packagist',
       dev: false,
-      pkgs: [
-        'php-di/php-di',
-        'tightenco/collect',
-        'roots/support',
-      ],
+      pkgs: ['php-di/php-di', 'tightenco/collect', 'roots/support'],
     },
     {
       action: 'addDependencies',
