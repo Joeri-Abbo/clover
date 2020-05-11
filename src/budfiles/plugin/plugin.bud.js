@@ -187,7 +187,7 @@ module.exports = {
         scripts: {
           ...pkg.scripts,
           dev:
-            'cross-env NODE_ENV=hmr webpack-dev-server --colors --watch --config webpack.config.js',
+            'cross-env NODE_ENV=hmr webpack-dev-server --colors --watch --https --config webpack.config.js',
           build:
             'cross-env NODE_ENV=development webpack --progress --colors --inline -p --config webpack.config.js',
           'build:production':
