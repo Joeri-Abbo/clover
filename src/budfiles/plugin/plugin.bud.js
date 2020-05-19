@@ -134,17 +134,17 @@ module.exports = {
     {
       action: 'template',
       template: 'app/Block/Contracts/BlockInterface.php.hbs',
-      path: 'app/Block/BlockInterface.php',
+      path: 'app/Block/Contracts/BlockInterface.php',
     },
     {
       action: 'template',
       template: 'app/Plugin/BlockRepository.php.hbs',
-      path: 'app/Block/BlockRepository.php',
+      path: 'app/Plugin/BlockRepository.php',
     },
     {
       action: 'template',
       template: 'app/Plugin/BlockRepositoryInterface.php.hbs',
-      path: 'app/Block/BlockRepositoryInterface.php',
+      path: 'app/Plugin/BlockRepositoryInterface.php',
     },
     {
       action: 'scaffold',
@@ -181,6 +181,7 @@ module.exports = {
         '@wordpress/browserslist-config',
         '@wordpress/dependency-extraction-webpack-plugin',
         'autoprefixer',
+        'assets-webpack-plugin',
         'babel-eslint',
         'babel-loader',
         'clean-webpack-plugin',
@@ -196,6 +197,7 @@ module.exports = {
         'extract-loader',
         'file-loader',
         'friendly-errors-webpack-plugin',
+        'mini-css-extract-plugin',
         'npm-run-all',
         'postcss-import',
         'postcss-loader',
