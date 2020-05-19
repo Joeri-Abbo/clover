@@ -1,25 +1,12 @@
 /**
- * bud generate new plugin
+ * bud generate plugin
  */
 
+// prettier-ignore
 module.exports = {
   name: 'plugin',
   description: 'Generate a new plugin',
   actions: [
-    {
-      action: 'scaffold',
-      paths: [
-        'src',
-        'src/blocks',
-        'src/components',
-        'src/extensions',
-        'app',
-        'app/Block',
-        'app/Block/Partials',
-        'app/Block/Contracts',
-        'app/Block/Base',
-      ],
-    },
     {
       action: 'template',
       template: 'README.md.hbs',
@@ -110,14 +97,77 @@ module.exports = {
       path: 'app/bootstrap.php',
     },
     {
-      action: 'templateGlob',
-      glob: 'app/**/*',
+      action: 'template',
+      template: 'app/Plugin/Activate.php.hbs',
+      path: 'app/Plugin/Activate.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/Deactivate.php.hbs',
+      path: 'app/Plugin/Deactivate.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/Asset.php.hbs',
+      path: 'app/Plugin/Asset.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/AssetInterface.php.hbs',
+      path: 'app/Plugin/AssetInterface.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/Manifest.php.hbs',
+      path: 'app/Plugin/Manifest.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Block/Block.php.hbs',
+      path: 'app/Block/Block.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Block/Base/BaseBlock.php.hbs',
+      path: 'app/Block/Base/BaseBlock.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Block/Contracts/BlockInterface.php.hbs',
+      path: 'app/Block/BlockInterface.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/BlockRepository.php.hbs',
+      path: 'app/Block/BlockRepository.php',
+    },
+    {
+      action: 'template',
+      template: 'app/Plugin/BlockRepositoryInterface.php.hbs',
+      path: 'app/Block/BlockRepositoryInterface.php',
+    },
+    {
+      action: 'scaffold',
+      paths: ['app/Block/Partials'],
+    },
+    {
+      action: 'scaffold',
+      paths: [
+        'src',
+        'src/blocks',
+        'src/components',
+        'src/extensions',
+      ],
     },
     {
       action: 'addDependencies',
       repo: 'packagist',
       dev: false,
-      pkgs: ['php-di/php-di', 'tightenco/collect', 'roots/support'],
+      pkgs: [
+        'php-di/php-di',
+        'tightenco/collect',
+        'roots/support',
+      ],
     },
     {
       action: 'addDependencies',
@@ -130,7 +180,6 @@ module.exports = {
         '@babel/preset-react',
         '@wordpress/browserslist-config',
         '@wordpress/dependency-extraction-webpack-plugin',
-        'assets-webpack-plugin',
         'autoprefixer',
         'babel-eslint',
         'babel-loader',
@@ -147,7 +196,6 @@ module.exports = {
         'extract-loader',
         'file-loader',
         'friendly-errors-webpack-plugin',
-        'mini-css-extract-plugin',
         'npm-run-all',
         'postcss-import',
         'postcss-loader',
@@ -177,20 +225,18 @@ module.exports = {
         browserslist: ['extends @wordpress/browserslist-config'],
         scripts: {
           ...pkg.scripts,
-          dev:
-            'cross-env NODE_ENV=hmr webpack-dev-server --colors --watch --https --config webpack.config.js',
-          build:
-            'cross-env NODE_ENV=development webpack --progress --colors --inline -p --config webpack.config.js',
-          'build:production':
-            'cross-env NODE_ENV=production webpack --progress --colors --inline -p --config webpack.config.js',
+          dev: 'cross-env NODE_ENV=hmr webpack-dev-server --colors --watch --https --config webpack.config.js',
+          build: 'cross-env NODE_ENV=development webpack --progress --colors --inline -p --config webpack.config.js',
+          'build:production': 'cross-env NODE_ENV=production webpack --progress --colors --inline -p --config webpack.config.js',
           lint: 'run-s -c lint:*',
           'lint:css': 'stylelint ./src/**/*.css',
           'lint:js': 'eslint ./src/**/*.js',
           format: 'prettier --write .',
           translate: 'run-s -c translate:*',
           'translate:pot':
-            'wp i18n make-pot . ./src/languages/plugin.pot --ignore-domain --include="./src"',
-          'translate:js': 'wp i18n make-json ./src/languages --no-purge --pretty-print',
+          'wp i18n make-pot . ./src/languages/plugin.pot --ignore-domain --include="./src"',
+          'translate:js':
+          'wp i18n make-json ./src/languages --no-purge --pretty-print',
         },
       }),
     },

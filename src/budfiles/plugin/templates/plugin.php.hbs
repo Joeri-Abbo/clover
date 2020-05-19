@@ -12,8 +12,8 @@
 
 namespace {{pascalcase namespace}};
 
-use \\{{pascalcase namespace}}\Plugin\AssetInterface;
-use \\{{pascalcase namespace}}\Plugin\BlockInterface;
+use \\{{pascalcase namespace}}\Plugin\Asset;
+use \\{{pascalcase namespace}}\Block\Block;
 
 /**
  * Register {{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}} block assets
@@ -66,7 +66,7 @@ add_action('init', function () {
         protected function load(): void
         {
             $this->bud->get('plugin.blocks')->each(function ($name) {
-                /** @var \\{{pascalcase namespace}}\Block\Contracts\BlockInterface */
+                /** @var \\{{pascalcase namespace}}\Block\Block */
                 $block = $this->bud->make('block');
 
                 $block->setName($name);
@@ -74,7 +74,7 @@ add_action('init', function () {
                 $this->collection::make([
                     $this->manifest->getAsset($block->getName(), 'editor', 'js'),
                     $this->manifest->getAsset($block->getName(), 'editor', 'css'),
-                ])->each(function (AssetInterface $asset) use ($block) {
+                ])->each(function (Asset $asset) use ($block) {
                     if (! $asset) return;
 
                     $block->setEditorAsset($asset);
@@ -83,7 +83,7 @@ add_action('init', function () {
                 $this->collection::make([
                     $this->manifest->getAsset($block->getName(), 'public', 'js'),
                     $this->manifest->getAsset($block->getName(), 'public', 'css'),
-                ])->each(function (AssetInterface $asset) use ($block) {
+                ])->each(function (Asset $asset) use ($block) {
                     if (! $asset) return;
 
                     $block->setPublicAsset($asset);
@@ -100,8 +100,8 @@ add_action('init', function () {
          */
         protected function register(): void
         {
-            $this->blocks->all()->each(function (BlockInterface $block) {
-                $block->getAssets()->each(function (AssetInterface $asset) {
+            $this->blocks->all()->each(function (Block $block) {
+                $block->getAssets()->each(function (Asset $asset) {
                     $registerAssetCallable = "wp_register_{$asset->getType()}";
 
                     $registerAssetCallable(

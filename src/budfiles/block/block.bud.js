@@ -1,6 +1,8 @@
 /**
- * Bud Block
+ * bud generate block
  */
+
+// prettier-ignore
 module.exports = {
   name: 'block',
   description: 'Generate a new block',
