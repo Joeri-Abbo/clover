@@ -2,7 +2,9 @@
 
 namespace {{pascalcase namespace}}\Plugin;
 
+use {{pascalcase namespace}}\Plugin\AssetInterface;
 use Psr\Container\ContainerInterface;
+use Illuminate\Support\Collection;
 
 /**
  * Manifest class.
@@ -12,138 +14,65 @@ class Manifest
     /** @var ContainerInterface */
     protected $bud;
 
-    /** @var array */
-    protected $entries;
+    /** @var Collection */
+    protected $assets;
 
     /** @var array */
     protected $types = [
         'js' => 'script',
         'css' => 'style',
-        'json' => 'object',
     ];
 
     /**
      * Class constructor.
-     */
-    public function __construct(ContainerInterface $bud)
-    {
-        $this->bud = $bud;
-        $this->collection = $bud->get('util.collection');
-        $this->namespace = $bud->get('config.namespace');
-
-        $this->entries = $this->collection::make([]);
-    }
-
-    /**
-     * Load manifest assets
-     */
-    public function load()
-    {
-        /**
-         * Collect assets from manifest
-         */
-        $entries = $this->collection::make(
-            json_decode(file_get_contents($this->bud->get('config.manifest')))
-        );
-
-        /**
-         * Process manifest entries.
-         */
-        $entries->each(function ($url, $handle) {
-            $handleParts = $this->collection::make(
-                explode('/', $handle)
-            );
-
-            $fileParts = $this->collection::make(
-                explode('.', $handleParts[count($handleParts) - 1])
-            );
-
-            $entry = $this->collection::make([
-                'url' => plugins_url($url, realpath(__DIR__ . '/..')),
-                'type' => $this->types[$fileParts[1]],
-                'name' => $handleParts[1],
-                'location' => $fileParts[0],
-                'group' => join('/', [
-                    $this->namespace,
-                    $handleParts[1],
-                ]),
-            ]);
-
-            /**
-             * Asset key used when registering blocks
-             */
-            $entry->put('registration', (
-                function () use ($entry) {
-                    if ($entry->get('location') == 'public') {
-                        return $entry->get('type');
-                    }
-
-                    return join('_', [
-                        $entry->get('location'),
-                        $entry->get('type')
-                    ]);
-                }
-            )());
-
-            /**
-             * Matched against Block handle property.
-             */
-            $entry->put('handle', join('/', [
-                $this->namespace,
-                $entry->get('name'),
-                $entry->get('registration')
-            ]));
-
-            /**
-             * Process WordPress dependency manifest plugin
-             */
-            $entry->put('dependencies', $this->getDependencies(
-                $entry->get('name'),
-                $entry->get('location')
-            ));
-
-            /**
-             * Create a new collection key if it doesn't yet exist.
-             */
-            if (! $this->entries->has($entry->get('group'))) {
-                $this->entries->put(
-                    $entry->get('group'),
-                    $this->collection::make()
-                );
-            }
-
-            /**
-             * Load asset into repository.
-             */
-            $this->entries
-                ->get($entry->get('group'))
-                ->push((object) $entry->toArray());
-        });
-    }
-
-    /**
-     * Get webpack dependency manifest.
      *
-     * @return array
+     * @param ContainerInterface
+     * @param Collection
+     * @param Collection
      */
-    protected function getDependencies($name, $location): array
+    public function __construct(
+        ContainerInterface $bud,
+        Collection $assets,
+        Collection $collection
+    ) {
+        $this->bud = $bud;
+        $this->assets = $assets;
+        $this->collection = $collection;
+    }
+
+    /**
+     * Return asset
+     *
+     * @return AssetInterface
+     */
+    public function getAsset($name, $context, $ext): AssetInterface
     {
-        $blocksDir = $this->bud->get('config.dir') . "/dist/blocks";
-        if (! realpath($manifestSrc = $blocksDir . "/{$name}/{$location}.asset.json")) {
-            return [];
+        $blockName = str_replace($this->bud->get('plugin.namespace') . '/', '', $name);
+        $entry = $this->assets->get("{$blockName}/{$context}")->{$ext};
+        $uri = str_replace($this->bud->get('plugin.path.dist'), '', $entry);
+
+        $asset = $this->bud->make('asset');
+        $asset->setName(join('/', [$name, $context, $this->types[$ext]]));
+        $asset->setType($this->types[$ext]);
+        $asset->setUrl($this->bud->get('plugin.url') . $uri);
+
+        if ($this->types[$ext] !== 'style'
+        && $dependencies = $this->getDependencies($blockName, $context)) {
+            $asset->setDependencies($dependencies);
         }
 
-        return ((object) json_decode(file_get_contents($manifestSrc), true))->dependencies;
+        return $asset;
     }
 
     /**
-     * Get entries of type.
-     *
-     * @param  string
-     * @return array
+     * Return dependency manifest
      */
-    public function getBlockAssets(string $handle)
+    public function getDependencies($name, $context)
     {
-        return $this->entries->get($handle);
+        $manifestPath = $this->bud->get('plugin.path') . $this->assets->get("{$name}/{$context}")->json;
+
+        return $this->collection::make(
+            (object) json_decode(file_get_contents($manifestPath))
+        )->get('dependencies');
     }
 }

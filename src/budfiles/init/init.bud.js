@@ -40,39 +40,15 @@ module.exports = {
       message: 'Author email',
       initial: 'wiley@gmail.com',
     },
-    {
-      type: 'input',
-      name: 'proxy',
-      message: 'Proxy hostname',
-      initial: 'sage-app.test',
-    },
-    {
-      type: 'select',
-      name: 'protocol',
-      message: 'What protocol are you using in development?',
-      initial: 'https',
-      choices: ['https', 'http'],
-    },
-    {
-      type: 'input',
-      name: 'port',
-      message: 'Live reload port',
-      initial: 3000,
-    },
   ],
   actions: [
     {
       action: 'scaffold',
-      paths: [
-        '.bud',
-        '.bud/budfiles',
-        '.bud/budfiles/example',
-        '.bud/budfiles/example/templates',
-      ],
+      paths: ['.bud', '.bud/budfiles', '.bud/budfiles/example', '.bud/budfiles/example/templates'],
     },
     {
       action: 'template',
-      template: 'bud.config.json.hbs',
+      template: '.bud/bud.config.json.hbs',
       path: '.bud/bud.config.json',
       parser: 'json',
     },
@@ -84,12 +60,12 @@ module.exports = {
     },
     {
       action: 'template',
-      template: 'budfiles/example/example.bud.js.hbs',
+      template: '.bud/budfiles/example/example.bud.js.hbs',
       path: '.bud/budfiles/example/example.bud.js',
     },
     {
       action: 'template',
-      template: 'budfiles/example/templates/Component.js.hbs',
+      template: '.bud/budfiles/example/templates/Component.js.hbs',
       path: '.bud/budfiles/example/templates/Component.js.hbs',
     },
     {

@@ -53,7 +53,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 Bud is currently pre-release. But, you can try it out now:
 
 ```sh
-npx @roots/bud@1.0.0-beta.6 init [project-dir]
+npx @roots/bud@1.0.0-beta.8 init [project-dir]
 ```
 
 This will initialize your project and install `@roots/bud` as a local dev dependency.
@@ -74,12 +74,12 @@ Documentation forthcoming. For now, you can run `yarn generate:list` to see what
 
 ## All commands:
 
-| Command            | Description                          |
-| ------------------ | ------------------------------------ |
-| `bud`              | Bud information                      |
-| `bud init`         | Create a new project                 |
-| `bud generate`     | List available budfiles              |
-| `bud generate new` | Generate code described by a budfile |
+| Command         | Description                  |
+| --------------- | ---------------------------- |
+| `bud`           | Bud information              |
+| `bud init`      | Create a new project         |
+| `bud generate`  | Generate code from a budfile |
+| `generate list` | List available budfiles      |
 
 ### Dependencies
 

@@ -1,121 +1,90 @@
-import {join, resolve} from 'path'
+import {dirname} from 'path'
 import React, {useState, useEffect} from 'react'
-import {Text, Color, Box} from 'ink'
-import Table from 'ink-table'
+import {Text, Color} from 'ink'
+import PropTypes from 'prop-types'
 import BudCLI from '../../src/components/BudCLI'
 import globby from 'globby'
 
 /**
- * Budfile glob paths
+ * Resolvers for different budfile locations
  */
-const rootsBudsGlob = resolve(__dirname, `../../../src/budfiles/**/*.bud.js`)
-
-const moduleBudsGlob = join(
-  process.cwd(),
-  `node_modules/**/bud-plugin-*/**/*.bud.js`,
-)
-const projectBudsGlob = join(process.cwd(), `.bud/budfiles/**/*.bud.js`)
+const getRootBudPath = name =>
+  `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${name}.bud.js`
+const getModuleBudPath = name => `${process.cwd()}/node_modules/**/bud-plugin-*/${name}.bud.js`
+const getProjectBudPath = name => `${process.cwd()}/.bud/budfiles/**/${name}.bud.js`
 
 /** Command: bud generate */
-/// List available budfiles
-const GenerateIndex = () => {
-  /**
-   * Project buds
-   */
-  const [projectBuds, setProjectBuds] = useState([])
-  useEffect(() => {
-    ;(async () => {
-      const buds = await globby([projectBudsGlob])
-
-      buds &&
-        setProjectBuds(
-          buds.map(bud => {
-            const src = require(bud)
-            return {
-              command: `bud generate ${src.name}`,
-              source: 'project',
-              name: src.name,
-              description: src.description,
-            }
-          }),
-        )
-    })()
-  }, [])
+/// Generate code from a budfile
+const Generate = props => {
+  const [budName] = useState(props.budName)
+  const [sprout, setSprout] = useState(false)
+  const [checked, setChecked] = useState({
+    project: false,
+    modules: false,
+    roots: false,
+  })
 
   /**
-   * Module buds
+   * Local budfiles
    */
-  const [moduleBuds, setModuleBuds] = useState([])
   useEffect(() => {
-    ;(async () => {
-      const buds = await globby([moduleBudsGlob])
-
-      buds &&
-        setModuleBuds(
-          buds.map(bud => {
-            const src = require(bud)
-            return {
-              command: `bud generate ${src.name}`,
-              source: 'plugin',
-              name: src.name,
-              description: src.description,
-            }
-          }),
-        )
-    })()
-  }, [])
+    budName &&
+      !checked.project &&
+      (async () => {
+        const buds = await globby([getProjectBudPath(budName)])
+        buds && buds.length > 0 && setSprout(buds[0])
+        setChecked({...checked, project: true})
+      })()
+  }, [budName, checked.project])
 
   /**
-   * Module buds
+   * Module budfiles
    */
-  const [rootsBuds, setRootsBuds] = useState([])
   useEffect(() => {
-    ;(async () => {
-      const buds = await globby([rootsBudsGlob])
+    !sprout &&
+      checked.project &&
+      (async () => {
+        const buds = await globby([getModuleBudPath(budName)])
+        buds && buds.length > 0 && setSprout(buds[0])
+        setChecked({...checked, modules: true})
+      })()
+  }, [sprout, checked.project])
 
-      buds &&
-        setRootsBuds(
-          buds
-            .map(bud => {
-              const src = require(bud)
-              return src.name !== 'bud' && src.name !== 'init'
-                ? {
-                    command: `bud generate ${src.name}`,
-                    source: '@roots/bud',
-                    name: src.name,
-                    description: src.description,
-                  }
-                : {}
-            })
-            .filter(bud => bud.name),
-        )
-    })()
-  }, [])
+  /**
+   * Core budfiles
+   */
+  useEffect(() => {
+    !sprout &&
+      checked.modules &&
+      (async () => {
+        const buds = await globby([getRootBudPath(budName)])
+        buds && buds.length > 0 && setSprout(buds[0])
+        setChecked({...checked, roots: true})
+      })()
+  }, [sprout, checked.modules])
 
   /**
    * Render
    */
-  return (
-    <BudCLI label={'bud generate'} inert={true}>
-      <Box flexDirection="column" marginTop={1} marginBottom={1}>
-        <Box marginBottom={1}>
-          <Text>
-            <Color green>Budfiles available:</Color>
-          </Text>
-        </Box>
-        <Box
-          width={200}
-          flexDirection="column"
-          flexGrow={1}
-          justifyContent="space-between">
-          <Table
-            width={200}
-            data={[...projectBuds, ...rootsBuds, ...moduleBuds]}
-          />
-        </Box>
-      </Box>
-    </BudCLI>
+  return sprout ? (
+    <BudCLI
+      label={require(sprout).description}
+      outDir={process.cwd()}
+      templateDir={`${dirname(sprout)}/templates`}
+      sprout={require(sprout)}
+    />
+  ) : (
+    <Text>
+      <Color green>Searching...</Color>
+    </Text>
   )
 }
 
-export default GenerateIndex
+Generate.propTypes = {
+  // Generator name ([name].bud.js)
+  budName: PropTypes.string,
+}
+
+Generate.positionalArgs = ['budName']
+
+export default Generate

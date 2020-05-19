@@ -122,7 +122,7 @@ module.exports = {
   arrowParens: 'avoid',
   bracketSpacing: false,
   tabWidth: 2,
-  printWidth: 80,
+  printWidth: 100,
   singleQuote: true,
   jsxBracketSameLine: true,
   useTabs: false,
@@ -190,7 +190,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.bud = void 0;
 
 const {
-  join
+  join,
+  resolve
 } = require('path');
 
 const fs = require('fs-extra');
@@ -202,6 +203,8 @@ const execa = require('execa');
 const handlebars = require('handlebars');
 
 const prettier = require('prettier');
+
+const globby = require('globby');
 
 const {
   Observable,
@@ -288,21 +291,6 @@ const bud = {
   },
 
   /**
-   * Get template contents.
-   *
-   * @param  {string} template
-   * @return {array}
-   */
-  getTemplate: async function (template) {
-    const path = join(this.templateDir, template);
-    const contents = await fs.readFile(path, 'utf8');
-    return {
-      path,
-      contents
-    };
-  },
-
-  /**
    * Register actions
    */
   registerActions: function () {
@@ -356,6 +344,7 @@ const bud = {
     return new Observable(function (observer) {
       from(bud.sprout.actions).pipe(concatMap(function (task) {
         return new Observable(async function (observer) {
+          observer.next(task.action);
           return bud[task.action](task, observer, bud);
         });
       })).subscribe({
@@ -406,6 +395,49 @@ const bud = {
   },
 
   /**
+   * Get template contents.
+   *
+   * @param  {string} template
+   * @return {array}
+   */
+  getTemplate: async function (template) {
+    const path = join(this.templateDir, template);
+    const contents = await fs.readFile(path, 'utf8');
+    return {
+      path,
+      contents
+    };
+  },
+
+  /**
+   * Infer parser
+   *
+   * @param  {string} file
+   * @return {string}
+   */
+  inferParser: async function (file) {
+    var _parserMap$;
+
+    const ext = file.split('.')[file.split('.').length - 1];
+    const parserMap = {
+      js: 'babel',
+      jsx: 'babel',
+      graphql: 'graphql',
+      css: 'css',
+      json: 'json',
+      md: 'markdown',
+      html: 'html',
+      htm: 'html',
+      ts: 'typescript',
+      tsx: 'typescript',
+      yml: 'yaml',
+      yaml: 'yaml',
+      less: 'less'
+    };
+    return (_parserMap$ = parserMap[`${ext}`]) !== null && _parserMap$ !== void 0 ? _parserMap$ : null;
+  },
+
+  /**
    * Action: template
    *
    * @param  {string} parser
@@ -421,11 +453,39 @@ const bud = {
     const {
       contents
     } = await this.getTemplate(template);
-    const dest = join(this.projectDir, this.handlebars.compile(path)(this.getData()));
+    const dest = join(this.projectDir, this.handlebars.compile(path)(this.getData()).replace('.hbs', ''));
     observer.next(`Writing ${dest.split('/')[dest.split('/').length - 1]}`);
     const compiled = this.handlebars.compile(contents)(this.getData());
     const outputContents = parser ? this.format(compiled, parser) : compiled;
     fs.outputFile(dest, outputContents).then(() => observer.complete());
+  },
+
+  /**
+   * Action: template dir
+   *
+   * @param  {string} parser
+   * @param  {string} path
+   * @param  {string} templateDir
+   * @return {Observable}
+   */
+  templateGlob: async function ({
+    glob
+  }, observer) {
+    observer.next(glob);
+    const templates = await globby([resolve(this.templateDir, glob)]);
+    from(templates).pipe(concatMap(template => {
+      return new Observable(async observer => {
+        const parser = await this.inferParser(template.replace('.hbs', ''));
+        await this.template({
+          parser,
+          template: template.replace(this.templateDir, ''),
+          path: template.replace(this.templateDir, '').replace('.hbs', '')
+        }, observer);
+      });
+    })).subscribe({
+      next: next => observer.next(next),
+      complete: () => observer.complete()
+    });
   },
 
   /**
@@ -555,6 +615,7 @@ const DEFAULT_BUDFILE = {
  * @prop {string} outDir
  * @prop {object} values
  * @prop {object} children
+ * @prop {bool}   noClear
  */
 
 const BudCLI = ({
@@ -564,7 +625,8 @@ const BudCLI = ({
   outDir,
   values = null,
   inert = false,
-  children
+  children,
+  noClear = false
 }) => {
   /**
    * Parse values from .bud/bud.config.json
@@ -647,20 +709,26 @@ const BudCLI = ({
   }, '  Bud'))))), /*#__PURE__*/_react.default.createElement(Tasks, {
     data: data,
     status: status,
-    complete: complete
+    complete: complete,
+    noClear: noClear
   }), children && children);
 };
+/**
+ * Tasks
+ */
+
 
 const Tasks = ({
   data,
   status,
-  complete
+  complete,
+  noClear
 }) => {
   const {
     stdout
   } = (0, _ink.useStdout)();
   (0, _react.useEffect)(() => {
-    data && stdout.write('\x1B[2J\x1B[0f');
+    data && !noClear && stdout.write('\x1B[2J\x1B[0f');
   }, [data]);
   return status ? /*#__PURE__*/_react.default.createElement(_ink.Box, null, complete ? /*#__PURE__*/_react.default.createElement(_ink.Color, {
     green: true
@@ -699,7 +767,8 @@ const Init = props => {
     outDir: props.projectDir,
     label: require(`${props.budFileDir}/init.bud`).label,
     sprout: require(`${props.budFileDir}/init.bud`),
-    templateDir: `${props.budFileDir}/templates`
+    templateDir: `${props.budFileDir}/templates`,
+    noClear: true
   });
 };
 
@@ -716,12 +785,6 @@ Init.propTypes = {
   email: _propTypes.default.string,
   /// Project website
   website: _propTypes.default.string,
-  /// Project proxy URL
-  proxy: _propTypes.default.string,
-  /// Project uses SSL
-  protocol: _propTypes.default.string,
-  /// Dev server port
-  port: _propTypes.default.number,
   /// Output directory
   projectDir: _propTypes.default.string
 };

@@ -7,8 +7,13 @@
  * License:      MIT
  * Text Domain:  {{lowercase (dashcase namespace)}}
  *
- * @package {{namespace}}
+ * @package {{lowercase (dashcase namespace)}}
  */
+
+namespace {{pascalcase namespace}};
+
+use \\{{pascalcase namespace}}\Plugin\AssetInterface;
+use \\{{pascalcase namespace}}\Plugin\BlockInterface;
 
 /**
  * Register {{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}} block assets
@@ -18,8 +23,17 @@
  */
 add_action('init', function () {
     (new class {
-        /** @var DI\Container */
+        /** @var \Psr\Container\ContainerInterface */
         public $bud;
+
+        /** @var \Illuminate\Support\Collection */
+        public $collection;
+
+        /** @var \\{{pascalcase namespace}}\Plugin\BlockRepository */
+        public $blocks;
+
+        /** @var \\{{pascalcase namespace}}\Plugin\Manifest */
+        public $manifest;
 
         /**
          * Class constructor.
@@ -27,8 +41,7 @@ add_action('init', function () {
         public function __construct()
         {
             $this->bud = require __DIR__ . '/app/bootstrap.php';
-            $this->collection = $this->bud->get('util.collection');
-
+            $this->collection = $this->bud->get('collection');
             $this->blocks = $this->bud->get('blocks');
             $this->manifest = $this->bud->get('manifest');
         }
@@ -41,76 +54,67 @@ add_action('init', function () {
          */
         public function __invoke(): void
         {
-            if (! file_exists($this->bud->get('config.manifest'))) {
-                return;
-            }
-
-            $this->loadBlocks();
-            $this->registerBlocks();
+            $this->load();
+            $this->register();
         }
 
         /**
-         * Load blocks into repository.
-         */
-        public function loadBlocks()
-        {
-            $blocks = $this->collection::make(
-                glob(__DIR__ . '/src/blocks/*', GLOB_ONLYDIR)
-            )->map(function ($path) {
-                return str_replace(__DIR__ . '/src/blocks/', '', $path);
-            });
-
-            $blocks->each(function ($handle) {
-                $block = $this->bud->make('block');
-                $block->setHandle($handle);
-
-                $this->manifest->getBlockAssets($block->getHandle())
-                    ->filter(function ($asset) use ($block) {
-                        return $asset->group == $block->getHandle();
-                    })
-                    ->each(function ($asset) use ($block) {
-                        $block->addAsset($asset);
-                    });
-
-                $this->blocks->addBlock($block);
-            });
-        }
-
-        /**
-         * Register blocks and assets with WordPress.
+         * Load blocks and assets.
          *
          * @return void
          */
-        public function registerBlocks(): void
+        protected function load(): void
         {
-            $this->blocks->getBlocks()->each(function ($block) {
-                $blockAssets = $this->bud->get('util.collection')::make([]);
+            $this->bud->get('plugin.blocks')->each(function ($name) {
+                /** @var \\{{pascalcase namespace}}\Block\Contracts\BlockInterface */
+                $block = $this->bud->make('block');
 
-                $block->getAssets()
-                    ->filter(function ($asset) {
-                        return $asset->type !== 'object';
-                    })
-                    ->each(function ($asset) use (&$blockAssets) {
-                        $registerCallable = "wp_register_{$asset->type}";
+                $block->setName($name);
 
-                        $registerCallable(
-                            $asset->handle,
-                            $asset->url,
-                            $asset->dependencies,
-                            null
-                        );
+                $this->collection::make([
+                    $this->manifest->getAsset($block->getName(), 'editor', 'js'),
+                    $this->manifest->getAsset($block->getName(), 'editor', 'css'),
+                ])->each(function (AssetInterface $asset) use ($block) {
+                    if (! $asset) return;
 
-                        $blockAssets->put(
-                            $asset->registration,
-                            $asset->handle
-                        );
-                    });
+                    $block->setEditorAsset($asset);
+                });
 
-                register_block_type(
-                    $block->getHandle(),
-                    $blockAssets->toArray()
-                );
+                $this->collection::make([
+                    $this->manifest->getAsset($block->getName(), 'public', 'js'),
+                    $this->manifest->getAsset($block->getName(), 'public', 'css'),
+                ])->each(function (AssetInterface $asset) use ($block) {
+                    if (! $asset) return;
+
+                    $block->setPublicAsset($asset);
+                });
+
+                $this->blocks->add($block);
+            });
+        }
+
+        /**
+         * Register blocks and assets.
+         *
+         * @return void
+         */
+        protected function register(): void
+        {
+            $this->blocks->all()->each(function (BlockInterface $block) {
+                $block->getAssets()->each(function (AssetInterface $asset) {
+                    $registerAssetCallable = "wp_register_{$asset->getType()}";
+
+                    $registerAssetCallable(
+                        $asset->getName(),
+                        $asset->getUrl(),
+                        $asset->getDependencies(),
+                        null
+                    );
+                });
+
+                $block->register();
             });
         }
     })();
 });
+

@@ -4,7 +4,7 @@ namespace {{pascalcase namespace}}\Plugin;
 
 use Psr\Container\ContainerInterface;
 use Illuminate\Support\Collection;
-use {{pascalcase namespace}}\Plugin\Block;
+use {{pascalcase namespace}}\Block\Contracts\BlockInterface;
 use {{pascalcase namespace}}\Plugin\BlockRepositoryInterface;
 
 /**
@@ -20,38 +20,49 @@ class BlockRepository implements BlockRepositoryInterface
      */
     public function __construct(ContainerInterface $bud)
     {
-        $this->blocks = $bud->get('util.collection')::make([]);
-    }
-
-    /**
-     * Get blocks.
-     *
-     * @return Block[]
-     */
-    public function getBlocks()
-    {
-        return $this->blocks;
+        $this->blocks = $bud->get('collection')::make([]);
     }
 
     /**
      * Get block.
      *
      * @param  string
-     * @return Block
+     * @return BlockInterface
      */
-    public function getBlock(string $handle): Block
+    public function get(string $handle): BlockInterface
     {
-        return $this->blocks[$handle];
+        return $this->blocks->get($handle);
+    }
+
+    /**
+     * Get blocks.
+     *
+     * @return Collection
+     */
+    public function all(): Collection
+    {
+        return $this->blocks;
     }
 
     /**
      * Add block.
      *
-     * @param  Block
+     * @param  BlockInterface
      * @return void
      */
-    public function addBlock(Block $block): void
+    public function add(BlockInterface $block): void
     {
-        $this->blocks->push($block);
+        $this->blocks->put($block->getName(), $block);
+    }
+
+    /**
+     * Remove block.
+     *
+     * @param  string
+     * @return void
+     */
+    public function remove(string $handle): void
+    {
+        $this->blocks->forget($handle);
     }
 }
