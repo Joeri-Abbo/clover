@@ -766,7 +766,7 @@ const Bud = () => /*#__PURE__*/_react.default.createElement(_BudCLI.default, {
   flexDirection: "column"
 }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
   marginBottom: 1
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "To get started run", ' ', /*#__PURE__*/_react.default.createElement(_ink.Color, {
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "To get started run ", /*#__PURE__*/_react.default.createElement(_ink.Color, {
   green: true
 }, "npx @roots/bud init ", `{project-dir}`)))));
 
