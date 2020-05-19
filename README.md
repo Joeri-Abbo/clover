@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" height="100">
+  <img alt="Bud" src="https://cdn.roots.io/app/uploads/logo-bud.svg" width="100">
 </p>
 
 <p align="center">
@@ -53,7 +53,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 Bud is currently pre-release. But, you can try it out now:
 
 ```sh
-npx @roots/bud@1.0.0-beta.8 init [project-dir]
+npx @roots/bud@1.0.0-beta.9 init [project-dir]
 ```
 
 This will initialize your project and install `@roots/bud` as a local dev dependency.
@@ -130,7 +130,7 @@ We have [contributing guidelines](https://github.com/roots/guidelines/blob/maste
 
 Help support our open-source development efforts by [becoming a patron](https://www.patreon.com/rootsdev).
 
-<a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="200" height="150"></a> <a href="https://k-m.com/"><img src="https://cdn.roots.io/app/uploads/km-digital.svg" alt="KM Digital" width="200" height="150"></a> <a href="https://carrot.com/"><img src="https://cdn.roots.io/app/uploads/carrot.svg" alt="Carrot" width="200" height="150"></a>
+<a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="200" height="150"></a> <a href="https://k-m.com/"><img src="https://cdn.roots.io/app/uploads/km-digital.svg" alt="KM Digital" width="200" height="150"></a>
 
 ## Community
 
