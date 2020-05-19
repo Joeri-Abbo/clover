@@ -72,6 +72,13 @@
 			"subCommands": []
 		},
 		{
+			"path": "list/index.js",
+			"name": "list",
+			"description": "List available budfiles",
+			"args": [],
+			"subCommands": []
+		},
+		{
 			"path": "generate/index.js",
 			"name": "generate",
 			"description": "Generate code from a budfile",
@@ -85,13 +92,6 @@
 					"positional": true
 				}
 			],
-			"subCommands": []
-		},
-		{
-			"path": "list/index.js",
-			"name": "list",
-			"description": "List available budfiles",
-			"args": [],
 			"subCommands": []
 		}
 	]
