@@ -1,0 +1,97 @@
+<?php
+
+namespace {{pascalcase namespace}}\Asset\Base;
+
+use Illuminate\Support\Collection;
+use Psr\Container\ContainerInterface;
+use {{pascalcase namespace}}\Asset\Contract\AssetInterface;
+use {{pascalcase namespace}}\Block\Contract\BlockInterface;
+use {{pascalcase namespace}}\Asset\Contract\ManifestInterface;
+
+/**
+ * Abstract Manifest class.
+ */
+abstract class AbstractManifest implements ManifestInterface
+{
+    /** @var ContainerInterface */
+    protected $bud;
+
+    /** @var Collection */
+    protected $assets;
+
+    /** @var array */
+    protected $types = [
+        'js' => 'script',
+        'css' => 'style',
+    ];
+
+    /**
+     * Class constructor.
+     *
+     * @param ContainerInterface
+     * @param Collection
+     * @param Collection
+     */
+    public function __construct(
+        ContainerInterface $bud,
+        Collection $collection
+    ) {
+        $this->bud = $bud;
+        $this->collection = $collection;
+
+        $this->manifestContents = $this->collection::make(
+            $this->bud->get('plugin.manifest')
+        );
+    }
+
+    /**
+     * Return asset
+     *
+     * @return AssetInterface
+     */
+    public function getAsset(BlockInterface $block, $context, $ext): AssetInterface
+    {
+        $blockName = str_replace($this->bud->get('plugin.namespace') . '/', '', $block->getName());
+
+        $asset = $this->bud->make(AssetInterface::class);
+
+        $asset->setType($this->types[$ext]);
+        $asset->setContext($context);
+        $asset->setName(join('/', [$blockName, $context, $asset->getType()]));
+        $asset->setUrl($this->bud->get('plugin.url') . $this->manifestContents->get("{$blockName}/{$context}")->{$ext});
+
+        if ($asset->getType() !== 'style' && $dependencies = $this->getDependencies($blockName, $context)) {
+            $asset->setDependencies($dependencies);
+        }
+
+        return $asset;
+    }
+
+    /**
+     * Get assets.
+     *
+     * @param  BlockInterface $block
+     * @return Collection
+     */
+    public function getAssets(BlockInterface $block): Collection
+    {
+        return $this->collection::make([
+            $this->getAsset($block, 'editor', 'js'),
+            $this->getAsset($block, 'editor', 'css'),
+            $this->getAsset($block, 'public', 'js'),
+            $this->getAsset($block, 'public', 'css'),
+        ]);
+    }
+
+    /**
+     * Return dependency manifest
+     */
+    public function getDependencies($name, $context): array
+    {
+        $manifestPath = $this->bud->get('path.plugin') . $this->manifestContents->get("{$name}/{$context}")->json;
+
+        return $this->collection::make(
+            (object) json_decode(file_get_contents($manifestPath))
+        )->get('dependencies');
+    }
+}

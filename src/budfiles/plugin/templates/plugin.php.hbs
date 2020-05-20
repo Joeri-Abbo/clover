@@ -12,109 +12,50 @@
 
 namespace {{pascalcase namespace}};
 
-use \\{{pascalcase namespace}}\Plugin\Asset;
-use \\{{pascalcase namespace}}\Block\Block;
+(new class {
+    /** @var string */
+    public $autoload;
 
-/**
- * Register {{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}} block assets
- *
- * @see Enqueueing Editor Assets <https://git.io/JvPHy>
- * @see Dependency Extraction Webpack Plugin <https://git.io/Jv1ll>
- */
-add_action('init', function () {
-    (new class {
-        /** @var \Psr\Container\ContainerInterface */
-        public $bud;
+    /** @var string */
+    public $container;
 
-        /** @var \Illuminate\Support\Collection */
-        public $collection;
+    /** @var \Psr\Container\ContainerInterface */
+    public $bud;
 
-        /** @var \\{{pascalcase namespace}}\Plugin\BlockRepository */
-        public $blocks;
+    /**
+     * Plugin constructor
+     */
+    public function __construct()
+    {
+        $this->autoload = realpath(__DIR__ . '/vendor/autoload.php');
+        $this->container = realpath(__DIR__ . '/app/bootstrap.php');
+    }
 
-        /** @var \\{{pascalcase namespace}}\Plugin\Manifest */
-        public $manifest;
+    /**
+     * Plugin invocation.
+     */
+    public function __invoke()
+    {
+        /** Bounce early if the autoloader/container are missing */
+        if (! $this->autoload || ! $this->container) {
+            add_action('admin_notices', [$this, 'error']);
 
-        /**
-         * Class constructor.
-         */
-        public function __construct()
-        {
-            $this->bud = require __DIR__ . '/app/bootstrap.php';
-            $this->collection = $this->bud->get('collection');
-            $this->blocks = $this->bud->get('blocks');
-            $this->manifest = $this->bud->get('manifest');
+            return;
         }
 
-        /**
-         * Class invocation.
-         *
-         * @throws \WP_Error
-         * @return void
-         */
-        public function __invoke(): void
-        {
-            $this->load();
-            $this->register();
-        }
+        /** Load the container and hook the runtime on init */
+        $this->bud = require $this->container;
+        add_action('init', $this->bud->get('plugin.registration'));
+    }
 
-        /**
-         * Load blocks and assets.
-         *
-         * @return void
-         */
-        protected function load(): void
-        {
-            $this->bud->get('plugin.blocks')->each(function ($name) {
-                /** @var \\{{pascalcase namespace}}\Block\Block */
-                $block = $this->bud->make('block');
-
-                $block->setName($name);
-
-                $this->collection::make([
-                    $this->manifest->getAsset($block->getName(), 'editor', 'js'),
-                    $this->manifest->getAsset($block->getName(), 'editor', 'css'),
-                ])->each(function (Asset $asset) use ($block) {
-                    if (! $asset) return;
-
-                    $block->setEditorAsset($asset);
-                });
-
-                $this->collection::make([
-                    $this->manifest->getAsset($block->getName(), 'public', 'js'),
-                    $this->manifest->getAsset($block->getName(), 'public', 'css'),
-                ])->each(function (Asset $asset) use ($block) {
-                    if (! $asset) return;
-
-                    $block->setPublicAsset($asset);
-                });
-
-                $this->blocks->add($block);
-            });
-        }
-
-        /**
-         * Register blocks and assets.
-         *
-         * @return void
-         */
-        protected function register(): void
-        {
-            $this->blocks->all()->each(function (Block $block) {
-                $block->getAssets()->each(function (Asset $asset) {
-                    $registerAssetCallable = "wp_register_{$asset->getType()}";
-
-                    $registerAssetCallable(
-                        $asset->getName(),
-                        $asset->getUrl(),
-                        $asset->getDependencies(),
-                        null
-                    );
-                });
-
-                $block->register();
-            });
-        }
-    })();
-});
-
+    /**
+     * Plugin error.
+     */
+    public function error()
+    {
+        print '<div class="notice notice-error">
+            <p><strong>There\'s a problem with the {{name}} plugin.</strong></p>
+            <p>Please run <code>composer install</code> in <code>' . __DIR__ .'</code></p>
+        </div>';
+    }
+})();

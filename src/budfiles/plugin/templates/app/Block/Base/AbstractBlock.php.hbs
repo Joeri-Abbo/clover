@@ -1,0 +1,188 @@
+<?php
+
+namespace {{pascalcase namespace}}\Block\Base;
+
+use Illuminate\Support\Collection;
+use Psr\Container\ContainerInterface;
+use {{pascalcase namespace}}\Asset\Contract\AssetInterface;
+use {{pascalcase namespace}}\Block\Contract\BlockInterface;
+
+/**
+ * Block class.
+ */
+abstract class AbstractBlock extends \WP_Block_Type implements BlockInterface
+{
+    /** @var string */
+    public $name;
+
+    /** @var string */
+    public $editor_script;
+
+    /** @var string */
+    public $editor_style;
+
+    /** @var string */
+    public $script;
+
+    /** @var string */
+    public $style;
+
+    /** @var Collection */
+    public $assets;
+
+    /** @var Collection */
+    public $attributes;
+
+    /**
+     * Constructor.
+     *
+     * @param Collection
+     * @param ContainerInterface
+     */
+    public function __construct(
+        Collection $collection,
+        ContainerInterface $bud
+    ) {
+        $this->bud = $bud;
+
+        $this->assets = $collection::make([]);
+    }
+
+    /**
+     * Register block.
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        register_block_type($this);
+    }
+
+    /**
+     * Get name.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set the block name.
+     *
+     * @param  string
+     * @return void
+     */
+    public function setName(string $name): void
+    {
+        $this->name = "{$this->bud->get('plugin.namespace')}/{$name}";
+    }
+
+    /**
+     * Get attributes.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAttributes(): Collection
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Set attributes.
+     *
+     * @param  string $attributesPath
+     * @return Block
+     */
+    public function setAttributes(Collection $attributes): void
+    {
+        $this->attributes = $attributes;
+    }
+
+    /**
+     * Get assets.
+     *
+     * @return Collection
+     */
+    public function getAssets(): Collection
+    {
+        return $this->assets;
+    }
+
+    /**
+     * Set assets
+     *
+     * @return void
+     */
+    public function setAssets(Collection $assets): void
+    {
+        $this->assets = $assets;
+
+        $assets->each(function (AssetInterface $asset) {
+            if ($asset->getContext() == 'editor'
+            && $asset->getType() == 'script') {
+                $this->setEditorScript($asset);
+            }
+
+            if ($asset->getContext() == 'editor'
+            && $asset->getType() == 'style') {
+                $this->setEditorStyle($asset);
+            }
+
+            if ($asset->getContext() == 'public'
+            && $asset->getType() == 'script') {
+                $this->setPublicScript($asset);
+            }
+
+            if ($asset->getContext() == 'public'
+            && $asset->getType() == 'style') {
+                $this->setPublicStyle($asset);
+            }
+        });
+    }
+
+    /**
+     * Set editor script
+     *
+     * @param  Asset
+     * @return void
+     */
+    public function setEditorScript(AssetInterface $asset): void
+    {
+        $this->editor_script = $asset->getName();
+    }
+
+    /**
+     * Set editor asset
+     *
+     * @param  Asset
+     * @return void
+     */
+    public function setEditorStyle(AssetInterface $asset): void
+    {
+        $this->editor_style = $asset->getName();
+    }
+
+    /**
+     * Set public asset
+     *
+     * @param  string
+     * @return void
+     */
+    public function setPublicScript(AssetInterface $asset): void
+    {
+        $this->script = $asset->getName();
+    }
+
+    /**
+     * Set public asset
+     *
+     * @param  string
+     * @return void
+     */
+    public function setPublicStyle(AssetInterface $asset): void
+    {
+        $this->style = $asset->getName();
+    }
+}

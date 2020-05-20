@@ -1,14 +1,14 @@
 <?php
 
-namespace {{pascalcase namespace}}\Plugin;
+namespace {{pascalcase namespace}}\Asset\Base;
 
-use {{pascalcase namespace}}\Plugin\AssetInterface;
 use Psr\Container\ContainerInterface;
+use {{pascalcase namespace}}\Asset\Contract\AssetInterface;
 
 /**
- * Asset class.
+ * Abstract Asset class.
  */
-class Asset implements AssetInterface
+abstract class AbstractAsset implements AssetInterface
 {
     /** @var string */
     public $name;
@@ -69,6 +69,27 @@ class Asset implements AssetInterface
     public function setUrl(string $url): void
     {
         $this->url = $url;
+    }
+
+    /**
+     * Get context
+     *
+     * @return string
+     */
+    public function getContext(): string
+    {
+        return $this->context;
+    }
+
+    /**
+     * Set context
+     *
+     * @param  string $context
+     * @return void
+     */
+    public function setContext(string $context): void
+    {
+        $this->context = $context;
     }
 
     /**
