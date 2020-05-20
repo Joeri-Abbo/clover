@@ -72,6 +72,27 @@ abstract class AbstractAsset implements AssetInterface
     }
 
     /**
+     * Get context
+     *
+     * @return string
+     */
+    public function getContext(): string
+    {
+        return $this->context;
+    }
+
+    /**
+     * Set context
+     *
+     * @param  string $context
+     * @return void
+     */
+    public function setContext(string $context): void
+    {
+        $this->context = $context;
+    }
+
+    /**
      * Get type
      *
      * @return string
