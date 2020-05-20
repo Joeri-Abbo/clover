@@ -12,6 +12,9 @@
 
 namespace {{pascalcase namespace}};
 
+/**
+ * {{name}}
+ */
 (new class {
     /** @var string */
     public $autoload;
@@ -19,39 +22,51 @@ namespace {{pascalcase namespace}};
     /** @var string */
     public $container;
 
-    /** @var \Psr\Container\ContainerInterface */
+    /** @var Psr\Container\ContainerInterface */
     public $bud;
 
     /**
-     * Plugin constructor
+     * Class constructor.
      */
     public function __construct()
     {
         $this->autoload = realpath(__DIR__ . '/vendor/autoload.php');
-        $this->container = realpath(__DIR__ . '/app/bootstrap.php');
+        $this->bootstrap = realpath(__DIR__ . '/app/bootstrap.php');
     }
 
     /**
-     * Plugin invocation.
+     * Instantiate the plugin.
      */
     public function __invoke()
     {
-        /** Bounce early if the autoloader/container are missing */
-        if (! $this->autoload || ! $this->container) {
-            add_action('admin_notices', [$this, 'error']);
-
+        if (! $this->autoload) {
+            add_action('admin_notices', [$this, 'composerError']);
             return;
         }
 
-        /** Load the container and hook the runtime on init */
-        $this->bud = require $this->container;
+        /**
+         * Instantiate the plugin container.
+         */
+        $this->bud = require $this->bootstrap;
+
+        /**
+         * Register script and style assets.
+         */
         add_action('init', $this->bud->get('plugin.registration'));
+
+        /**
+         * Handle plugin lifecycle.
+         */
+        register_activation_hook(__FILE__, $this->bud->get('plugin.activate'));
+        register_deactivation_hook(__FILE__, $this->bud->get('plugin.deactivate'));
     }
 
     /**
-     * Plugin error.
+     * Alert if autoloader can't be found.
+     *
+     * @return void
      */
-    public function error()
+    public function composerError(): void
     {
         print '<div class="notice notice-error">
             <p><strong>There\'s a problem with the {{name}} plugin.</strong></p>

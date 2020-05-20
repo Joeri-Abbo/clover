@@ -3,15 +3,12 @@
 namespace {{pascalcase namespace}}\Block\Contract;
 
 use Illuminate\Support\Collection;
-use {{pascalcase namespace}}\Asset\Contract\AssetInterface;
 
 /**
  * Block class interface.
  */
 interface BlockInterface
 {
-    public function register(): void;
-
     public function getName(): string;
 
     public function setName(string $name): void;
@@ -20,11 +17,5 @@ interface BlockInterface
 
     public function setAssets(Collection $assets): void;
 
-    public function setEditorScript(AssetInterface $asset): void;
-
-    public function setEditorStyle(AssetInterface $asset): void;
-
-    public function setPublicScript(AssetInterface $asset): void;
-
-    public function setPublicStyle(AssetInterface $asset): void;
+    public function register(): void;
 }
