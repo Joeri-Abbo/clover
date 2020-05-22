@@ -1,0 +1,51 @@
+version: '3'
+services:
+  bedrock:
+    build: .bud/docker/build/php-fpm
+    restart: always
+    depends_on:
+      - mariadb
+      - redis
+    links:
+      - mariadb
+    environment:
+      DB_NAME: db
+      DB_USER: root
+      DB_PASSWORD: db_password
+      DB_HOST: mariadb:3306
+      WP_ENV: development
+      WP_HOME: http://localhost/wp
+      WP_SITEURL: http://localhost/wp
+    volumes:
+      - .bud/docker/bedrock:/bedrock
+      - ./:/bedrock/web/app/plugins/{{lowercase (dashcase name)}}
+
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: db
+      MYSQL_ROOT_PASSWORD: dev_password
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: dev_password
+    volumes:
+      - .bud/docker/db:/var/lib/mysql
+
+  redis:
+    image: redis
+    restart: always
+
+  nginx:
+    image: nginx
+    restart: always
+    depends_on:
+      - bedrock
+    links:
+      - bedrock
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - .bud/docker/bedrock:/bedrock
+      - ./:/bedrock/web/app/plugins/{{lowercase (dashcase name)}}
+      - .bud/docker/build/nginx/conf.d:/etc/nginx/conf.d
