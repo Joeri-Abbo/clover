@@ -21,16 +21,7 @@ import Tasks from './components/Tasks'
  * @prop {object} children
  * @prop {bool}   noClear
  */
-const BudCLI = ({
-  label,
-  templateDir,
-  sprout,
-  outDir,
-  values,
-  inert,
-  children,
-  noClear,
-}) => {
+const BudCLI = ({label, templateDir, sprout, outDir, values, inert, children, noClear}) => {
   const {stdout} = useStdout()
 
   /**
@@ -106,7 +97,7 @@ const BudCLI = ({
    * Exit if a completion or error is emitted.
    */
   useEffect(() => {
-    (complete || error) &&
+    ;(complete || error) &&
       (async () => {
         await budSubscription.unsubscribe()
 
@@ -118,13 +109,10 @@ const BudCLI = ({
    * Render TTY
    */
   return (
-    <Box
-      flexDirection="column"
-      justifyContent="flex-start"
-      padding={1}>
+    <Box flexDirection="column" justifyContent="flex-start" padding={1}>
       <Banner label={label} />
 
-      {! error && <Tasks status={status} complete={complete} />}
+      {!error && <Tasks status={status} complete={complete} />}
       {error && <Error message={error} />}
       {children && children}
     </Box>

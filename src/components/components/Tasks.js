@@ -6,11 +6,12 @@ import Spinner from 'ink-spinner'
 /**
  * Tasks
  */
-const Tasks = ({status, complete}) => status ? (
-  <Box>
-    {complete
-      ? <Color green>⚡️ All set.</Color>
-      : (
+const Tasks = ({status, complete}) =>
+  status ? (
+    <Box>
+      {complete ? (
+        <Color green>⚡️ All set.</Color>
+      ) : (
         <Text>
           <Color green>
             <Spinner type="dots" />
@@ -18,10 +19,11 @@ const Tasks = ({status, complete}) => status ? (
 
           {` ${status}`}
         </Text>
-      )
-    }
-  </Box>
-) : []
+      )}
+    </Box>
+  ) : (
+    []
+  )
 
 Tasks.propTypes = {
   status: propTypes.string,

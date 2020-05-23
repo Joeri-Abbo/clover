@@ -9,10 +9,7 @@ import Link from 'ink-link'
  * @prop {string} label
  */
 const Banner = ({label}) => (
-  <Box
-    marginBottom={1}
-    flexDirection="row"
-    justifyContent="space-between">
+  <Box marginBottom={1} flexDirection="row" justifyContent="space-between">
     <Box flexDirection="column">
       <Text>{label}</Text>
     </Box>
