@@ -83,6 +83,14 @@
 					"isRequired": false,
 					"aliases": [],
 					"positional": true
+				},
+				{
+					"key": "out",
+					"type": "string",
+					"description": "",
+					"isRequired": false,
+					"aliases": [],
+					"positional": false
 				}
 			],
 			"subCommands": []

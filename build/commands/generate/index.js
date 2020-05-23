@@ -594,7 +594,125 @@ const bud = {
   }
 };
 exports.bud = bud;
-},{"./../../prettier.config.js":"../prettier.config.js","./helpers":"../src/bud/helpers.js"}],"../src/components/BudCLI.js":[function(require,module,exports) {
+},{"./../../prettier.config.js":"../prettier.config.js","./helpers":"../src/bud/helpers.js"}],"../src/components/components/Banner.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _ink = require("ink");
+
+var _inkLink = _interopRequireDefault(require("ink-link"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Banner
+ *
+ * @prop {string} label
+ */
+const Banner = ({
+  label
+}) => /*#__PURE__*/_react.default.createElement(_ink.Box, {
+  marginBottom: 1,
+  flexDirection: "row",
+  justifyContent: "space-between"
+}, /*#__PURE__*/_react.default.createElement(_ink.Box, {
+  flexDirection: "column"
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, label)), /*#__PURE__*/_react.default.createElement(_ink.Box, {
+  flexDirection: "row"
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, `🌱`), /*#__PURE__*/_react.default.createElement(_ink.Text, {
+  bold: true
+}, /*#__PURE__*/_react.default.createElement(_inkLink.default, {
+  url: "https://roots.io/bud"
+}, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+  green: true
+}, '  Bud')))));
+
+Banner.propTypes = {
+  label: _propTypes.default.string
+};
+var _default = Banner;
+exports.default = _default;
+},{}],"../src/components/components/Error.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _ink = require("ink");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Error
+ */
+const Error = ({
+  message
+}) => /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+  red: true
+}, "\uD83D\uDCA5 ", JSON.stringify(message)));
+
+Error.propTypes = {
+  message: _propTypes.default.string
+};
+var _default = Error;
+exports.default = _default;
+},{}],"../src/components/components/Tasks.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _ink = require("ink");
+
+var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Tasks
+ */
+const Tasks = ({
+  status,
+  complete
+}) => status ? /*#__PURE__*/_react.default.createElement(_ink.Box, null, complete ? /*#__PURE__*/_react.default.createElement(_ink.Color, {
+  green: true
+}, "\u26A1\uFE0F All set.") : /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+  green: true
+}, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, {
+  type: "dots"
+})), ` ${status}`)) : [];
+
+Tasks.propTypes = {
+  status: _propTypes.default.string,
+  complete: _propTypes.default.bool
+};
+Tasks.defaultProps = {
+  status: '',
+  complete: false
+};
+var _default = Tasks;
+exports.default = _default;
+},{}],"../src/components/BudCLI.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -608,15 +726,19 @@ var _fs = require("fs");
 
 var _react = _interopRequireWildcard(require("react"));
 
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
 var _ink = require("ink");
-
-var _inkLink = _interopRequireDefault(require("ink-link"));
-
-var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
 
 var _enquirer = require("enquirer");
 
 var _bud = require("./../bud");
+
+var _Banner = _interopRequireDefault(require("./components/Banner"));
+
+var _Error = _interopRequireDefault(require("./components/Error"));
+
+var _Tasks = _interopRequireDefault(require("./components/Tasks"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -624,11 +746,8 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const DEFAULT_BUDFILE = {
-  actions: [],
-  label: 'Budfile',
-  prompts: []
-};
+/** Components */
+
 /**
  * Bud CLI
  *
@@ -639,20 +758,23 @@ const DEFAULT_BUDFILE = {
  * @prop {object} children
  * @prop {bool}   noClear
  */
-
 const BudCLI = ({
   label,
   templateDir,
-  sprout = DEFAULT_BUDFILE,
+  sprout,
   outDir,
-  values = null,
-  inert = false,
+  values,
+  inert,
   children,
-  noClear = false
+  noClear
 }) => {
+  const {
+    stdout
+  } = (0, _ink.useStdout)();
   /**
    * Parse values from .bud/bud.config.json
    */
+
   const config = (0, _path.join)(process.cwd(), '.bud/bud.config.json');
   const [configData] = (0, _react.useState)((0, _fs.existsSync)(config) ? require(config) : null);
   /**
@@ -664,6 +786,9 @@ const BudCLI = ({
     exit
   } = (0, _ink.useApp)();
   const [data, setData] = (0, _react.useState)(null);
+  (0, _react.useEffect)(() => {
+    data && !noClear && stdout.write('\x1B[2J\x1B[0f');
+  }, [data]);
   const [status, setStatus] = (0, _react.useState)(null);
   const [error, setError] = (0, _react.useState)(null);
   const [complete, setComplete] = (0, _react.useState)(false);
@@ -704,12 +829,16 @@ const BudCLI = ({
       complete: () => setComplete(true)
     }));
   }, [data, status]);
+  /**
+   * Exit if a completion or error is emitted.
+   */
+
   (0, _react.useEffect)(() => {
-    complete && (async () => {
+    (complete || error) && (async () => {
       await budSubscription.unsubscribe();
       exit();
     })();
-  }, [complete, budSubscription]);
+  }, [error, complete, budSubscription]);
   /**
    * Render TTY
    */
@@ -718,66 +847,49 @@ const BudCLI = ({
     flexDirection: "column",
     justifyContent: "flex-start",
     padding: 1
-  }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    marginBottom: 1,
-    flexDirection: "row",
-    justifyContent: "space-between"
-  }, label && /*#__PURE__*/_react.default.createElement(_ink.Text, null, label), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "row"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, `🌱`), /*#__PURE__*/_react.default.createElement(_ink.Text, {
-    bold: true
-  }, /*#__PURE__*/_react.default.createElement(_inkLink.default, {
-    url: "https://roots.io/bud"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, '  Bud'))))), !error ? /*#__PURE__*/_react.default.createElement(Tasks, {
-    data: data,
+  }, /*#__PURE__*/_react.default.createElement(_Banner.default, {
+    label: label
+  }), !error && /*#__PURE__*/_react.default.createElement(_Tasks.default, {
     status: status,
-    complete: complete,
-    noClear: noClear
-  }) : /*#__PURE__*/_react.default.createElement(Error, {
+    complete: complete
+  }), error && /*#__PURE__*/_react.default.createElement(_Error.default, {
     message: error
   }), children && children);
 };
 /**
- * Error
+ * Sprout fallback
  */
 
 
-const Error = ({
-  message
-}) => /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  red: true
-}, "\uD83D\uDCA5 ", JSON.stringify(message)));
-/**
- * Tasks
- */
-
-
-const Tasks = ({
-  data,
-  status,
-  complete,
-  noClear
-}) => {
-  const {
-    stdout
-  } = (0, _ink.useStdout)();
-  (0, _react.useEffect)(() => {
-    data && !noClear && stdout.write('\x1B[2J\x1B[0f');
-  }, [data]);
-  return status ? /*#__PURE__*/_react.default.createElement(_ink.Box, null, complete ? /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, "\u26A1\uFE0F All set.") : /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, {
-    type: "dots"
-  })), ` ${status}`)) : [];
+const DEFAULT_SPROUT = {
+  actions: [],
+  label: 'Budfile',
+  prompts: []
 };
-
+BudCLI.propTypes = {
+  label: _propTypes.default.string,
+  templateDir: _propTypes.default.string,
+  sprout: _propTypes.default.shape({
+    actions: _propTypes.default.array,
+    label: _propTypes.default.string,
+    prompts: _propTypes.default.array
+  }).isRequired,
+  outDir: _propTypes.default.string,
+  values: _propTypes.default.object,
+  inert: _propTypes.default.bool,
+  children: _propTypes.default.object,
+  noClear: _propTypes.default.bool
+};
+BudCLI.defaultProps = {
+  label: '',
+  sprout: DEFAULT_SPROUT,
+  values: {},
+  inert: false,
+  noClear: false
+};
 var _default = BudCLI;
 exports.default = _default;
-},{"./../bud":"../src/bud/index.js"}],"generate/index.js":[function(require,module,exports) {
+},{"./../bud":"../src/bud/index.js","./components/Banner":"../src/components/components/Banner.js","./components/Error":"../src/components/components/Error.js","./components/Tasks":"../src/components/components/Tasks.js"}],"generate/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -878,7 +990,9 @@ const Generate = props => {
 
 Generate.propTypes = {
   // Generator name ([name].bud.js)
-  budName: _propTypes.default.string
+  budName: _propTypes.default.string,
+  // Output file
+  out: _propTypes.default.string
 };
 Generate.positionalArgs = ['budName'];
 var _default = Generate;

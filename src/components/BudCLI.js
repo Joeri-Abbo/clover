@@ -1,17 +1,15 @@
 import {join} from 'path'
 import {existsSync} from 'fs'
 import React, {useState, useEffect} from 'react'
-import {Box, Color, Text, useApp, useStdout} from 'ink'
-import Link from 'ink-link'
-import Spinner from 'ink-spinner'
+import propTypes from 'prop-types'
+import {Box, useApp, useStdout} from 'ink'
 import {prompt} from 'enquirer'
 import {bud as BudCore} from './../bud'
 
-const DEFAULT_BUDFILE = {
-  actions: [],
-  label: 'Budfile',
-  prompts: [],
-}
+/** Components */
+import Banner from './components/Banner'
+import Error from './components/Error'
+import Tasks from './components/Tasks'
 
 /**
  * Bud CLI
@@ -26,13 +24,15 @@ const DEFAULT_BUDFILE = {
 const BudCLI = ({
   label,
   templateDir,
-  sprout = DEFAULT_BUDFILE,
+  sprout,
   outDir,
-  values = null,
-  inert = false,
+  values,
+  inert,
   children,
-  noClear = false,
+  noClear,
 }) => {
+  const {stdout} = useStdout()
+
   /**
    * Parse values from .bud/bud.config.json
    */
@@ -46,6 +46,10 @@ const BudCLI = ({
 
   const {exit} = useApp()
   const [data, setData] = useState(null)
+  useEffect(() => {
+    data && !noClear && stdout.write('\x1B[2J\x1B[0f')
+  }, [data])
+
   const [status, setStatus] = useState(null)
   const [error, setError] = useState(null)
   const [complete, setComplete] = useState(false)
@@ -98,76 +102,65 @@ const BudCLI = ({
       )
   }, [data, status])
 
+  /**
+   * Exit if a completion or error is emitted.
+   */
   useEffect(() => {
-    complete &&
+    (complete || error) &&
       (async () => {
         await budSubscription.unsubscribe()
+
         exit()
       })()
-  }, [complete, budSubscription])
+  }, [error, complete, budSubscription])
 
   /**
    * Render TTY
    */
   return (
-    <Box flexDirection="column" justifyContent="flex-start" padding={1}>
-      <Box marginBottom={1} flexDirection="row" justifyContent="space-between">
-        {label && <Text>{label}</Text>}
-        <Box flexDirection="row">
-          <Text>{`🌱`}</Text>
-          <Text bold>
-            <Link url="https://roots.io/bud">
-              <Color green>{'  Bud'}</Color>
-            </Link>
-          </Text>
-        </Box>
-      </Box>
+    <Box
+      flexDirection="column"
+      justifyContent="flex-start"
+      padding={1}>
+      <Banner label={label} />
 
-      {!error ? (
-        <Tasks data={data} status={status} complete={complete} noClear={noClear} />
-      ) : (
-        <Error message={error} />
-      )}
-
+      {! error && <Tasks status={status} complete={complete} />}
+      {error && <Error message={error} />}
       {children && children}
     </Box>
   )
 }
 
 /**
- * Error
+ * Sprout fallback
  */
-const Error = ({message}) => (
-  <Box>
-    <Color red>💥 {JSON.stringify(message)}</Color>
-  </Box>
-)
+const DEFAULT_SPROUT = {
+  actions: [],
+  label: 'Budfile',
+  prompts: [],
+}
 
-/**
- * Tasks
- */
-const Tasks = ({data, status, complete, noClear}) => {
-  const {stdout} = useStdout()
-  useEffect(() => {
-    data && !noClear && stdout.write('\x1B[2J\x1B[0f')
-  }, [data])
+BudCLI.propTypes = {
+  label: propTypes.string,
+  templateDir: propTypes.string,
+  sprout: propTypes.shape({
+    actions: propTypes.array,
+    label: propTypes.string,
+    prompts: propTypes.array,
+  }).isRequired,
+  outDir: propTypes.string,
+  values: propTypes.object,
+  inert: propTypes.bool,
+  children: propTypes.object,
+  noClear: propTypes.bool,
+}
 
-  return status ? (
-    <Box>
-      {complete ? (
-        <Color green>⚡️ All set.</Color>
-      ) : (
-        <Text>
-          <Color green>
-            <Spinner type="dots" />
-          </Color>
-          {` ${status}`}
-        </Text>
-      )}
-    </Box>
-  ) : (
-    []
-  )
+BudCLI.defaultProps = {
+  label: '',
+  sprout: DEFAULT_SPROUT,
+  values: {},
+  inert: false,
+  noClear: false,
 }
 
 export default BudCLI

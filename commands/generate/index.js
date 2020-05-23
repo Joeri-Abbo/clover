@@ -8,8 +8,7 @@ import globby from 'globby'
 /**
  * Resolvers for different budfile locations
  */
-const getRootBudPath = name =>
-  `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${name}.bud.js`
+const getRootBudPath = name => `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${name}.bud.js`
 const getModuleBudPath = name => `${process.cwd()}/node_modules/**/bud-plugin-*/${name}.bud.js`
 const getProjectBudPath = name => `${process.cwd()}/.bud/budfiles/**/${name}.bud.js`
 
@@ -83,6 +82,8 @@ const Generate = props => {
 Generate.propTypes = {
   // Generator name ([name].bud.js)
   budName: PropTypes.string,
+  // Output file
+  out: PropTypes.string,
 }
 
 Generate.positionalArgs = ['budName']
