@@ -10,56 +10,8 @@
 		{
 			"path": "init.js",
 			"name": "init",
-			"description": "Create a new project",
+			"description": "Initialize a Bud project",
 			"args": [
-				{
-					"key": "name",
-					"type": "string",
-					"description": "Project name",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "namespace",
-					"type": "string",
-					"description": "Project namespace",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "description",
-					"type": "string",
-					"description": "Project description",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "author",
-					"type": "string",
-					"description": "Project author name",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "email",
-					"type": "string",
-					"description": "Project author email",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "website",
-					"type": "string",
-					"description": "Project website",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
 				{
 					"key": "projectDir",
 					"type": "string",
@@ -74,32 +26,17 @@
 		{
 			"path": "generate/index.js",
 			"name": "generate",
-			"description": "Generate code from a budfile",
+			"description": "Generate project functionality",
 			"args": [
 				{
-					"key": "budName",
+					"key": "request",
 					"type": "string",
 					"description": "",
 					"isRequired": false,
 					"aliases": [],
 					"positional": true
-				},
-				{
-					"key": "out",
-					"type": "string",
-					"description": "",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
 				}
 			],
-			"subCommands": []
-		},
-		{
-			"path": "list/index.js",
-			"name": "list",
-			"description": "List available budfiles",
-			"args": [],
 			"subCommands": []
 		}
 	]

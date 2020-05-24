@@ -12,6 +12,8 @@ const basePrettierConfig = require('./../../prettier.config.js')
 const handlebarsHelpers = require('handlebars-helpers')
 const helpers = require('./helpers')
 
+const CWD = process.cwd()
+
 /**
  * Bud Core
  */
@@ -31,10 +33,10 @@ export const bud = {
    * @param {string} templateDir
    * @param {bool}   skipInstall
    */
-  init: function ({outDir = './', data = {}, sprout, templateDir}) {
+  init: function ({data = {}, sprout, templateDir, outDir}) {
     this.data = data
     this.sprout = sprout
-    this.projectDir = outDir
+    this.projectDir = outDir ? join(CWD, outDir) : CWD
     this.execaOptions = {cwd: this.projectDir}
     this.templateDir = templateDir
 
@@ -132,8 +134,6 @@ export const bud = {
         .pipe(
           concatMap(function (task) {
             return new Observable(async function (observer) {
-              observer.next(task.action)
-
               return bud[task.action](task, observer, bud)
             })
           }),
@@ -365,7 +365,7 @@ export const bud = {
     }
 
     installation.stdout.on('data', status => {
-      observer.next(status)
+      observer.next(status.code)
     })
 
     installation.then(() => observer.complete())
@@ -376,12 +376,17 @@ export const bud = {
    */
   json: async function ({file, merge}, observer) {
     const json = require(`${this.projectDir}/${file}`)
+
+    observer.next('json-ish?')
     observer.next(`Writing JSON to ${file}`)
+    observer.next('json-ish?')
+    const output = merge(json)
 
     try {
-      const output = merge(json)
-
-      await fs.outputFile(`${this.projectDir}/${file}`, this.format(output, 'json'))
+      await fs.outputFile(
+        `${this.projectDir}/${file}`,
+        this.format(output, 'json')
+      )
 
       observer.complete()
     } catch (err) {

@@ -5,11 +5,13 @@ import PropTypes from 'prop-types'
 /**
  * Error
  */
-const Error = ({message}) => (
-  <Box>
-    <Color red>💥 {JSON.stringify(message)}</Color>
-  </Box>
-)
+const Error = ({message}) =>
+  message ? (
+    <Box>
+      <Color red>💥 {JSON.stringify(message)}</Color>
+    </Box>
+  ) : []
+
 
 Error.propTypes = {
   message: PropTypes.string,

@@ -1,44 +1,60 @@
 import {resolve} from 'path'
-import React from 'react'
+import React, {useContext, useEffect, useState} from 'react'
+import {Box} from 'ink'
 import PropTypes from 'prop-types'
-import BudCLI from './../src/components/BudCLI'
+
+/** application */
+import Bud from '../src/components/Bud'
+import {StateProvider, store} from '../src/components/store'
+import Banner from '../src/components/components/Banner'
+
+const initModule = resolve(__dirname, './../../src/budfiles/init/init.bud')
+
+const strings = {
+  title: 'Bud: WordPress CLI generator tooling',
+}
 
 /** Command: bud init */
 /// Create a new project
 const Init = props => {
+  const {state} = useContext(store)
+  /**
+   * Update the generator label.
+   */
+  const [label, setLabel] = useState(strings.title)
+  useEffect(() => {
+    state?.label && setLabel(state.label)
+  }, [state?.label])
+
   return (
-    <BudCLI
-      values={props.name ? props : null}
-      outDir={props.projectDir}
-      label={require(`${props.budFileDir}/init.bud`).label}
-      sprout={require(`${props.budFileDir}/init.bud`)}
-      templateDir={`${props.budFileDir}/templates`}
-      noClear={true}
-    />
+    <Box marginTop={1} flexDirection={'column'}>
+      <Banner label={label} />
+      <Box flexDirection={'column'} marginBottom={1}>
+        <Bud
+          outDir={props.projectDir}
+          module={initModule}
+          moduleReady={true}
+        />
+      </Box>
+    </Box>
   )
 }
 
-Init.propTypes = {
-  /// Project name
-  name: PropTypes.string,
-  /// Project namespace
-  namespace: PropTypes.string,
-  /// Project description
-  description: PropTypes.string,
-  /// Project author name
-  author: PropTypes.string,
-  /// Project author email
-  email: PropTypes.string,
-  /// Project website
-  website: PropTypes.string,
+/** Command: bud init */
+/// Initialize a Bud project
+const InitCLI = props => {
+  return (
+    <StateProvider>
+      <Init {...props} />
+    </StateProvider>
+  )
+}
+
+InitCLI.propTypes = {
   /// Output directory
   projectDir: PropTypes.string,
 }
 
-Init.defaultProps = {
-  budFileDir: resolve(__dirname, './../../src/budfiles/init'),
-}
+InitCLI.positionalArgs = ['projectDir']
 
-Init.positionalArgs = ['projectDir']
-
-export default Init
+export default InitCLI

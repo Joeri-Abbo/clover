@@ -17,8 +17,13 @@ const Bud = () => (
 
       <Box marginBottom={1}>
         <Text>
-          The init command will install Bud as a project dependency. Afterward, you can run
-          subsequent commands with <Color green>yarn generate [generator-name]</Color>.
+          The init command will install Bud as a project dependency.
+        </Text>
+      </Box>
+      <Box marginBottom={1}>
+        <Text>
+          Afterward, you can run subsequent commands with{` `}
+          <Color green>yarn generate [generator-name]</Color>.
         </Text>
       </Box>
     </Box>

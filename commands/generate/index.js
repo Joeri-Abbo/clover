@@ -1,92 +1,137 @@
-import {dirname} from 'path'
-import React, {useState, useEffect} from 'react'
-import {Text, Color} from 'ink'
+import React, {useContext, useEffect, useState} from 'react'
+import {Box, Color, Text} from 'ink'
 import PropTypes from 'prop-types'
-import BudCLI from '../../src/components/BudCLI'
-import globby from 'globby'
+
+/** application */
+import Bud from '../../src/components/Bud'
+import {StateProvider, store} from '../../src/components/store'
+import Banner from '../../src/components/components/Banner'
+import Search from '../../src/components/containers/Search'
 
 /**
- * Resolvers for different budfile locations
+ * Constants
  */
-const getRootBudPath = name =>
-  `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${name}.bud.js`
-const getModuleBudPath = name => `${process.cwd()}/node_modules/**/bud-plugin-*/${name}.bud.js`
-const getProjectBudPath = name => `${process.cwd()}/.bud/budfiles/**/${name}.bud.js`
+const strings = {
+  title: 'Bud: WordPress CLI generator tooling',
+  searchText: '🔎  Searching..',
+  noResults: '💢  No results found.',
+  searchSuccess: '🎉  Generator found',
+}
 
-/** Command: bud generate */
-/// Generate code from a budfile
-const Generate = props => {
-  const [budName] = useState(props.budName)
-  const [sprout, setSprout] = useState(false)
-  const [checked, setChecked] = useState({
-    project: false,
-    modules: false,
-    roots: false,
-  })
+/**
+ * Scaffold candidate locations
+ */
+const globs = {
+  project: search => `${process.cwd()}/.bud/budfiles/${search}/*.bud.js`,
+  plugins: search => `${process.cwd()}/node_modules/**/bud-plugin-*/${search}/*.bud.js`,
+  core: search => `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${search}.bud.js`,
+}
 
+/**
+ * Generate
+ *
+ * @prop {string} request
+ */
+const Generate = ({request}) => {
+  const {state} = useContext(store)
   /**
-   * Local budfiles
+   * Update the generator label.
    */
+  const [label, setLabel] = useState(strings.title)
   useEffect(() => {
-    budName &&
-      !checked.project &&
-      (async () => {
-        const buds = await globby([getProjectBudPath(budName)])
-        buds && buds.length > 0 && setSprout(buds[0])
-        setChecked({...checked, project: true})
-      })()
-  }, [budName, checked.project])
+    state?.label && setLabel(state.label)
+  }, [state?.label])
 
   /**
-   * Module budfiles
+   * Determine if generator is ready for next step.
    */
+  const [complete, setComplete] = useState(false)
   useEffect(() => {
-    !sprout &&
-      checked.project &&
-      (async () => {
-        const buds = await globby([getModuleBudPath(budName)])
-        buds && buds.length > 0 && setSprout(buds[0])
-        setChecked({...checked, modules: true})
-      })()
-  }, [sprout, checked.project])
+    const complete =
+      state?.search?.project?.complete
+        && state?.search?.plugins?.complete
+        && state?.search?.core?.complete
+    setComplete(complete ? complete : false)
+  }, [state])
 
   /**
-   * Core budfiles
+   * Update the module to be utilized.
    */
+  const [module, setModule] = useState(false)
   useEffect(() => {
-    !sprout &&
-      checked.modules &&
-      (async () => {
-        const buds = await globby([getRootBudPath(budName)])
-        buds && buds.length > 0 && setSprout(buds[0])
-        setChecked({...checked, roots: true})
-      })()
-  }, [sprout, checked.modules])
+    const module =
+      state?.search?.project?.results
+        || state?.search?.plugins?.results
+        || state?.search?.core?.results
 
-  /**
-   * Render
-   */
-  return sprout ? (
-    <BudCLI
-      label={require(sprout).description}
-      outDir={process.cwd()}
-      templateDir={`${dirname(sprout)}/templates`}
-      sprout={require(sprout)}
-    />
-  ) : (
-    <Text>
-      <Color green>Searching...</Color>
-    </Text>
+    setModule(module ? module : false)
+  }, [state])
+
+  return (
+    <Box marginTop={1} flexDirection={'column'}>
+      <Banner label={label} />
+      <Box flexDirection={'column'} marginBottom={1}>
+        {module && (
+          <Text>
+            {strings.searchSuccess}
+          </Text>
+        )}
+
+        {! complete && ! module && (
+          <Text>
+            <Color yellow>
+              {strings.searchText}
+            </Color>
+          </Text>
+        )}
+
+        {complete && ! module && (
+          <Text>
+            <Color red>
+              {strings.noResults}
+            </Color>
+          </Text>
+        )}
+      </Box>
+
+      <Search
+        label="project"
+        glob={[globs.project(request)]}
+      />
+
+      <Search
+        label="plugins"
+        glob={[globs.plugins(request)]}
+      />
+
+      <Search
+        label="core"
+        glob={[globs.core(request)]}
+      />
+
+      <Bud
+        module={module}
+        moduleReady={complete}
+      />
+    </Box>
   )
 }
 
-Generate.propTypes = {
-  // Generator name ([name].bud.js)
-  budName: PropTypes.string,
-  // Output file
-  out: PropTypes.string,
+/** Command: bud generate */
+/// Generate project functionality
+const GenerateCLI = ({request}) => {
+  return (
+    <StateProvider>
+      <Generate request={request} />
+    </StateProvider>
+  )
 }
 
-Generate.positionalArgs = ['budName']
+GenerateCLI.propTypes = {
+  // Requested generator
+  request: PropTypes.string,
+}
 
-export default Generate
+GenerateCLI.positionalArgs = ['request']
+
+export default GenerateCLI
