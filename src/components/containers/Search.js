@@ -21,7 +21,7 @@ const Search = ({glob, label}) => {
    * search criterion matches.
    */
   const [search] = useState(
-    new Observable (async observer => {
+    new Observable(async observer => {
       observer.next({status: 'Searching'})
 
       const results = await globby(glob)
@@ -31,7 +31,7 @@ const Search = ({glob, label}) => {
       })
 
       observer.complete()
-    })
+    }),
   )
 
   /**
@@ -67,8 +67,7 @@ const Search = ({glob, label}) => {
   }, [results, status, complete])
 
   /** Format matched files for display */
-  const displayFile = file =>
-    file.replace(process.cwd() + '/', '')
+  const displayFile = file => file.replace(process.cwd() + '/', '')
 
   /**
    * Render
@@ -78,37 +77,25 @@ const Search = ({glob, label}) => {
       <Box flexDirection="row">
         <Box width="15">
           <Text>
-            <Color blue>
-              {label}
-            </Color>
+            <Color blue>{label}</Color>
           </Text>
         </Box>
 
         <Box width={15} paddingLeft={2}>
           {complete ? (
             <Text>
-              <Color green>
-                complete
-              </Color>
+              <Color green>complete</Color>
             </Text>
           ) : (
             <Text>
-              <Color gray>
-                {status}
-              </Color>
+              <Color gray>{status}</Color>
             </Text>
           )}
         </Box>
 
         {results && (
-          <Box
-            flexDirection="column"
-            width={45}
-            marginBottom={1}
-            textWrap="truncate-start">
-            <Text underline>
-              {displayFile(results)}
-            </Text>
+          <Box flexDirection="column" width={45} marginBottom={1} textWrap="truncate-start">
+            <Text underline>{displayFile(results)}</Text>
           </Box>
         )}
       </Box>

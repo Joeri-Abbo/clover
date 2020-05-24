@@ -30,11 +30,7 @@ const Init = props => {
     <Box marginTop={1} flexDirection={'column'}>
       <Banner label={label} />
       <Box flexDirection={'column'} marginBottom={1}>
-        <Bud
-          outDir={props.projectDir}
-          module={initModule}
-          moduleReady={true}
-        />
+        <Bud outDir={props.projectDir} module={initModule} moduleReady={true} />
       </Box>
     </Box>
   )

@@ -190,15 +190,15 @@ const Bud = () => /*#__PURE__*/_react.default.createElement(_ink.Box, {
   flexDirection: "column"
 }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
   marginBottom: 1
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "To get started run ", /*#__PURE__*/_react.default.createElement(_ink.Color, {
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "To get started run", /*#__PURE__*/_react.default.createElement(_ink.Color, {
   green: true
-}, "npx @roots/bud init ", `[project-dir]`))), /*#__PURE__*/_react.default.createElement(_ink.Box, {
+}, " npx @roots/bud init ", `[project-dir]`))), /*#__PURE__*/_react.default.createElement(_ink.Box, {
   marginBottom: 1
 }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "The init command will install Bud as a project dependency.")), /*#__PURE__*/_react.default.createElement(_ink.Box, {
   marginBottom: 1
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "Afterward, you can run subsequent commands with", ` `, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "Afterward, you can run subsequent commands with", /*#__PURE__*/_react.default.createElement(_ink.Color, {
   green: true
-}, "yarn generate [generator-name]"), "."))));
+}, " yarn generate [generator-name]"), "."))));
 
 var _default = Bud;
 exports.default = _default;

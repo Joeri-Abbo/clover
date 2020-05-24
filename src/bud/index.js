@@ -383,10 +383,7 @@ export const bud = {
     const output = merge(json)
 
     try {
-      await fs.outputFile(
-        `${this.projectDir}/${file}`,
-        this.format(output, 'json')
-      )
+      await fs.outputFile(`${this.projectDir}/${file}`, this.format(output, 'json'))
 
       observer.complete()
     } catch (err) {

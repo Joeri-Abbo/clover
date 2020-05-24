@@ -23,18 +23,15 @@ const Runner = ({ready, data, sprout, module, outDir}) => {
    */
   const [subscription, setSubscription] = useState()
   useEffect(() => {
-    ready && setSubscription(
-      BudEngine.init({
-        sprout,
-        data,
-        outDir: outDir ? outDir : null,
-        templateDir: join(
-          dirname(module),
-          'templates',
-        ),
-      })
-      .actions()
-    )
+    ready &&
+      setSubscription(
+        BudEngine.init({
+          sprout,
+          data,
+          outDir: outDir ? outDir : null,
+          templateDir: join(dirname(module), 'templates'),
+        }).actions(),
+      )
   }, [ready])
 
   /**
@@ -57,30 +54,33 @@ const Runner = ({ready, data, sprout, module, outDir}) => {
    * Handle status emittences.
    */
   useEffect(() => {
-    status && dispatch({
-      type: 'SET_STATUS',
-      status,
-    })
+    status &&
+      dispatch({
+        type: 'SET_STATUS',
+        status,
+      })
   }, [status])
 
   /**
    * Handle error emittences.
    */
   useEffect(() => {
-    error && dispatch({
-      type: 'SET_ERROR',
-      error,
-    })
+    error &&
+      dispatch({
+        type: 'SET_ERROR',
+        error,
+      })
   }, [error])
 
   /**
    * Handle the completion emittence.
    */
   useEffect(() => {
-    complete && dispatch({
-      type: 'SET_COMPLETE',
-      complete,
-    })
+    complete &&
+      dispatch({
+        type: 'SET_COMPLETE',
+        complete,
+      })
   }, [complete])
 
   return null

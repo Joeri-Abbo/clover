@@ -9,9 +9,9 @@ import Spinner from 'ink-spinner'
  * @prop {string} status
  * @prop {bool}   comp
  */
-const Status = ({status, complete}) =>
+const Status = ({status, complete}) => (
   <Box>
-    {status && ! complete && (
+    {status && !complete && (
       <Text>
         <Color green>
           <Spinner type="dots" />
@@ -22,12 +22,11 @@ const Status = ({status, complete}) =>
 
     {complete && (
       <Text>
-        <Color green>
-          ⚡️ All set.
-        </Color>
+        <Color green>⚡️ All set.</Color>
       </Text>
     )}
   </Box>
+)
 
 Status.propTypes = {
   complete: propTypes.bool,

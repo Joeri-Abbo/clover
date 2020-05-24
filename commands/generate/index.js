@@ -48,9 +48,9 @@ const Generate = ({request}) => {
   const [complete, setComplete] = useState(false)
   useEffect(() => {
     const complete =
-      state?.search?.project?.complete
-        && state?.search?.plugins?.complete
-        && state?.search?.core?.complete
+      state?.search?.project?.complete &&
+      state?.search?.plugins?.complete &&
+      state?.search?.core?.complete
     setComplete(complete ? complete : false)
   }, [state])
 
@@ -60,9 +60,9 @@ const Generate = ({request}) => {
   const [module, setModule] = useState(false)
   useEffect(() => {
     const module =
-      state?.search?.project?.results
-        || state?.search?.plugins?.results
-        || state?.search?.core?.results
+      state?.search?.project?.results ||
+      state?.search?.plugins?.results ||
+      state?.search?.core?.results
 
     setModule(module ? module : false)
   }, [state])
@@ -71,48 +71,28 @@ const Generate = ({request}) => {
     <Box marginTop={1} flexDirection={'column'}>
       <Banner label={label} />
       <Box flexDirection={'column'} marginBottom={1}>
-        {module && (
+        {module && <Text>{strings.searchSuccess}</Text>}
+
+        {!complete && !module && (
           <Text>
-            {strings.searchSuccess}
+            <Color yellow>{strings.searchText}</Color>
           </Text>
         )}
 
-        {! complete && ! module && (
+        {complete && !module && (
           <Text>
-            <Color yellow>
-              {strings.searchText}
-            </Color>
-          </Text>
-        )}
-
-        {complete && ! module && (
-          <Text>
-            <Color red>
-              {strings.noResults}
-            </Color>
+            <Color red>{strings.noResults}</Color>
           </Text>
         )}
       </Box>
 
-      <Search
-        label="project"
-        glob={[globs.project(request)]}
-      />
+      <Search label="project" glob={[globs.project(request)]} />
 
-      <Search
-        label="plugins"
-        glob={[globs.plugins(request)]}
-      />
+      <Search label="plugins" glob={[globs.plugins(request)]} />
 
-      <Search
-        label="core"
-        glob={[globs.core(request)]}
-      />
+      <Search label="core" glob={[globs.core(request)]} />
 
-      <Bud
-        module={module}
-        moduleReady={complete}
-      />
+      <Bud module={module} moduleReady={complete} />
     </Box>
   )
 }

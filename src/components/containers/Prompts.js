@@ -28,8 +28,8 @@ const Prompts = () => {
    * and dispatch the results to the global store.
    */
   useEffect(() => {
-    prompts?.length > 0
-      && prompt(prompts).then(data => {
+    prompts?.length > 0 &&
+      prompt(prompts).then(data => {
         /**
          * Since enquirer is not
          * ink-specific it causes duplication of the

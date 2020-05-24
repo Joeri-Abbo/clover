@@ -1,13 +1,6 @@
 {
 	"commands": [
 		{
-			"path": "index.js",
-			"name": "index",
-			"description": "Bud information",
-			"args": [],
-			"subCommands": []
-		},
-		{
 			"path": "init.js",
 			"name": "init",
 			"description": "Initialize a Bud project",
@@ -21,6 +14,13 @@
 					"positional": true
 				}
 			],
+			"subCommands": []
+		},
+		{
+			"path": "index.js",
+			"name": "index",
+			"description": "Bud information",
+			"args": [],
 			"subCommands": []
 		},
 		{

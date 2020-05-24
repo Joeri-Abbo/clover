@@ -31,7 +31,7 @@ const {Provider} = store
 
 const StateProvider = ({children}) => {
   const [state, dispatch] = useReducer((state, action) => {
-    switch(action.type) {
+    switch (action.type) {
       case 'SET_LABEL': {
         const {label} = action
         return {
@@ -101,11 +101,7 @@ const StateProvider = ({children}) => {
     }
   }, store)
 
-  return (
-    <Provider value={{state, dispatch}}>
-      {children}
-    </Provider>
-  )
+  return <Provider value={{state, dispatch}}>{children}</Provider>
 }
 
 export {store, StateProvider}

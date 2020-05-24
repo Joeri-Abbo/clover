@@ -10,8 +10,9 @@ const Error = ({message}) =>
     <Box>
       <Color red>💥 {JSON.stringify(message)}</Color>
     </Box>
-  ) : []
-
+  ) : (
+    []
+  )
 
 Error.propTypes = {
   message: PropTypes.string,

@@ -34,9 +34,7 @@ const Bud = ({moduleReady, module, outDir}) => {
    */
   const [sprout, setSprout] = useState(null)
   useEffect(() => {
-    moduleReady
-      && module
-      && setSprout(require(module))
+    moduleReady && module && setSprout(require(module))
   }, [moduleReady, module])
 
   /**
@@ -44,10 +42,11 @@ const Bud = ({moduleReady, module, outDir}) => {
    * then update the application banner.
    */
   useEffect(() => {
-    sprout?.description && dispatch({
-      type: 'SET_LABEL',
-      label: sprout.description,
-    })
+    sprout?.description &&
+      dispatch({
+        type: 'SET_LABEL',
+        label: sprout.description,
+      })
   }, [sprout])
 
   /**
@@ -55,10 +54,11 @@ const Bud = ({moduleReady, module, outDir}) => {
    * so that generators can use it as a fallback.
    */
   useEffect(() => {
-    budConfig && dispatch({
-      type: 'SET_DATA',
-      data: budConfig.project,
-    })
+    budConfig &&
+      dispatch({
+        type: 'SET_DATA',
+        data: budConfig.project,
+      })
   }, [budConfig])
 
   /**
@@ -66,18 +66,18 @@ const Bud = ({moduleReady, module, outDir}) => {
    * store with those prompts.
    */
   useEffect(() => {
-    sprout && (() => {
-      sprout.prompts
-      && sprout.prompts.length > 0
-        ? dispatch({
-          type: 'SET_PROMPTS',
-          prompts: sprout.prompts,
-        })
-        : dispatch({
-          type: 'SET_READY',
-          ready: true,
-        })
-    })()
+    sprout &&
+      (() => {
+        sprout.prompts && sprout.prompts.length > 0
+          ? dispatch({
+              type: 'SET_PROMPTS',
+              prompts: sprout.prompts,
+            })
+          : dispatch({
+              type: 'SET_READY',
+              ready: true,
+            })
+      })()
   }, [sprout])
 
   /**
@@ -87,10 +87,7 @@ const Bud = ({moduleReady, module, outDir}) => {
     <Box flexDirection="column">
       <Error message={state?.error} />
 
-      <Status
-        status={state?.status}
-        complete={state?.complete}
-      />
+      <Status status={state?.status} complete={state?.complete} />
 
       <Prompts />
 
