@@ -8,13 +8,7 @@ import {concatMap} from 'rxjs/operators'
 
 /** application */
 import {store} from './../../store'
-
-/** tasks */
-import addDependencies from './tasks/addDependencies'
-import install from './tasks/install'
-import json from './tasks/json'
-import scaffold from './tasks/scaffold'
-import template from './tasks/template'
+import tasks from './tasks'
 
 /**
  * Runner
@@ -23,7 +17,7 @@ import template from './tasks/template'
  * @param {object}   sprout
  * @param {string}   templateDir
  */
-const Runner = ({sprout, data, module}) => {
+const Runner = ({sprout, data, module, writeDir}) => {
   const {state} = useContext(store)
 
   const [templateDir, setTemplateDir] = useState(null)
@@ -33,35 +27,19 @@ const Runner = ({sprout, data, module}) => {
     )
   }, [module])
 
-  /**
-   * Set writeDir
-   */
-  const [writeDir, setWriteDir] = useState(state?.writeDir)
-  useEffect(() => {
-    state?.writeDir && setWriteDir(state.writeDir)
-  }, [state])
-
-  const jobs = {
-    addDependencies,
-    install,
-    json,
-    scaffold,
-    template,
-  }
-
   const [status, setStatus] = useState(null)
   const [error, setError] = useState(null)
-  const [complete, setComplete] = useState('')
-
+  const [complete, setComplete] = useState(false)
   useEffect(() => {
-    state && state.ready && sprout && sprout.actions && data && (
-      new Observable(observer =>
-        from(sprout.actions)
+    state && state.ready &&
+    sprout && sprout.actions &&
+    data && new Observable(observer =>
+      from(sprout.actions)
         .pipe(
           concatMap(task => {
             return new Observable(async observer => {
               try {
-                return jobs[task.action]({
+                return tasks[task.action]({
                   task,
                   sprout,
                   data,
@@ -70,31 +48,24 @@ const Runner = ({sprout, data, module}) => {
                   writeDir,
                 })
               } catch (error) {
-                observer.error(
-                  `${task.action} handler error`
-                )
+                observer.error(`${task.action} handler error: ${error}`)
               }
             })
-          })
+          }),
         )
         .subscribe({
           next: next => observer.next(next),
           error: error => observer.error(error),
           complete: () => observer.complete(),
-        })
-      )
-      .subscribe({
-        next: next => setStatus(next.status),
-        error: error => setError(error),
-        complete: () => setComplete(true),
-      })
-    )
+        }),
+    ).subscribe({
+      next: next => setStatus(next.status),
+      error: error => setError(error),
+      complete: () => setComplete(true),
+    })
   }, [state, sprout])
 
-  /**
-   * Render
-   */
-  return !complete ? (
+  return ! complete ? (
     <Box flexDirection="column">
       {status && (
         <Box flexDirection="column">
@@ -107,18 +78,16 @@ const Runner = ({sprout, data, module}) => {
       {error && (
         <Box flexDirection="column">
           <Text>
-            <Color red>{
-              typeof error !== 'string'
-                ? JSON.stringify(error)
-                : error
-            }</Color>
+            <Color red>{typeof error !== 'string' ? JSON.stringify(error) : error}</Color>
           </Text>
         </Box>
       )}
     </Box>
   ) : (
     <Box>
-      <Text><Color green>All done.</Color></Text>
+      <Text>
+        <Color green>All done.</Color>
+      </Text>
     </Box>
   )
 }

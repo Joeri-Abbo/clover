@@ -42,14 +42,11 @@ const Prettify = async ({observer, string, extension}) => {
   /**
    * Make prettier.
    */
-  observer.next(parser
-    ? `Skipping prettier. No support for this extension.`
-    : `Prettifying file output`
+  observer.next(
+    parser ? `Skipping prettier. No support for this extension.` : `Prettifying file output`,
   )
 
-  const prettified = parser
-    ? format(string, config)
-    : string
+  const prettified = parser ? format(string, config) : string
 
   return prettified
 }

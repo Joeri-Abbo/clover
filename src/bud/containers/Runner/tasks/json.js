@@ -9,12 +9,7 @@ const CWD = process.cwd()
 /**
  * JSON
  */
-const json = async ({
-  task: {file, merge},
-  sprout,
-  data,
-  observer,
-}) => {
+const json = async ({task: {file, merge}, sprout, data, observer}) => {
   const json = require(join(CWD, file))
 
   observer.next({status: `Writing JSON to ${file}`})

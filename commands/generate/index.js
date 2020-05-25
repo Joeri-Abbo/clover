@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react'
-import {Box, Color, Text} from 'ink'
+import {Box} from 'ink'
 import PropTypes from 'prop-types'
 
 /** application */
@@ -68,56 +68,27 @@ const Generate = ({request}) => {
   }, [state])
 
   return (
-    <Box marginTop={1} flexDirection={'column'}>
+    <Box flexDirection={'column'}>
       <Banner label={label} />
-      <Box flexDirection={'column'} marginBottom={1}>
-        {module && <Text>{strings.searchSuccess}</Text>}
-
-        {!complete && !module && (
-          <Text>
-            <Color yellow>{strings.searchText}</Color>
-          </Text>
-        )}
-
-        {complete && !module && (
-          <Text>
-            <Color red>{strings.noResults}</Color>
-          </Text>
-        )}
-      </Box>
-
-      <Search
-        label="project"
-        glob={[globs.project(request)]}
-      />
-
-      <Search
-        label="plugins"
-        glob={[globs.plugins(request)]}
-      />
-
-      <Search
-        label="core"
-        glob={[globs.core(request)]}
-      />
-
-      <Bud
-        module={module}
-        moduleReady={complete}
-      />
+      {!complete && (
+        <>
+          <Search label="project" glob={[globs.project(request)]} />
+          <Search label="plugins" glob={[globs.plugins(request)]} />
+          <Search label="core" glob={[globs.core(request)]} />
+        </>
+      )}
+      <Bud module={module} moduleReady={complete} />
     </Box>
   )
 }
 
 /** Command: bud generate */
 /// Generate project functionality
-const GenerateCLI = ({request}) => {
-  return (
-    <StateProvider>
-      <Generate request={request} />
-    </StateProvider>
-  )
-}
+const GenerateCLI = ({request}) => (
+  <StateProvider>
+    <Generate request={request} />
+  </StateProvider>
+)
 
 GenerateCLI.propTypes = {
   // Requested generator

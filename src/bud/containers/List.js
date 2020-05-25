@@ -1,9 +1,9 @@
+import {basename} from 'path'
 import React, {useContext, useState, useEffect} from 'react'
-import {Box, Text} from 'ink'
+import {Box, Color, Text} from 'ink'
 import PropTypes from 'prop-types'
 import globby from 'globby'
 import {Observable} from 'rxjs'
-import Spinner from 'ink-spinner'
 
 /** application */
 import {store} from '../store'
@@ -14,12 +14,12 @@ import {store} from '../store'
  * @prop {array}  glob
  * @prop {string} label
  */
-const Search = ({glob, label}) => {
+const List = ({glob, label}) => {
   const {dispatch} = useContext(store)
 
   /**
    * Return an observable emitting
-   * search criterion matches.
+   * budfile matches.
    */
   const [search] = useState(
     new Observable(async observer => {
@@ -28,7 +28,7 @@ const Search = ({glob, label}) => {
       const results = await globby(glob)
 
       observer.next({
-        results: results ? results[0] : null,
+        results: results ? results : null,
       })
 
       observer.complete()
@@ -58,6 +58,12 @@ const Search = ({glob, label}) => {
    * in the global store.
    */
   useEffect(() => {
+    complete && dispatch({
+      type: 'SET',
+      key: 'status',
+      value: 'complete',
+    })
+
     dispatch({
       type: 'SEARCH_RESULTS',
       label,
@@ -68,41 +74,30 @@ const Search = ({glob, label}) => {
   }, [results, status, complete])
 
   /** Format matched files for display */
-  const displayFile = file => file.replace(process.cwd() + '/', '')
+  const displayFile = file => basename(file).replace('.bud.js', '')
 
   /**
    * Render
    */
   return (
     <Box flexDirection="column">
-      <Box flexDirection="row">
-        <Box marginRight={2} width={10}>
-          <Text>{label}</Text>
+      {results?.map((result, id) => (
+        <Box key={id} flexDirection="row" textWrap="truncate-start">
+          <Text><Color gray>yarn generate </Color></Text>
+          <Text>{`${displayFile(result)}`}</Text>
         </Box>
-
-        {results
-          ? <Text underline>{displayFile(results)}</Text>
-          : ! complete ? (
-            <Box flexDirection="column">
-              <Spinner />
-            </Box>
-          ) : (
-            <Box flexDirection="column">
-              <Text>No results</Text>
-            </Box>
-          )}
-      </Box>
+      ))}
     </Box>
   )
 }
 
-Search.propTypes = {
+List.propTypes = {
   glob: PropTypes.array.isRequired,
   label: PropTypes.string,
 }
 
-Search.defaultProps = {
-  label: 'Search',
+List.defaultProps = {
+  label: 'List',
 }
 
-export default Search
+export default List

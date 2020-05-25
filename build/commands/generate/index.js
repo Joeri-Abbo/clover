@@ -368,17 +368,17 @@ var _execa = _interopRequireDefault(require("execa"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const execaOptions = {
-  cwd: process.cwd()
-};
-
 const install = async ({
   task: {
     repo
   },
+  writeDir,
   observer
 }) => {
   let installation;
+  const options = {
+    cwd: writeDir
+  };
   observer.next({
     status: `Installing packages from ${repo}...`
   });
@@ -388,11 +388,11 @@ const install = async ({
   }
 
   if (repo == 'npm') {
-    installation = _execa.default.command(`yarn`, execaOptions);
+    installation = _execa.default.command(`yarn`, options);
   }
 
   if (repo == 'packagist') {
-    installation = _execa.default.command(`composer install`, execaOptions);
+    installation = _execa.default.command(`composer install`, options);
   }
 
   installation.stdout.on('data', status => {
@@ -400,7 +400,9 @@ const install = async ({
       status: status.code
     });
   });
-  installation.then(() => observer.complete());
+  installation.then(() => {
+    observer.complete();
+  });
 };
 
 var _default = install;
@@ -695,12 +697,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* eslint-disable react/display-name */
 
 /* eslint-disable react/jsx-no-undef */
-const CWD = process.cwd();
 
+/**
+ * Task: scaffold dir
+ *
+ * @prop {object}   task
+ * @prop {string}   writeDir
+ * @prop {object}   sprout
+ * @prop {object}   data
+ * @prop {Observer} observer
+ */
 const scaffold = async ({
   task: {
     paths
   },
+  writeDir,
   sprout,
   data,
   observer
@@ -711,20 +722,20 @@ const scaffold = async ({
   (0, _rxjs.from)(paths).pipe((0, _operators.concatMap)(path => {
     return new _rxjs.Observable(async observer => {
       try {
-        const pathTemplate = await (0, _Process.default)({
+        const pathTmp = await (0, _Process.default)({
           sprout,
           data,
           observer,
           string: path
         });
-        const dirPath = (0, _path.join)(CWD, pathTemplate);
+        const dirPath = (0, _path.join)(writeDir, pathTmp);
 
         try {
           await (0, _fsExtra.ensureDir)(dirPath).then(() => {
             observer.complete();
           });
         } catch {
-          observer.error(`scaffolding action throw: ${paths}, ${dirPath}`);
+          observer.error(`Scaffolding action throw: ${paths}, ${dirPath}`);
         }
       } catch {
         observer.error(`Action error: scaffold, pathTemplate`);
@@ -830,7 +841,37 @@ const template = async ({
 
 var _default = template;
 exports.default = _default;
-},{"./../Read":"../src/bud/containers/Runner/Read.js","./../Process":"../src/bud/containers/Runner/Process.js","./../Prettify":"../src/bud/containers/Runner/Prettify.js","./../Write":"../src/bud/containers/Runner/Write.js"}],"../src/bud/containers/Runner/index.js":[function(require,module,exports) {
+},{"./../Read":"../src/bud/containers/Runner/Read.js","./../Process":"../src/bud/containers/Runner/Process.js","./../Prettify":"../src/bud/containers/Runner/Prettify.js","./../Write":"../src/bud/containers/Runner/Write.js"}],"../src/bud/containers/Runner/tasks/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _addDependencies = _interopRequireDefault(require("./addDependencies"));
+
+var _install = _interopRequireDefault(require("./install"));
+
+var _json = _interopRequireDefault(require("./json"));
+
+var _scaffold = _interopRequireDefault(require("./scaffold"));
+
+var _template = _interopRequireDefault(require("./template"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/** tasks */
+const tasks = {
+  addDependencies: _addDependencies.default,
+  install: _install.default,
+  json: _json.default,
+  scaffold: _scaffold.default,
+  template: _template.default
+};
+var _default = tasks;
+exports.default = _default;
+},{"./addDependencies":"../src/bud/containers/Runner/tasks/addDependencies.js","./install":"../src/bud/containers/Runner/tasks/install.js","./json":"../src/bud/containers/Runner/tasks/json.js","./scaffold":"../src/bud/containers/Runner/tasks/scaffold.js","./template":"../src/bud/containers/Runner/tasks/template.js"}],"../src/bud/containers/Runner/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -850,15 +891,7 @@ var _operators = require("rxjs/operators");
 
 var _store = require("./../../store");
 
-var _addDependencies = _interopRequireDefault(require("./tasks/addDependencies"));
-
-var _install = _interopRequireDefault(require("./tasks/install"));
-
-var _json = _interopRequireDefault(require("./tasks/json"));
-
-var _scaffold = _interopRequireDefault(require("./tasks/scaffold"));
-
-var _template = _interopRequireDefault(require("./tasks/template"));
+var _tasks = _interopRequireDefault(require("./tasks"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -872,8 +905,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 /** application */
 
-/** tasks */
-
 /**
  * Runner
  *
@@ -884,7 +915,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 const Runner = ({
   sprout,
   data,
-  module
+  module,
+  writeDir
 }) => {
   const {
     state
@@ -893,29 +925,14 @@ const Runner = ({
   (0, _react.useEffect)(() => {
     module && setTemplateDir((0, _path.join)((0, _path.dirname)(module), 'templates'));
   }, [module]);
-  /**
-   * Set writeDir
-   */
-
-  const [writeDir, setWriteDir] = (0, _react.useState)(state === null || state === void 0 ? void 0 : state.writeDir);
-  (0, _react.useEffect)(() => {
-    (state === null || state === void 0 ? void 0 : state.writeDir) && setWriteDir(state.writeDir);
-  }, [state]);
-  const jobs = {
-    addDependencies: _addDependencies.default,
-    install: _install.default,
-    json: _json.default,
-    scaffold: _scaffold.default,
-    template: _template.default
-  };
   const [status, setStatus] = (0, _react.useState)(null);
   const [error, setError] = (0, _react.useState)(null);
-  const [complete, setComplete] = (0, _react.useState)('');
+  const [complete, setComplete] = (0, _react.useState)(false);
   (0, _react.useEffect)(() => {
     state && state.ready && sprout && sprout.actions && data && new _rxjs.Observable(observer => (0, _rxjs.from)(sprout.actions).pipe((0, _operators.concatMap)(task => {
       return new _rxjs.Observable(async observer => {
         try {
-          return jobs[task.action]({
+          return _tasks.default[task.action]({
             task,
             sprout,
             data,
@@ -924,7 +941,7 @@ const Runner = ({
             writeDir
           });
         } catch (error) {
-          observer.error(`${task.action} handler error`);
+          observer.error(`${task.action} handler error: ${error}`);
         }
       });
     })).subscribe({
@@ -937,10 +954,6 @@ const Runner = ({
       complete: () => setComplete(true)
     });
   }, [state, sprout]);
-  /**
-   * Render
-   */
-
   return !complete ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
     flexDirection: "column"
   }, status && /*#__PURE__*/_react.default.createElement(_ink.Box, {
@@ -958,7 +971,7 @@ const Runner = ({
 
 var _default = Runner;
 exports.default = _default;
-},{"./../../store":"../src/bud/store.js","./tasks/addDependencies":"../src/bud/containers/Runner/tasks/addDependencies.js","./tasks/install":"../src/bud/containers/Runner/tasks/install.js","./tasks/json":"../src/bud/containers/Runner/tasks/json.js","./tasks/scaffold":"../src/bud/containers/Runner/tasks/scaffold.js","./tasks/template":"../src/bud/containers/Runner/tasks/template.js"}],"../src/bud/containers/Prompts.js":[function(require,module,exports) {
+},{"./../../store":"../src/bud/store.js","./tasks":"../src/bud/containers/Runner/tasks/index.js"}],"../src/bud/containers/Prompts.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -968,9 +981,9 @@ exports.default = void 0;
 
 var _react = require("react");
 
-var _ink = require("ink");
-
 var _enquirer = require("enquirer");
+
+var _ink = require("ink");
 
 var _store = require("../store");
 
@@ -1015,12 +1028,12 @@ const Prompts = () => {
        * @todo rewrite enquirer prompts with ink-specific
        * componentry.
        */
-      // stdout.write('\x1B[2J\x1B[0f')
-
+      stdout.write('\x1B[2J\x1B[0f');
       /**
        * Dispatch resultant data to the global store,
        * to be merged with whatever is already there.
        */
+
       dispatch({
         type: 'SET_DATA',
         data
@@ -1037,12 +1050,12 @@ const Prompts = () => {
       });
     });
   }, [prompts]);
-  return null;
+  return [];
 };
 
 var _default = Prompts;
 exports.default = _default;
-},{"../store":"../src/bud/store.js"}],"../src/bud/components/Status.js":[function(require,module,exports) {
+},{"../store":"../src/bud/store.js"}],"../src/bud/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1050,7 +1063,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -1058,82 +1071,11 @@ var _ink = require("ink");
 
 var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Status
- *
- * @prop {string} status
- * @prop {bool}   comp
- */
-const Status = ({
-  status,
-  complete
-}) => /*#__PURE__*/_react.default.createElement(_ink.Box, null, status && !complete && /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  green: true
-}, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, {
-  type: "dots"
-})), ` ${status}`), complete && /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  green: true
-}, "\u26A1\uFE0F All set.")));
-
-Status.propTypes = {
-  complete: _propTypes.default.bool
-};
-Status.defaultProps = {
-  status: '',
-  complete: false
-};
-var _default = Status;
-exports.default = _default;
-},{}],"../src/bud/components/Error.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _ink = require("ink");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Error
- */
-const Error = ({
-  message
-}) => message ? /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  red: true
-}, "\uD83D\uDCA5 ", message && message.code ? message.code : message)) : [];
-
-var _default = Error;
-exports.default = _default;
-},{}],"../src/bud/index.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _path = require("path");
-
-var _react = _interopRequireWildcard(require("react"));
-
-var _ink = require("ink");
-
 var _store = require("./store");
 
 var _Runner = _interopRequireDefault(require("./containers/Runner"));
 
 var _Prompts = _interopRequireDefault(require("./containers/Prompts"));
-
-var _Status = _interopRequireDefault(require("./components/Status"));
-
-var _Error = _interopRequireDefault(require("./components/Error"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1157,12 +1099,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *
  * @prop {bool}   moduleReady
  * @prop {string} module
- * @prop {string} outDirectory
+ * @prop {string} writeDir
  */
 const Bud = ({
   moduleReady,
   module,
-  outDir
+  writeDir
 }) => {
   const {
     state,
@@ -1174,12 +1116,12 @@ const Bud = ({
    */
 
   (0, _react.useEffect)(() => {
-    outDir && dispatch({
+    writeDir && dispatch({
       type: 'SET',
       key: 'writeDir',
-      value: `${process.cwd()}/${outDir}`
+      value: `${process.cwd()}/${writeDir}`
     });
-  }, [outDir]);
+  }, [writeDir]);
   /**
    * Load the "sprout" from the module file
    * if the search has concluded.
@@ -1206,7 +1148,7 @@ const Bud = ({
    */
 
   (0, _react.useEffect)(() => {
-    (sprout === null || sprout === void 0 ? void 0 : sprout.prompts) ? dispatch({
+    (state === null || state === void 0 ? void 0 : state.writeDir) && (sprout === null || sprout === void 0 ? void 0 : sprout.prompts) ? dispatch({
       type: 'SET_PROMPTS',
       prompts: sprout.prompts
     }) : dispatch({
@@ -1218,24 +1160,30 @@ const Bud = ({
    * Render the main app flow.
    */
 
-  return /*#__PURE__*/_react.default.createElement(_ink.Box, {
+  return state ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
     flexDirection: "column"
-  }, /*#__PURE__*/_react.default.createElement(_Error.default, {
-    message: state === null || state === void 0 ? void 0 : state.error
-  }), /*#__PURE__*/_react.default.createElement(_Prompts.default, null), /*#__PURE__*/_react.default.createElement(_Runner.default, {
+  }, /*#__PURE__*/_react.default.createElement(_Prompts.default, null), /*#__PURE__*/_react.default.createElement(_Runner.default, {
+    module: module,
+    writeDir: state.writeDir,
     sprout: sprout,
-    data: state.data,
-    module: module
-  }));
+    data: state.data
+  })) : /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: "row"
+  }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null), '  Loading');
 };
 
+Bud.propTypes = {
+  writeDir: _propTypes.default.string,
+  moduleReady: _propTypes.default.bool
+};
 Bud.defaultProps = {
-  outDir: null,
+  writeDir: null,
+  module: null,
   moduleReady: false
 };
 var _default = Bud;
 exports.default = _default;
-},{"./store":"../src/bud/store.js","./containers/Runner":"../src/bud/containers/Runner/index.js","./containers/Prompts":"../src/bud/containers/Prompts.js","./components/Status":"../src/bud/components/Status.js","./components/Error":"../src/bud/components/Error.js"}],"../src/bud/components/Banner.js":[function(require,module,exports) {
+},{"./store":"../src/bud/store.js","./containers/Runner":"../src/bud/containers/Runner/index.js","./containers/Prompts":"../src/bud/containers/Prompts.js"}],"../src/bud/components/Banner.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1243,7 +1191,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -1251,37 +1199,81 @@ var _ink = require("ink");
 
 var _inkLink = _interopRequireDefault(require("ink-link"));
 
+var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
+
+var _store = require("./../store");
+
+var _inkUseStdoutDimensions = _interopRequireDefault(require("ink-use-stdout-dimensions"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+const colors = {
+  success: '#96EF85',
+  error: '#BE425E'
+};
 /**
  * Banner
  *
  * @prop {string} label
  */
+
 const Banner = ({
   label
-}) => /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  marginBottom: 1,
-  flexDirection: "row",
-  justifyContent: "space-between"
-}, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  flexDirection: "column"
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, label)), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  flexDirection: "row"
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, `🌱`), /*#__PURE__*/_react.default.createElement(_ink.Text, {
-  bold: true
-}, /*#__PURE__*/_react.default.createElement(_inkLink.default, {
-  url: "https://roots.io/bud"
-}, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  green: true
-}, '  Bud')))));
+}) => {
+  const {
+    state
+  } = (0, _react.useContext)(_store.store);
+  const [width] = (0, _inkUseStdoutDimensions.default)();
+  const [spinner, setSpinner] = (0, _react.useState)(true);
+  const [status, setStatus] = (0, _react.useState)(false);
+  const [statusColor, setStatusColor] = (0, _react.useState)('#ffffff');
+  (0, _react.useEffect)(() => {
+    if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'complete') {
+      setStatus('🎉');
+      setStatusColor(colors.success);
+      setSpinner(false);
+    }
+
+    if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'error') {
+      setStatus('💢');
+      setStatusColor(colors.error);
+      setSpinner(false);
+    }
+  }, [state]);
+  return state ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 1,
+    width: width - width / 20
+  }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: "row",
+    justifyContent: "space-between"
+  }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    width: 1,
+    marginRight: 2
+  }, spinner ? /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null) : /*#__PURE__*/_react.default.createElement(_ink.Text, null, status)), /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+    hex: statusColor
+  }, label)))), /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: "row"
+  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, `🌱`), /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Text, {
+    bold: true
+  }, /*#__PURE__*/_react.default.createElement(_inkLink.default, {
+    url: "https://roots.io/bud"
+  }, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+    green: true
+  }, 'Bud')))))) : /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null), " Loading");
+};
 
 Banner.propTypes = {
   label: _propTypes.default.string
 };
 var _default = Banner;
 exports.default = _default;
-},{}],"../src/bud/containers/Search.js":[function(require,module,exports) {
+},{"./../store":"../src/bud/store.js"}],"../src/bud/containers/Search.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1298,6 +1290,8 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _globby = _interopRequireDefault(require("globby"));
 
 var _rxjs = require("rxjs");
+
+var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
 
 var _store = require("../store");
 
@@ -1382,24 +1376,15 @@ const Search = ({
   }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
     flexDirection: "row"
   }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    width: "15"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    blue: true
-  }, label))), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    width: 15,
-    paddingLeft: 2
-  }, complete ? /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, "complete")) : /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    gray: true
-  }, status))), results && /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "column",
-    width: 45,
-    marginBottom: 1,
-    textWrap: "truncate-start"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Text, {
+    marginRight: 2,
+    width: 10
+  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, label)), results ? /*#__PURE__*/_react.default.createElement(_ink.Text, {
     underline: true
-  }, displayFile(results)))));
+  }, displayFile(results)) : !complete ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: "column"
+  }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null)) : /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: "column"
+  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "No results"))));
 };
 
 Search.propTypes = {
@@ -1502,18 +1487,10 @@ const Generate = ({
     setModule(module ? module : false);
   }, [state]);
   return /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    marginTop: 1,
     flexDirection: 'column'
   }, /*#__PURE__*/_react.default.createElement(_Banner.default, {
     label: label
-  }), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: 'column',
-    marginBottom: 1
-  }, module && /*#__PURE__*/_react.default.createElement(_ink.Text, null, strings.searchSuccess), !complete && !module && /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    yellow: true
-  }, strings.searchText)), complete && !module && /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    red: true
-  }, strings.noResults))), /*#__PURE__*/_react.default.createElement(_Search.default, {
+  }), !complete && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_Search.default, {
     label: "project",
     glob: [globs.project(request)]
   }), /*#__PURE__*/_react.default.createElement(_Search.default, {
@@ -1522,7 +1499,7 @@ const Generate = ({
   }), /*#__PURE__*/_react.default.createElement(_Search.default, {
     label: "core",
     glob: [globs.core(request)]
-  }), /*#__PURE__*/_react.default.createElement(_bud.default, {
+  })), /*#__PURE__*/_react.default.createElement(_bud.default, {
     module: module,
     moduleReady: complete
   }));
@@ -1533,11 +1510,9 @@ const Generate = ({
 
 const GenerateCLI = ({
   request
-}) => {
-  return /*#__PURE__*/_react.default.createElement(_store.StateProvider, null, /*#__PURE__*/_react.default.createElement(Generate, {
-    request: request
-  }));
-};
+}) => /*#__PURE__*/_react.default.createElement(_store.StateProvider, null, /*#__PURE__*/_react.default.createElement(Generate, {
+  request: request
+}));
 
 GenerateCLI.propTypes = {
   // Requested generator

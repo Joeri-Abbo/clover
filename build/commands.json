@@ -38,6 +38,13 @@
 				}
 			],
 			"subCommands": []
+		},
+		{
+			"path": "list/index.js",
+			"name": "list",
+			"description": "List generators",
+			"args": [],
+			"subCommands": []
 		}
 	]
 }

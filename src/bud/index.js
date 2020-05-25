@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useContext} from 'react'
+import PropTypes from 'prop-types'
 import {Box} from 'ink'
+import Spinner from 'ink-spinner'
 
 /** application */
 import {store} from './store'
 import Runner from './containers/Runner'
 import Prompts from './containers/Prompts'
-import Error from './components/Error'
 
 /**
  * Bud Application
@@ -21,9 +22,9 @@ import Error from './components/Error'
  *
  * @prop {bool}   moduleReady
  * @prop {string} module
- * @prop {string} outDirectory
+ * @prop {string} writeDir
  */
-const Bud = ({moduleReady, module, outDir}) => {
+const Bud = ({moduleReady, module, writeDir}) => {
   const {state, dispatch} = useContext(store)
 
   /**
@@ -31,13 +32,13 @@ const Bud = ({moduleReady, module, outDir}) => {
    * stash it to the store.
    */
   useEffect(() => {
-    outDir
-      && dispatch({
+    writeDir &&
+      dispatch({
         type: 'SET',
         key: 'writeDir',
-        value: `${process.cwd()}/${outDir}`,
+        value: `${process.cwd()}/${writeDir}`,
       })
-  }, [outDir])
+  }, [writeDir])
 
   /**
    * Load the "sprout" from the module file
@@ -45,8 +46,7 @@ const Bud = ({moduleReady, module, outDir}) => {
    */
   const [sprout, setSprout] = useState(null)
   useEffect(() => {
-    moduleReady && module &&
-      setSprout(require(module))
+    moduleReady && module && setSprout(require(module))
   }, [moduleReady, module])
 
   /**
@@ -66,37 +66,41 @@ const Bud = ({moduleReady, module, outDir}) => {
    * store with those prompts.
    */
   useEffect(() => {
-    sprout?.prompts
+    state?.writeDir && sprout?.prompts
       ? dispatch({
-        type: 'SET_PROMPTS',
-        prompts: sprout.prompts,
-      })
+          type: 'SET_PROMPTS',
+          prompts: sprout.prompts,
+        })
       : dispatch({
-        type: 'SET_READY',
-        ready: true,
-      })
+          type: 'SET_READY',
+          ready: true,
+        })
   }, [sprout])
 
   /**
    * Render the main app flow.
    */
-  return (
+  return state ? (
     <Box flexDirection="column">
-      <Error message={state?.error} />
-
       <Prompts />
-
       <Runner
+        module={module}
+        writeDir={state.writeDir}
         sprout={sprout}
         data={state.data}
-        module={module}
       />
     </Box>
-  )
+  ) : <Box flexDirection="row"><Spinner />{'  Loading'}</Box>
+}
+
+Bud.propTypes = {
+  writeDir: PropTypes.string,
+  moduleReady: PropTypes.bool,
 }
 
 Bud.defaultProps = {
-  outDir: null,
+  writeDir: null,
+  module: null,
   moduleReady: false,
 }
 

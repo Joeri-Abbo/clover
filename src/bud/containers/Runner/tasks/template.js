@@ -8,14 +8,7 @@ import Write from './../Write'
 /**
  * Template
  */
-const template = async ({
-  task,
-  sprout,
-  data,
-  writeDir,
-  templateDir,
-  observer,
-}) => {
+const template = async ({task, sprout, data, writeDir, templateDir, observer}) => {
   const string = await Read({
     observer,
     file: `${templateDir}/${task.template}`,
@@ -31,9 +24,7 @@ const template = async ({
   const prettier = await Prettify({
     observer,
     string: template,
-    extension: task.path.split('.')[
-      task.path.split('.').length - 1
-    ],
+    extension: task.path.split('.')[task.path.split('.').length - 1],
   })
 
   const output = await Write({

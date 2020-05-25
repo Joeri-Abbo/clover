@@ -31,9 +31,7 @@ const helpers = data => [
         })
       }
 
-      return hasInstance
-        ? options.fn(this)
-        : options.inverse(this)
+      return hasInstance ? options.fn(this) : options.inverse(this)
     },
   },
   {

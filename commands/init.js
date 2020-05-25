@@ -30,11 +30,7 @@ const Init = ({projectDir}) => {
     <Box marginTop={1} flexDirection={'column'}>
       <Banner label={label} />
       <Box flexDirection={'column'} marginBottom={1}>
-        <Bud
-          outDir={projectDir}
-          module={initModule}
-          moduleReady={true}
-        />
+        <Bud writeDir={projectDir} module={initModule} moduleReady={true} />
       </Box>
     </Box>
   )

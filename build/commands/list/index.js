@@ -392,7 +392,130 @@ Banner.propTypes = {
 };
 var _default = Banner;
 exports.default = _default;
-},{"./../store":"../src/bud/store.js"}],"index.js":[function(require,module,exports) {
+},{"./../store":"../src/bud/store.js"}],"../src/bud/containers/List.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _path = require("path");
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _ink = require("ink");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _globby = _interopRequireDefault(require("globby"));
+
+var _rxjs = require("rxjs");
+
+var _store = require("../store");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+/** application */
+
+/**
+ * Search
+ *
+ * @prop {array}  glob
+ * @prop {string} label
+ */
+const List = ({
+  glob,
+  label
+}) => {
+  const {
+    dispatch
+  } = (0, _react.useContext)(_store.store);
+  /**
+   * Return an observable emitting
+   * budfile matches.
+   */
+
+  const [search] = (0, _react.useState)(new _rxjs.Observable(async observer => {
+    observer.next({
+      status: 'Searching'
+    });
+    const results = await (0, _globby.default)(glob);
+    observer.next({
+      results: results ? results : null
+    });
+    observer.complete();
+  }));
+  /**
+   * Once there is an observer available to subscribe to,
+   * use what it emits to set various component states.
+   */
+
+  const [status, setStatus] = (0, _react.useState)(null);
+  const [complete, setComplete] = (0, _react.useState)(null);
+  const [results, setResults] = (0, _react.useState)(null);
+  (0, _react.useEffect)(() => {
+    search === null || search === void 0 ? void 0 : search.subscribe({
+      next: next => {
+        next.status && setStatus(next.status);
+        next.results && setResults(next.results);
+      },
+      complete: () => setComplete(true),
+      error: () => setComplete(true)
+    });
+  }, [search]);
+  /**
+   * Mirror any changes to component state
+   * in the global store.
+   */
+
+  (0, _react.useEffect)(() => {
+    complete && dispatch({
+      type: 'SET',
+      key: 'status',
+      value: 'complete'
+    });
+    dispatch({
+      type: 'SEARCH_RESULTS',
+      label,
+      results,
+      complete,
+      status
+    });
+  }, [results, status, complete]);
+  /** Format matched files for display */
+
+  const displayFile = file => (0, _path.basename)(file).replace('.bud.js', '');
+  /**
+   * Render
+   */
+
+
+  return /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: "column"
+  }, results === null || results === void 0 ? void 0 : results.map((result, id) => /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    key: id,
+    flexDirection: "row",
+    textWrap: "truncate-start"
+  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+    gray: true
+  }, "yarn generate ")), /*#__PURE__*/_react.default.createElement(_ink.Text, null, `${displayFile(result)}`))));
+};
+
+List.propTypes = {
+  glob: _propTypes.default.array.isRequired,
+  label: _propTypes.default.string
+};
+List.defaultProps = {
+  label: 'List'
+};
+var _default = List;
+exports.default = _default;
+},{"../store":"../src/bud/store.js"}],"list/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -404,32 +527,58 @@ var _react = _interopRequireDefault(require("react"));
 
 var _ink = require("ink");
 
-var _Banner = _interopRequireDefault(require("./../src/bud/components/Banner"));
+var _inkUseStdoutDimensions = _interopRequireDefault(require("ink-use-stdout-dimensions"));
+
+var _store = require("../../src/bud/store");
+
+var _Banner = _interopRequireDefault(require("../../src/bud/components/Banner"));
+
+var _List = _interopRequireDefault(require("../../src/bud/containers/List"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/** Command: bud */
-/// Bud information
-const Bud = () => /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  flexDirection: "column",
-  marginTop: 1
-}, /*#__PURE__*/_react.default.createElement(_Banner.default, {
-  label: "Bud: Modern WordPress Scaffolding"
-}), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  flexDirection: "column"
-}, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  marginBottom: 1
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "To get started run", /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  green: true
-}, " npx @roots/bud init ", `[project-dir]`))), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  marginBottom: 1
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "The init command will install Bud as a project dependency.")), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-  marginBottom: 1
-}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "Afterward, you can run subsequent commands with", /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  green: true
-}, " yarn generate [generator-name]"), "."))));
+/** application */
 
-var _default = Bud;
+/**
+ * Scaffold candidate locations
+ */
+const globs = {
+  project: `${process.cwd()}/.bud/budfiles/**/*.bud.js`,
+  plugins: `${process.cwd()}/node_modules/**/bud-plugin-*/**/*.bud.js`,
+  core: `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/**.bud.js`
+};
+/**
+ * List
+ *
+ * @prop {string} request
+ */
+
+const ListView = () => {
+  return /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    flexDirection: 'column'
+  }, /*#__PURE__*/_react.default.createElement(_Banner.default, {
+    label: 'bud list'
+  }), /*#__PURE__*/_react.default.createElement(_List.default, {
+    glob: [globs.project, globs.plugins, globs.core]
+  }));
+};
+/** Command: bud list */
+/// List generators
+
+
+const ListCLI = ({
+  request
+}) => {
+  const [width, height] = (0, _inkUseStdoutDimensions.default)();
+  return /*#__PURE__*/_react.default.createElement(_store.StateProvider, null, /*#__PURE__*/_react.default.createElement(_ink.Box, {
+    width: width,
+    height: height - 5
+  }, /*#__PURE__*/_react.default.createElement(ListView, {
+    request: request
+  })));
+};
+
+var _default = ListCLI;
 exports.default = _default;
-},{"./../src/bud/components/Banner":"../src/bud/components/Banner.js"}]},{},["index.js"], null)
-//# sourceMappingURL=/index.js.map
+},{"../../src/bud/store":"../src/bud/store.js","../../src/bud/components/Banner":"../src/bud/components/Banner.js","../../src/bud/containers/List":"../src/bud/containers/List.js"}]},{},["list/index.js"], null)
+//# sourceMappingURL=/list/index.js.map

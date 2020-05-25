@@ -5,10 +5,7 @@ const execaOptions = {cwd: process.cwd()}
 /**
  * Add dependencies
  */
-const addDependencies = async function ({
-  task: {repo, pkgs, dev},
-  observer,
-}) {
+const addDependencies = async function ({task: {repo, pkgs, dev}, observer}) {
   let installation
 
   observer.next({status: `Installing packages from ${repo}...`})
@@ -18,10 +15,7 @@ const addDependencies = async function ({
   }
 
   if (repo == 'npm') {
-    installation = execa.command(
-      `yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`,
-      execaOptions,
-    )
+    installation = execa.command(`yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`, execaOptions)
   }
 
   if (repo == 'packagist') {

@@ -7,32 +7,31 @@ import {concatMap} from 'rxjs/operators'
 
 import Process from './../Process'
 
-const CWD = process.cwd()
-
-const scaffold = async ({task: {paths}, sprout, data, observer}) => {
+/**
+ * Task: scaffold dir
+ *
+ * @prop {object}   task
+ * @prop {string}   writeDir
+ * @prop {object}   sprout
+ * @prop {object}   data
+ * @prop {Observer} observer
+ */
+const scaffold = async ({task: {paths}, writeDir, sprout, data, observer}) => {
   observer.next({status: `Creating directories`})
-
   from(paths)
     .pipe(
       concatMap(path => {
         return new Observable(async observer => {
           try {
-            const pathTemplate = await Process({
-              sprout,
-              data,
-              observer,
-              string: path,
-            })
-
-            const dirPath = join(CWD, pathTemplate)
+            const pathTmp = await Process({sprout, data, observer, string: path})
+            const dirPath = join(writeDir, pathTmp)
 
             try {
-              await ensureDir(dirPath)
-                .then(() => {
-                  observer.complete()
-                })
+              await ensureDir(dirPath).then(() => {
+                observer.complete()
+              })
             } catch {
-              observer.error(`scaffolding action throw: ${paths}, ${dirPath}`)
+              observer.error(`Scaffolding action throw: ${paths}, ${dirPath}`)
             }
           } catch {
             observer.error(`Action error: scaffold, pathTemplate`)
