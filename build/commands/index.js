@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../src/components/components/Banner.js":[function(require,module,exports) {
+})({"../src/bud/components/Banner.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -175,7 +175,7 @@ var _react = _interopRequireDefault(require("react"));
 
 var _ink = require("ink");
 
-var _Banner = _interopRequireDefault(require("./../src/components/components/Banner"));
+var _Banner = _interopRequireDefault(require("./../src/bud/components/Banner"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -202,5 +202,5 @@ const Bud = () => /*#__PURE__*/_react.default.createElement(_ink.Box, {
 
 var _default = Bud;
 exports.default = _default;
-},{"./../src/components/components/Banner":"../src/components/components/Banner.js"}]},{},["index.js"], null)
+},{"./../src/bud/components/Banner":"../src/bud/components/Banner.js"}]},{},["index.js"], null)
 //# sourceMappingURL=/index.js.map

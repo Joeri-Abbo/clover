@@ -4,9 +4,9 @@ import {Box} from 'ink'
 import PropTypes from 'prop-types'
 
 /** application */
-import Bud from '../src/components/Bud'
-import {StateProvider, store} from '../src/components/store'
-import Banner from '../src/components/components/Banner'
+import Bud from '../src/bud'
+import {StateProvider, store} from '../src/bud/store'
+import Banner from '../src/bud/components/Banner'
 
 const initModule = resolve(__dirname, './../../src/budfiles/init/init.bud')
 
@@ -16,7 +16,7 @@ const strings = {
 
 /** Command: bud init */
 /// Create a new project
-const Init = props => {
+const Init = ({projectDir}) => {
   const {state} = useContext(store)
   /**
    * Update the generator label.
@@ -30,7 +30,11 @@ const Init = props => {
     <Box marginTop={1} flexDirection={'column'}>
       <Banner label={label} />
       <Box flexDirection={'column'} marginBottom={1}>
-        <Bud outDir={props.projectDir} module={initModule} moduleReady={true} />
+        <Bud
+          outDir={projectDir}
+          module={initModule}
+          moduleReady={true}
+        />
       </Box>
     </Box>
   )

@@ -3,10 +3,10 @@ import {Box, Color, Text} from 'ink'
 import PropTypes from 'prop-types'
 
 /** application */
-import Bud from '../../src/components/Bud'
-import {StateProvider, store} from '../../src/components/store'
-import Banner from '../../src/components/components/Banner'
-import Search from '../../src/components/containers/Search'
+import Bud from '../../src/bud'
+import {StateProvider, store} from '../../src/bud/store'
+import Banner from '../../src/bud/components/Banner'
+import Search from '../../src/bud/containers/Search'
 
 /**
  * Constants
@@ -86,13 +86,25 @@ const Generate = ({request}) => {
         )}
       </Box>
 
-      <Search label="project" glob={[globs.project(request)]} />
+      <Search
+        label="project"
+        glob={[globs.project(request)]}
+      />
 
-      <Search label="plugins" glob={[globs.plugins(request)]} />
+      <Search
+        label="plugins"
+        glob={[globs.plugins(request)]}
+      />
 
-      <Search label="core" glob={[globs.core(request)]} />
+      <Search
+        label="core"
+        glob={[globs.core(request)]}
+      />
 
-      <Bud module={module} moduleReady={complete} />
+      <Bud
+        module={module}
+        moduleReady={complete}
+      />
     </Box>
   )
 }

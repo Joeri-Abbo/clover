@@ -67,7 +67,8 @@ const Search = ({glob, label}) => {
   }, [results, status, complete])
 
   /** Format matched files for display */
-  const displayFile = file => file.replace(process.cwd() + '/', '')
+  const displayFile = file =>
+    file.replace(process.cwd() + '/', '')
 
   /**
    * Render

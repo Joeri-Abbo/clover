@@ -1,6 +1,6 @@
 import React from 'react'
 import {Box, Color, Text} from 'ink'
-import Banner from './../src/components/components/Banner'
+import Banner from './../src/bud/components/Banner'
 
 /** Command: bud */
 /// Bud information

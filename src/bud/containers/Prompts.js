@@ -1,16 +1,14 @@
 import {useState, useEffect, useContext} from 'react'
-import {useStdout} from 'ink'
 import {prompt} from 'enquirer'
 
 /** application */
-import {store} from './../store'
+import {store} from '../store'
 
 /**
  * Prompts
  */
 const Prompts = () => {
   /** @see ink docs */
-  const {stdout} = useStdout()
   const {state, dispatch} = useContext(store)
 
   /**
@@ -28,7 +26,7 @@ const Prompts = () => {
    * and dispatch the results to the global store.
    */
   useEffect(() => {
-    prompts?.length > 0 &&
+    prompts &&
       prompt(prompts).then(data => {
         /**
          * Since enquirer is not
@@ -40,7 +38,7 @@ const Prompts = () => {
          * @todo rewrite enquirer prompts with ink-specific
          * componentry.
          */
-        stdout.write('\x1B[2J\x1B[0f')
+        // stdout.write('\x1B[2J\x1B[0f')
 
         /**
          * Dispatch resultant data to the global store,

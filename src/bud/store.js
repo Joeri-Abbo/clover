@@ -1,8 +1,26 @@
 import React, {createContext, useReducer} from 'react'
 
-const store = createContext({
+const cwd = process.cwd()
+
+/** app config */
+let budConfig
+try {
+  budConfig = require(`${process.cwd()}/.bud/bud.config.json`)
+} catch {
+  budConfig = {}
+}
+
+/**
+ * Bud application context
+ */
+export const store = createContext({
+  cwd,
+  writeDir: cwd,
+  projectConfig: {
+    ...budConfig,
+  },
   label: 'Bud: a modern WordPress scaffolding utility',
-  prompts: [],
+  prompts: null,
   data: null,
   status: null,
   error: null,
@@ -29,8 +47,20 @@ const store = createContext({
 
 const {Provider} = store
 
-const StateProvider = ({children}) => {
+/**
+ * State provider
+ */
+export const StateProvider = ({children}) => {
   const [state, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'SET': {
+        const {key, value} = action
+        return {
+          ...state,
+          [key]: value,
+        }
+      }
+    }
     switch (action.type) {
       case 'SET_LABEL': {
         const {label} = action
@@ -101,7 +131,9 @@ const StateProvider = ({children}) => {
     }
   }, store)
 
-  return <Provider value={{state, dispatch}}>{children}</Provider>
+  return (
+    <Provider value={{state, dispatch}}>
+      {children}
+    </Provider>
+  )
 }
-
-export {store, StateProvider}
