@@ -131,33 +131,21 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const cwd = process.cwd();
-/** app config */
-
-let budConfig;
-
-try {
-  budConfig = require(`${process.cwd()}/.bud/bud.config.json`);
-} catch {
-  budConfig = {};
-}
 /**
  * Bud application context
  */
-
-
 const store = (0, _react.createContext)({
-  cwd,
-  writeDir: cwd,
-  projectConfig: { ...budConfig
-  },
-  label: 'Bud: a modern WordPress scaffolding utility',
+  writeDir: null,
+  projectConfig: null,
+  label: null,
   prompts: null,
   data: null,
   status: null,
   error: null,
   complete: false,
   ready: false,
+  budfile: null,
+  sprout: null,
   search: {
     core: {
       results: null,
@@ -357,6 +345,18 @@ const Banner = ({
       setSpinner(false);
     }
 
+    if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'building') {
+      setStatus('👩‍💻');
+      setStatusColor(colors.white);
+      setSpinner(true);
+    }
+
+    if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'questions') {
+      setStatus('❔');
+      setStatusColor(colors.white);
+      setSpinner(false);
+    }
+
     if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'error') {
       setStatus('💢');
       setStatusColor(colors.error);
@@ -527,8 +527,6 @@ var _react = _interopRequireDefault(require("react"));
 
 var _ink = require("ink");
 
-var _inkUseStdoutDimensions = _interopRequireDefault(require("ink-use-stdout-dimensions"));
-
 var _store = require("../../src/bud/store");
 
 var _Banner = _interopRequireDefault(require("../../src/bud/components/Banner"));
@@ -538,14 +536,15 @@ var _List = _interopRequireDefault(require("../../src/bud/containers/List"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /** application */
-
+const cwd = process.cwd();
 /**
  * Scaffold candidate locations
  */
+
 const globs = {
-  project: `${process.cwd()}/.bud/budfiles/**/*.bud.js`,
-  plugins: `${process.cwd()}/node_modules/**/bud-plugin-*/**/*.bud.js`,
-  core: `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/**.bud.js`
+  project: `${cwd}/.bud/budfiles/**/*.bud.js`,
+  plugins: `${cwd}/node_modules/**/bud-plugin-*/**/*.bud.js`,
+  core: `${cwd}/node_modules/@roots/bud/src/budfiles/**/**.bud.js`
 };
 /**
  * List
@@ -568,15 +567,9 @@ const ListView = () => {
 
 const ListCLI = ({
   request
-}) => {
-  const [width, height] = (0, _inkUseStdoutDimensions.default)();
-  return /*#__PURE__*/_react.default.createElement(_store.StateProvider, null, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    width: width,
-    height: height - 5
-  }, /*#__PURE__*/_react.default.createElement(ListView, {
-    request: request
-  })));
-};
+}) => /*#__PURE__*/_react.default.createElement(_store.StateProvider, null, /*#__PURE__*/_react.default.createElement(ListView, {
+  request: request
+}));
 
 var _default = ListCLI;
 exports.default = _default;

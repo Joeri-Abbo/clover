@@ -131,33 +131,21 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const cwd = process.cwd();
-/** app config */
-
-let budConfig;
-
-try {
-  budConfig = require(`${process.cwd()}/.bud/bud.config.json`);
-} catch {
-  budConfig = {};
-}
 /**
  * Bud application context
  */
-
-
 const store = (0, _react.createContext)({
-  cwd,
-  writeDir: cwd,
-  projectConfig: { ...budConfig
-  },
-  label: 'Bud: a modern WordPress scaffolding utility',
+  writeDir: null,
+  projectConfig: null,
+  label: null,
   prompts: null,
   data: null,
   status: null,
   error: null,
   complete: false,
   ready: false,
+  budfile: null,
+  sprout: null,
   search: {
     core: {
       results: null,
@@ -375,7 +363,6 @@ const install = async ({
   writeDir,
   observer
 }) => {
-  let installation;
   const options = {
     cwd: writeDir
   };
@@ -388,21 +375,22 @@ const install = async ({
   }
 
   if (repo == 'npm') {
-    installation = _execa.default.command(`yarn`, options);
+    const {
+      stdout
+    } = (0, _execa.default)(`yarn`, [`install`], options);
+    stdout.then(() => {
+      observer.complete();
+    });
   }
 
   if (repo == 'packagist') {
-    installation = _execa.default.command(`composer install`, options);
-  }
-
-  installation.stdout.on('data', status => {
-    observer.next({
-      status: status.code
+    const {
+      stdout
+    } = (0, _execa.default)(`composer`, [`install`], options);
+    stdout.then(() => {
+      observer.complete();
     });
-  });
-  installation.then(() => {
-    observer.complete();
-  });
+  }
 };
 
 var _default = install;
@@ -540,7 +528,6 @@ const Prettify = async ({
     jsx: 'babel',
     graphql: 'graphql',
     css: 'css',
-    json: 'json',
     md: 'markdown',
     html: 'html',
     htm: 'html',
@@ -776,7 +763,7 @@ const Read = async ({
     });
     return await (0, _fsExtra.readFile)(file, 'utf8');
   } catch (error) {
-    console.error(error);
+    observer.error(error);
   }
 };
 
@@ -813,30 +800,33 @@ const template = async ({
   templateDir,
   observer
 }) => {
-  const string = await (0, _Read.default)({
+  let string;
+  observer.next({
+    status: `Processing templates`
+  });
+  string = await (0, _Read.default)({
     observer,
     file: `${templateDir}/${task.template}`
   });
-  const template = await (0, _Process.default)({
+  string = await (0, _Process.default)({
     observer,
     string,
     sprout,
     data
   });
-  const prettier = await (0, _Prettify.default)({
+  if (!task.prettier == false) string = await (0, _Prettify.default)({
     observer,
     string: template,
     extension: task.path.split('.')[task.path.split('.').length - 1]
   });
-  const output = await (0, _Write.default)({
+  string = await (0, _Write.default)({
     observer,
-    string: prettier,
+    string,
     target: (0, _path.join)(writeDir, task.path)
   });
   observer.next({
-    status: output
+    status: string
   });
-  observer.complete();
 };
 
 var _default = template;
@@ -911,38 +901,34 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @param {object}   data
  * @param {object}   sprout
  * @param {string}   templateDir
+ * @param {string}   writeDir
  */
 const Runner = ({
   sprout,
   data,
-  module,
-  writeDir
+  budfile,
+  writeDir,
+  ready
 }) => {
   const {
-    state
+    state,
+    dispatch
   } = (0, _react.useContext)(_store.store);
-  const [templateDir, setTemplateDir] = (0, _react.useState)(null);
-  (0, _react.useEffect)(() => {
-    module && setTemplateDir((0, _path.join)((0, _path.dirname)(module), 'templates'));
-  }, [module]);
   const [status, setStatus] = (0, _react.useState)(null);
   const [error, setError] = (0, _react.useState)(null);
   const [complete, setComplete] = (0, _react.useState)(false);
   (0, _react.useEffect)(() => {
-    state && state.ready && sprout && sprout.actions && data && new _rxjs.Observable(observer => (0, _rxjs.from)(sprout.actions).pipe((0, _operators.concatMap)(task => {
+    ready && new _rxjs.Observable(observer => (0, _rxjs.from)(sprout.actions).pipe((0, _operators.concatMap)(task => {
       return new _rxjs.Observable(async observer => {
-        try {
-          return _tasks.default[task.action]({
-            task,
-            sprout,
-            data,
-            observer,
-            templateDir,
-            writeDir
-          });
-        } catch (error) {
-          observer.error(`${task.action} handler error: ${error}`);
-        }
+        return _tasks.default[task.action]({
+          task,
+          sprout,
+          data,
+          budfile,
+          observer,
+          templateDir: (0, _path.join)((0, _path.dirname)(budfile), 'templates'),
+          writeDir
+        });
       });
     })).subscribe({
       next: next => observer.next(next),
@@ -954,6 +940,15 @@ const Runner = ({
       complete: () => setComplete(true)
     });
   }, [state, sprout]);
+  (0, _react.useEffect)(() => {
+    complete && (() => {
+      dispatch({
+        type: 'SET',
+        key: 'status',
+        value: 'complete'
+      });
+    })();
+  }, [complete]);
   return !complete ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
     flexDirection: "column"
   }, status && /*#__PURE__*/_react.default.createElement(_ink.Box, {
@@ -964,14 +959,12 @@ const Runner = ({
     flexDirection: "column"
   }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
     red: true
-  }, typeof error !== 'string' ? JSON.stringify(error) : error)))) : /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, "All done.")));
+  }, typeof error !== 'string' ? JSON.stringify(error) : error)))) : [];
 };
 
 var _default = Runner;
 exports.default = _default;
-},{"./../../store":"../src/bud/store.js","./tasks":"../src/bud/containers/Runner/tasks/index.js"}],"../src/bud/containers/Prompts.js":[function(require,module,exports) {
+},{"./../../store":"../src/bud/store.js","./tasks":"../src/bud/containers/Runner/tasks/index.js"}],"../src/bud/containers/Prompt.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -983,8 +976,6 @@ var _react = require("react");
 
 var _enquirer = require("enquirer");
 
-var _ink = require("ink");
-
 var _store = require("../store");
 
 /** application */
@@ -992,68 +983,46 @@ var _store = require("../store");
 /**
  * Prompts
  */
-const Prompts = () => {
-  /** @see ink docs */
-  const {
-    stdout
-  } = (0, _ink.useStdout)();
+const Prompt = ({
+  prompts
+}) => {
   const {
     state,
     dispatch
   } = (0, _react.useContext)(_store.store);
-  /**
-   * State tracking prompts listed in the
-   * generator file.
-   */
-
-  const [prompts, setPrompts] = (0, _react.useState)(null);
-  (0, _react.useEffect)(() => {
-    const prompts = state === null || state === void 0 ? void 0 : state.prompts;
-    setPrompts(prompts ? prompts : null);
-  }, [state]);
   /**
    * If there are prompts to run then do so
    * and dispatch the results to the global store.
    */
 
   (0, _react.useEffect)(() => {
-    prompts && (0, _enquirer.prompt)(prompts).then(data => {
-      /**
-       * Since enquirer is not
-       * ink-specific it causes duplication of the
-       * application components in stdout.
-       *
-       * This clears the console to mask that issue.
-       *
-       * @todo rewrite enquirer prompts with ink-specific
-       * componentry.
-       */
-      stdout.write('\x1B[2J\x1B[0f');
-      /**
-       * Dispatch resultant data to the global store,
-       * to be merged with whatever is already there.
-       */
-
+    if (prompts && !state.ready) {
       dispatch({
-        type: 'SET_DATA',
-        data
+        type: 'SET',
+        key: 'status',
+        value: 'questions'
       });
-      /**
-       * Finally, tell the application that the prompts
-       * are finished and we're ready to build the
-       * requested component.
-       */
-
-      dispatch({
-        type: 'SET_READY',
-        ready: true
+      (0, _enquirer.prompt)(prompts).then(data => {
+        /**
+         * Dispatch resultant data to the global store,
+         * to be merged with whatever is already there.
+         */
+        dispatch({
+          type: 'SET_DATA',
+          data
+        });
+        dispatch({
+          type: 'SET',
+          key: 'ready',
+          value: true
+        });
       });
-    });
+    }
   }, [prompts]);
-  return [];
+  return null;
 };
 
-var _default = Prompts;
+var _default = Prompt;
 exports.default = _default;
 },{"../store":"../src/bud/store.js"}],"../src/bud/index.js":[function(require,module,exports) {
 "use strict";
@@ -1071,11 +1040,9 @@ var _ink = require("ink");
 
 var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
 
-var _store = require("./store");
-
 var _Runner = _interopRequireDefault(require("./containers/Runner"));
 
-var _Prompts = _interopRequireDefault(require("./containers/Prompts"));
+var _Prompt = _interopRequireDefault(require("./containers/Prompt"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1102,88 +1069,38 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @prop {string} writeDir
  */
 const Bud = ({
-  moduleReady,
-  module,
-  writeDir
+  writeDir,
+  sprout,
+  budfile,
+  data,
+  ready
 }) => {
-  const {
-    state,
-    dispatch
-  } = (0, _react.useContext)(_store.store);
-  /**
-   * If the command specifies an output dir
-   * stash it to the store.
-   */
-
-  (0, _react.useEffect)(() => {
-    writeDir && dispatch({
-      type: 'SET',
-      key: 'writeDir',
-      value: `${process.cwd()}/${writeDir}`
-    });
-  }, [writeDir]);
-  /**
-   * Load the "sprout" from the module file
-   * if the search has concluded.
-   */
-
-  const [sprout, setSprout] = (0, _react.useState)(null);
-  (0, _react.useEffect)(() => {
-    moduleReady && module && setSprout(require(module));
-  }, [moduleReady, module]);
-  /**
-   * If the sprout has a description
-   * then update the application banner.
-   */
-
-  (0, _react.useEffect)(() => {
-    (sprout === null || sprout === void 0 ? void 0 : sprout.description) && dispatch({
-      type: 'SET_LABEL',
-      label: sprout.description
-    });
-  }, [sprout]);
-  /**
-   * If the generator has prompts then update the
-   * store with those prompts.
-   */
-
-  (0, _react.useEffect)(() => {
-    (state === null || state === void 0 ? void 0 : state.writeDir) && (sprout === null || sprout === void 0 ? void 0 : sprout.prompts) ? dispatch({
-      type: 'SET_PROMPTS',
-      prompts: sprout.prompts
-    }) : dispatch({
-      type: 'SET_READY',
-      ready: true
-    });
-  }, [sprout]);
   /**
    * Render the main app flow.
    */
-
-  return state ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
+  return sprout ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
     flexDirection: "column"
-  }, /*#__PURE__*/_react.default.createElement(_Prompts.default, null), /*#__PURE__*/_react.default.createElement(_Runner.default, {
-    module: module,
-    writeDir: state.writeDir,
+  }, /*#__PURE__*/_react.default.createElement(_Prompt.default, {
+    prompts: sprout.prompts
+  }), /*#__PURE__*/_react.default.createElement(_Runner.default, {
+    ready: ready,
+    budfile: budfile,
+    writeDir: writeDir,
     sprout: sprout,
-    data: state.data
-  })) : /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "row"
-  }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null), '  Loading');
+    data: data
+  })) : /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null), " Loading...");
 };
 
 Bud.propTypes = {
-  writeDir: _propTypes.default.string,
-  moduleReady: _propTypes.default.bool
+  writeDir: _propTypes.default.string
 };
 Bud.defaultProps = {
   writeDir: null,
-  module: null,
-  moduleReady: false
+  ready: false
 };
 var _default = Bud;
 exports.default = _default;
-},{"./store":"../src/bud/store.js","./containers/Runner":"../src/bud/containers/Runner/index.js","./containers/Prompts":"../src/bud/containers/Prompts.js"}],"../src/bud/components/Banner.js":[function(require,module,exports) {
+},{"./containers/Runner":"../src/bud/containers/Runner/index.js","./containers/Prompt":"../src/bud/containers/Prompt.js"}],"../src/bud/components/Banner.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1238,6 +1155,18 @@ const Banner = ({
       setSpinner(false);
     }
 
+    if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'building') {
+      setStatus('👩‍💻');
+      setStatusColor(colors.white);
+      setSpinner(true);
+    }
+
+    if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'questions') {
+      setStatus('❔');
+      setStatusColor(colors.white);
+      setSpinner(false);
+    }
+
     if ((state === null || state === void 0 ? void 0 : state.status) && state.status == 'error') {
       setStatus('💢');
       setStatusColor(colors.error);
@@ -1281,9 +1210,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireWildcard(require("react"));
-
-var _ink = require("ink");
+var _react = require("react");
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -1291,15 +1218,9 @@ var _globby = _interopRequireDefault(require("globby"));
 
 var _rxjs = require("rxjs");
 
-var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
-
 var _store = require("../store");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /** application */
 
@@ -1318,7 +1239,7 @@ const Search = ({
   } = (0, _react.useContext)(_store.store);
   /**
    * Return an observable emitting
-   * search criterion matches.
+   * budfile matches.
    */
 
   const [search] = (0, _react.useState)(new _rxjs.Observable(async observer => {
@@ -1327,7 +1248,7 @@ const Search = ({
     });
     const results = await (0, _globby.default)(glob);
     observer.next({
-      results: results ? results[0] : null
+      results
     });
     observer.complete();
   }));
@@ -1340,7 +1261,7 @@ const Search = ({
   const [complete, setComplete] = (0, _react.useState)(null);
   const [results, setResults] = (0, _react.useState)(null);
   (0, _react.useEffect)(() => {
-    search === null || search === void 0 ? void 0 : search.subscribe({
+    search && search.subscribe({
       next: next => {
         next.status && setStatus(next.status);
         next.results && setResults(next.results);
@@ -1363,28 +1284,11 @@ const Search = ({
       status
     });
   }, [results, status, complete]);
-  /** Format matched files for display */
-
-  const displayFile = file => file.replace(process.cwd() + '/', '');
   /**
    * Render
    */
 
-
-  return /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "column"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "row"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    marginRight: 2,
-    width: 10
-  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, label)), results ? /*#__PURE__*/_react.default.createElement(_ink.Text, {
-    underline: true
-  }, displayFile(results)) : !complete ? /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "column"
-  }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null)) : /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "column"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, "No results"))));
+  return null;
 };
 
 Search.propTypes = {
@@ -1410,9 +1314,9 @@ var _ink = require("ink");
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
-var _bud = _interopRequireDefault(require("../../src/bud"));
-
 var _store = require("../../src/bud/store");
+
+var _bud = _interopRequireDefault(require("../../src/bud"));
 
 var _Banner = _interopRequireDefault(require("../../src/bud/components/Banner"));
 
@@ -1425,24 +1329,15 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /** application */
-
-/**
- * Constants
- */
-const strings = {
-  title: 'Bud: WordPress CLI generator tooling',
-  searchText: '🔎  Searching..',
-  noResults: '💢  No results found.',
-  searchSuccess: '🎉  Generator found'
-};
+const cwd = process.cwd();
 /**
  * Scaffold candidate locations
  */
 
 const globs = {
-  project: search => `${process.cwd()}/.bud/budfiles/${search}/*.bud.js`,
-  plugins: search => `${process.cwd()}/node_modules/**/bud-plugin-*/${search}/*.bud.js`,
-  core: search => `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${search}.bud.js`
+  project: search => `${cwd}/.bud/budfiles/${search}/*.bud.js`,
+  plugins: search => `${cwd}/node_modules/**/bud-plugin-*/${search}/*.bud.js`,
+  core: search => `${cwd}/node_modules/@roots/bud/src/budfiles/**/${search}.bud.js`
 };
 /**
  * Generate
@@ -1454,43 +1349,59 @@ const Generate = ({
   request
 }) => {
   const {
+    dispatch,
     state
   } = (0, _react.useContext)(_store.store);
-  /**
-   * Update the generator label.
-   */
-
-  const [label, setLabel] = (0, _react.useState)(strings.title);
-  (0, _react.useEffect)(() => {
-    (state === null || state === void 0 ? void 0 : state.label) && setLabel(state.label);
-  }, [state === null || state === void 0 ? void 0 : state.label]);
-  /**
-   * Determine if generator is ready for next step.
-   */
-
-  const [complete, setComplete] = (0, _react.useState)(false);
+  const [budfile, setBudfile] = (0, _react.useState)(null);
   (0, _react.useEffect)(() => {
     var _state$search, _state$search$project, _state$search2, _state$search2$plugin, _state$search3, _state$search3$core;
 
-    const complete = (state === null || state === void 0 ? void 0 : (_state$search = state.search) === null || _state$search === void 0 ? void 0 : (_state$search$project = _state$search.project) === null || _state$search$project === void 0 ? void 0 : _state$search$project.complete) && (state === null || state === void 0 ? void 0 : (_state$search2 = state.search) === null || _state$search2 === void 0 ? void 0 : (_state$search2$plugin = _state$search2.plugins) === null || _state$search2$plugin === void 0 ? void 0 : _state$search2$plugin.complete) && (state === null || state === void 0 ? void 0 : (_state$search3 = state.search) === null || _state$search3 === void 0 ? void 0 : (_state$search3$core = _state$search3.core) === null || _state$search3$core === void 0 ? void 0 : _state$search3$core.complete);
-    setComplete(complete ? complete : false);
+    state && setBudfile((state === null || state === void 0 ? void 0 : (_state$search = state.search) === null || _state$search === void 0 ? void 0 : (_state$search$project = _state$search.project) === null || _state$search$project === void 0 ? void 0 : _state$search$project.complete) && state.search.project.results.length > 0 ? state.search.project.results[0] : (state === null || state === void 0 ? void 0 : (_state$search2 = state.search) === null || _state$search2 === void 0 ? void 0 : (_state$search2$plugin = _state$search2.plugins) === null || _state$search2$plugin === void 0 ? void 0 : _state$search2$plugin.complete) && state.search.plugins.results.length > 0 ? state.search.plugins.results[0] : (state === null || state === void 0 ? void 0 : (_state$search3 = state.search) === null || _state$search3 === void 0 ? void 0 : (_state$search3$core = _state$search3.core) === null || _state$search3$core === void 0 ? void 0 : _state$search3$core.complete) && state.search.core.results.length > 0 ? state.search.core.results[0] : null);
   }, [state]);
-  /**
-   * Update the module to be utilized.
-   */
-
-  const [module, setModule] = (0, _react.useState)(false);
   (0, _react.useEffect)(() => {
-    var _state$search4, _state$search4$projec, _state$search5, _state$search5$plugin, _state$search6, _state$search6$core;
-
-    const module = (state === null || state === void 0 ? void 0 : (_state$search4 = state.search) === null || _state$search4 === void 0 ? void 0 : (_state$search4$projec = _state$search4.project) === null || _state$search4$projec === void 0 ? void 0 : _state$search4$projec.results) || (state === null || state === void 0 ? void 0 : (_state$search5 = state.search) === null || _state$search5 === void 0 ? void 0 : (_state$search5$plugin = _state$search5.plugins) === null || _state$search5$plugin === void 0 ? void 0 : _state$search5$plugin.results) || (state === null || state === void 0 ? void 0 : (_state$search6 = state.search) === null || _state$search6 === void 0 ? void 0 : (_state$search6$core = _state$search6.core) === null || _state$search6$core === void 0 ? void 0 : _state$search6$core.results);
-    setModule(module ? module : false);
-  }, [state]);
+    dispatch({
+      type: 'SET_DATA',
+      data: require(`${cwd}/.bud/bud.config.json`).project
+    });
+    budfile && dispatch({
+      type: 'SET',
+      key: 'budfile',
+      value: budfile
+    });
+  }, [budfile]);
+  (0, _react.useEffect)(() => {
+    dispatch({
+      type: 'SET',
+      key: 'writeDir',
+      value: cwd
+    });
+  }, [cwd]);
+  const [sprout, setSprout] = (0, _react.useState)(null);
+  (0, _react.useEffect)(() => {
+    budfile && setSprout(require(budfile));
+  }, [budfile]);
+  (0, _react.useEffect)(() => {
+    sprout && dispatch({
+      type: 'SET',
+      key: 'sprout',
+      value: sprout
+    });
+    (sprout === null || sprout === void 0 ? void 0 : sprout.description) && dispatch({
+      type: 'SET',
+      key: 'label',
+      value: sprout.description
+    });
+    sprout && !sprout.prompts && dispatch({
+      type: 'SET',
+      key: 'ready',
+      value: true
+    });
+  }, [sprout]);
   return /*#__PURE__*/_react.default.createElement(_ink.Box, {
     flexDirection: 'column'
   }, /*#__PURE__*/_react.default.createElement(_Banner.default, {
-    label: label
-  }), !complete && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_Search.default, {
+    label: `bud generate ${request}`
+  }), /*#__PURE__*/_react.default.createElement(_Search.default, {
     label: "project",
     glob: [globs.project(request)]
   }), /*#__PURE__*/_react.default.createElement(_Search.default, {
@@ -1499,20 +1410,13 @@ const Generate = ({
   }), /*#__PURE__*/_react.default.createElement(_Search.default, {
     label: "core",
     glob: [globs.core(request)]
-  })), /*#__PURE__*/_react.default.createElement(_bud.default, {
-    module: module,
-    moduleReady: complete
-  }));
+  }), /*#__PURE__*/_react.default.createElement(_bud.default, state));
 };
 /** Command: bud generate */
 /// Generate project functionality
 
 
-const GenerateCLI = ({
-  request
-}) => /*#__PURE__*/_react.default.createElement(_store.StateProvider, null, /*#__PURE__*/_react.default.createElement(Generate, {
-  request: request
-}));
+const GenerateCLI = props => /*#__PURE__*/_react.default.createElement(_store.StateProvider, null, /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(Generate, props)));
 
 GenerateCLI.propTypes = {
   // Requested generator
@@ -1521,5 +1425,5 @@ GenerateCLI.propTypes = {
 GenerateCLI.positionalArgs = ['request'];
 var _default = GenerateCLI;
 exports.default = _default;
-},{"../../src/bud":"../src/bud/index.js","../../src/bud/store":"../src/bud/store.js","../../src/bud/components/Banner":"../src/bud/components/Banner.js","../../src/bud/containers/Search":"../src/bud/containers/Search.js"}]},{},["generate/index.js"], null)
+},{"../../src/bud/store":"../src/bud/store.js","../../src/bud":"../src/bud/index.js","../../src/bud/components/Banner":"../src/bud/components/Banner.js","../../src/bud/containers/Search":"../src/bud/containers/Search.js"}]},{},["generate/index.js"], null)
 //# sourceMappingURL=/generate/index.js.map

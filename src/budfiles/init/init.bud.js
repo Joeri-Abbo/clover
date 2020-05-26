@@ -51,22 +51,26 @@ module.exports = {
       template: '.bud/bud.config.json.hbs',
       path: '.bud/bud.config.json',
       parser: 'json',
+      prettier: false,
     },
     {
       action: 'template',
       template: 'package.json.hbs',
       path: 'package.json',
       parser: 'json',
+      prettier: false,
     },
     {
       action: 'template',
       template: '.bud/budfiles/example/example.bud.js.hbs',
       path: '.bud/budfiles/example/example.bud.js',
+      prettier: false,
     },
     {
       action: 'template',
       template: '.bud/budfiles/example/templates/Component.js.hbs',
-      path: '.bud/budfiles/example/templates/Component.js.hbs',
+      path: '.bud/budfiles/example/templates/Component.js',
+      prettier: false,
     },
     {
       action: 'install',

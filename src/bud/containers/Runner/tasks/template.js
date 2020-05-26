@@ -9,32 +9,35 @@ import Write from './../Write'
  * Template
  */
 const template = async ({task, sprout, data, writeDir, templateDir, observer}) => {
-  const string = await Read({
+  let string
+
+  observer.next({status: `Processing templates`})
+
+  string = await Read({
     observer,
     file: `${templateDir}/${task.template}`,
   })
 
-  const template = await Process({
+  string = await Process({
     observer,
     string,
     sprout,
     data,
   })
 
-  const prettier = await Prettify({
+  if (! task.prettier == false) string = await Prettify({
     observer,
     string: template,
     extension: task.path.split('.')[task.path.split('.').length - 1],
   })
 
-  const output = await Write({
+  string = await Write({
     observer,
-    string: prettier,
+    string,
     target: join(writeDir, task.path),
   })
 
-  observer.next({status: output})
-  observer.complete()
+  observer.next({status: string})
 }
 
 export default template

@@ -1,9 +1,7 @@
-import React, {useContext, useState, useEffect} from 'react'
-import {Box, Text} from 'ink'
+import {useContext, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import globby from 'globby'
 import {Observable} from 'rxjs'
-import Spinner from 'ink-spinner'
 
 /** application */
 import {store} from '../store'
@@ -19,7 +17,7 @@ const Search = ({glob, label}) => {
 
   /**
    * Return an observable emitting
-   * search criterion matches.
+   * budfile matches.
    */
   const [search] = useState(
     new Observable(async observer => {
@@ -28,7 +26,7 @@ const Search = ({glob, label}) => {
       const results = await globby(glob)
 
       observer.next({
-        results: results ? results[0] : null,
+        results,
       })
 
       observer.complete()
@@ -43,7 +41,7 @@ const Search = ({glob, label}) => {
   const [complete, setComplete] = useState(null)
   const [results, setResults] = useState(null)
   useEffect(() => {
-    search?.subscribe({
+    search && search.subscribe({
       next: next => {
         next.status && setStatus(next.status)
         next.results && setResults(next.results)
@@ -67,33 +65,10 @@ const Search = ({glob, label}) => {
     })
   }, [results, status, complete])
 
-  /** Format matched files for display */
-  const displayFile = file => file.replace(process.cwd() + '/', '')
-
   /**
    * Render
    */
-  return (
-    <Box flexDirection="column">
-      <Box flexDirection="row">
-        <Box marginRight={2} width={10}>
-          <Text>{label}</Text>
-        </Box>
-
-        {results
-          ? <Text underline>{displayFile(results)}</Text>
-          : ! complete ? (
-            <Box flexDirection="column">
-              <Spinner />
-            </Box>
-          ) : (
-            <Box flexDirection="column">
-              <Text>No results</Text>
-            </Box>
-          )}
-      </Box>
-    </Box>
-  )
+  return null
 }
 
 Search.propTypes = {

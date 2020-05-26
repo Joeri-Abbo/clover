@@ -12,7 +12,7 @@ const Read = async ({observer, file}) => {
 
     return await readFile(file, 'utf8')
   } catch (error) {
-    console.error(error)
+    observer.error(error)
   }
 }
 

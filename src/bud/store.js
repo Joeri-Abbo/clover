@@ -1,31 +1,20 @@
 import React, {createContext, useReducer} from 'react'
 
-const cwd = process.cwd()
-
-/** app config */
-let budConfig
-try {
-  budConfig = require(`${process.cwd()}/.bud/bud.config.json`)
-} catch {
-  budConfig = {}
-}
-
 /**
  * Bud application context
  */
 export const store = createContext({
-  cwd,
-  writeDir: cwd,
-  projectConfig: {
-    ...budConfig,
-  },
-  label: 'Bud: a modern WordPress scaffolding utility',
+  writeDir: null,
+  projectConfig: null,
+  label: null,
   prompts: null,
   data: null,
   status: null,
   error: null,
   complete: false,
   ready: false,
+  budfile: null,
+  sprout: null,
   search: {
     core: {
       results: null,

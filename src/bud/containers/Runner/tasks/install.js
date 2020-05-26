@@ -1,7 +1,6 @@
 import execa from 'execa'
 
 const install = async ({task: {repo}, writeDir, observer}) => {
-  let installation
   const options = {cwd: writeDir}
 
   observer.next({status: `Installing packages from ${repo}...`})
@@ -11,20 +10,18 @@ const install = async ({task: {repo}, writeDir, observer}) => {
   }
 
   if (repo == 'npm') {
-    installation = execa.command(`yarn`, options)
+    const {stdout} = execa(`yarn`, [`install`], options)
+    stdout.then(() => {
+      observer.complete()
+    })
   }
 
   if (repo == 'packagist') {
-    installation = execa.command(`composer install`, options)
+    const {stdout} = execa(`composer`, [`install`], options)
+    stdout.then(() => {
+      observer.complete()
+    })
   }
-
-  installation.stdout.on('data', status => {
-    observer.next({status: status.code})
-  })
-
-  installation.then(() => {
-    observer.complete()
-  })
 }
 
 export default install

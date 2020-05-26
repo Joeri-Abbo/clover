@@ -1,30 +1,22 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useState, useEffect} from 'react'
 import {Box} from 'ink'
 import PropTypes from 'prop-types'
 
 /** application */
+import {store, StateProvider} from '../../src/bud/store'
 import Bud from '../../src/bud'
-import {StateProvider, store} from '../../src/bud/store'
 import Banner from '../../src/bud/components/Banner'
 import Search from '../../src/bud/containers/Search'
 
-/**
- * Constants
- */
-const strings = {
-  title: 'Bud: WordPress CLI generator tooling',
-  searchText: '🔎  Searching..',
-  noResults: '💢  No results found.',
-  searchSuccess: '🎉  Generator found',
-}
+const cwd = process.cwd()
 
 /**
  * Scaffold candidate locations
  */
 const globs = {
-  project: search => `${process.cwd()}/.bud/budfiles/${search}/*.bud.js`,
-  plugins: search => `${process.cwd()}/node_modules/**/bud-plugin-*/${search}/*.bud.js`,
-  core: search => `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${search}.bud.js`,
+  project: search => `${cwd}/.bud/budfiles/${search}/*.bud.js`,
+  plugins: search => `${cwd}/node_modules/**/bud-plugin-*/${search}/*.bud.js`,
+  core: search => `${cwd}/node_modules/@roots/bud/src/budfiles/**/${search}.bud.js`,
 }
 
 /**
@@ -33,60 +25,82 @@ const globs = {
  * @prop {string} request
  */
 const Generate = ({request}) => {
-  const {state} = useContext(store)
-  /**
-   * Update the generator label.
-   */
-  const [label, setLabel] = useState(strings.title)
+  const {dispatch, state} = useContext(store)
+  const [budfile, setBudfile] = useState(null)
   useEffect(() => {
-    state?.label && setLabel(state.label)
-  }, [state?.label])
-
-  /**
-   * Determine if generator is ready for next step.
-   */
-  const [complete, setComplete] = useState(false)
-  useEffect(() => {
-    const complete =
-      state?.search?.project?.complete &&
-      state?.search?.plugins?.complete &&
-      state?.search?.core?.complete
-    setComplete(complete ? complete : false)
+    state && setBudfile(
+      state?.search?.project?.complete && state.search.project.results.length > 0 ? state.search.project.results[0] :
+      state?.search?.plugins?.complete && state.search.plugins.results.length > 0 ? state.search.plugins.results[0] :
+      state?.search?.core?.complete    && state.search.core.results.length > 0 ? state.search.core.results[0] :
+      null
+    )
   }, [state])
 
-  /**
-   * Update the module to be utilized.
-   */
-  const [module, setModule] = useState(false)
   useEffect(() => {
-    const module =
-      state?.search?.project?.results ||
-      state?.search?.plugins?.results ||
-      state?.search?.core?.results
+    dispatch({
+      type: 'SET_DATA',
+      data: require(`${cwd}/.bud/bud.config.json`).project,
+    })
 
-    setModule(module ? module : false)
-  }, [state])
+    budfile && dispatch({
+      type: 'SET',
+      key: 'budfile',
+      value: budfile,
+    })
+  }, [budfile])
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET',
+      key: 'writeDir',
+      value: cwd,
+    })
+  }, [cwd])
+
+
+  const [sprout, setSprout] = useState(null)
+  useEffect(() => {
+    budfile && setSprout(require(budfile))
+  }, [budfile])
+
+  useEffect(() => {
+    sprout && dispatch({
+      type: 'SET',
+      key: 'sprout',
+      value: sprout,
+    })
+
+    sprout?.description && dispatch({
+      type: 'SET',
+      key: 'label',
+      value: sprout.description,
+    })
+
+    sprout && !sprout.prompts && dispatch({
+      type: 'SET',
+      key: 'ready',
+      value: true,
+    })
+  }, [sprout])
 
   return (
     <Box flexDirection={'column'}>
-      <Banner label={label} />
-      {!complete && (
-        <>
-          <Search label="project" glob={[globs.project(request)]} />
-          <Search label="plugins" glob={[globs.plugins(request)]} />
-          <Search label="core" glob={[globs.core(request)]} />
-        </>
-      )}
-      <Bud module={module} moduleReady={complete} />
+      <Banner label={`bud generate ${request}`} />
+      <Search label="project" glob={[globs.project(request)]} />
+      <Search label="plugins" glob={[globs.plugins(request)]} />
+      <Search label="core" glob={[globs.core(request)]} />
+      <Bud {...state} />
     </Box>
   )
 }
 
 /** Command: bud generate */
 /// Generate project functionality
-const GenerateCLI = ({request}) => (
+const GenerateCLI = props => (
   <StateProvider>
-    <Generate request={request} />
+    <Box>
+      <Generate {...props} />
+    </Box>
   </StateProvider>
 )
 

@@ -1,15 +1,15 @@
 {
 	"commands": [
 		{
-			"path": "index.js",
-			"name": "index",
-			"description": "Bud information",
+			"path": "list/index.js",
+			"name": "list",
+			"description": "List generators",
 			"args": [],
 			"subCommands": []
 		},
 		{
-			"path": "init.js",
-			"name": "init",
+			"path": "index.js",
+			"name": "index",
 			"description": "Initialize a Bud project",
 			"args": [
 				{
@@ -37,13 +37,6 @@
 					"positional": true
 				}
 			],
-			"subCommands": []
-		},
-		{
-			"path": "list/index.js",
-			"name": "list",
-			"description": "List generators",
-			"args": [],
 			"subCommands": []
 		}
 	]

@@ -23,12 +23,22 @@ const Banner = ({label}) => {
   const [status, setStatus] = useState(false)
   const [statusColor, setStatusColor] = useState('#ffffff')
   useEffect(() => {
-    if(state?.status && state.status == 'complete') {
+    if (state?.status && state.status == 'complete') {
       setStatus('🎉')
       setStatusColor(colors.success)
       setSpinner(false)
     }
-    if(state?.status && state.status == 'error') {
+    if (state?.status && state.status == 'building') {
+      setStatus('👩‍💻')
+      setStatusColor(colors.white)
+      setSpinner(true)
+    }
+    if (state?.status && state.status == 'questions') {
+      setStatus('❔')
+      setStatusColor(colors.white)
+      setSpinner(false)
+    }
+    if (state?.status && state.status == 'error') {
       setStatus('💢')
       setStatusColor(colors.error)
       setSpinner(false)
@@ -36,7 +46,11 @@ const Banner = ({label}) => {
   }, [state])
 
   return state ? (
-    <Box flexDirection="row" justifyContent="space-between" marginTop={1} width={width - (width/20)}>
+    <Box
+      flexDirection="row"
+      justifyContent="space-between"
+      marginTop={1}
+      width={width - width / 20}>
       <Box flexDirection="row" justifyContent="space-between">
         <Box width={1} marginRight={2}>
           {spinner ? <Spinner /> : <Text>{status}</Text>}
@@ -44,9 +58,7 @@ const Banner = ({label}) => {
 
         <Box>
           <Text>
-            <Color hex={statusColor}>
-              {label}
-            </Color>
+            <Color hex={statusColor}>{label}</Color>
           </Text>
         </Box>
       </Box>
@@ -63,7 +75,9 @@ const Banner = ({label}) => {
       </Box>
     </Box>
   ) : (
-    <Box><Spinner /> Loading</Box>
+    <Box>
+      <Spinner /> Loading
+    </Box>
   )
 }
 

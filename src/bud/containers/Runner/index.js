@@ -16,40 +16,28 @@ import tasks from './tasks'
  * @param {object}   data
  * @param {object}   sprout
  * @param {string}   templateDir
+ * @param {string}   writeDir
  */
-const Runner = ({sprout, data, module, writeDir}) => {
-  const {state} = useContext(store)
-
-  const [templateDir, setTemplateDir] = useState(null)
-  useEffect(() => {
-    module && setTemplateDir(
-      join(dirname(module), 'templates')
-    )
-  }, [module])
-
+const Runner = ({sprout, data, budfile, writeDir, ready}) => {
+  const {state, dispatch} = useContext(store)
   const [status, setStatus] = useState(null)
   const [error, setError] = useState(null)
   const [complete, setComplete] = useState(false)
   useEffect(() => {
-    state && state.ready &&
-    sprout && sprout.actions &&
-    data && new Observable(observer =>
+    ready && new Observable(observer =>
       from(sprout.actions)
         .pipe(
           concatMap(task => {
             return new Observable(async observer => {
-              try {
-                return tasks[task.action]({
-                  task,
-                  sprout,
-                  data,
-                  observer,
-                  templateDir,
-                  writeDir,
-                })
-              } catch (error) {
-                observer.error(`${task.action} handler error: ${error}`)
-              }
+              return tasks[task.action]({
+                task,
+                sprout,
+                data,
+                budfile,
+                observer,
+                templateDir: join(dirname(budfile), 'templates'),
+                writeDir,
+              })
             })
           }),
         )
@@ -57,13 +45,23 @@ const Runner = ({sprout, data, module, writeDir}) => {
           next: next => observer.next(next),
           error: error => observer.error(error),
           complete: () => observer.complete(),
-        }),
-    ).subscribe({
-      next: next => setStatus(next.status),
-      error: error => setError(error),
-      complete: () => setComplete(true),
-    })
+        })
+      ).subscribe({
+        next: next => setStatus(next.status),
+        error: error => setError(error),
+        complete: () => setComplete(true),
+      })
   }, [state, sprout])
+
+  useEffect(() => {
+    complete && (() => {
+      dispatch({
+        type: 'SET',
+        key: 'status',
+        value: 'complete',
+      })
+    })()
+  }, [complete])
 
   return ! complete ? (
     <Box flexDirection="column">
@@ -78,18 +76,16 @@ const Runner = ({sprout, data, module, writeDir}) => {
       {error && (
         <Box flexDirection="column">
           <Text>
-            <Color red>{typeof error !== 'string' ? JSON.stringify(error) : error}</Color>
+            <Color red>{
+              typeof error !== 'string'
+                ? JSON.stringify(error)
+                : error
+            }</Color>
           </Text>
         </Box>
       )}
     </Box>
-  ) : (
-    <Box>
-      <Text>
-        <Color green>All done.</Color>
-      </Text>
-    </Box>
-  )
+  ) : []
 }
 
 export default Runner

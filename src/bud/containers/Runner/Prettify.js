@@ -13,7 +13,6 @@ const Prettify = async ({observer, string, extension}) => {
     jsx: 'babel',
     graphql: 'graphql',
     css: 'css',
-    json: 'json',
     md: 'markdown',
     html: 'html',
     htm: 'html',

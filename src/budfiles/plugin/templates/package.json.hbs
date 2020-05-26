@@ -1,0 +1,36 @@
+{
+  "name": "@{{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}}",
+  "description": "{{description}}",
+  "homepage": "{{lowercase website}}",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "authors": [
+    {
+      "name": "{{capitalizeAll author}}",
+      "email": "{{lowercase email}}"
+    }
+  ],
+  "private": true,
+  "browserslist": ["extends @wordpress/browserslist-config"],
+  "scripts": {
+    "generate": "bud generate",
+    "dev": "cross-env NODE_ENV=hmr webpack-dev-server --colors --watch --https --config webpack.config.js",
+    "build": "cross-env NODE_ENV=development webpack --progress --colors --inline -p --config webpack.config.js",
+    "build:production": "cross-env NODE_ENV=production webpack --progress --colors --inline -p --config webpack.config.js",
+    "lint": "run-s -c lint:*",
+    "lint:css": "stylelint ./src/**/*.css",
+    "lint:js": "eslint ./src/**/*.js",
+    "format": "prettier --write .",
+    "translate": "run-s -c translate:*",
+    "translate:pot": "wp i18n make-pot . ./src/languages/plugin.pot --ignore-domain --include=\"./src\"",
+    "translate:js": "wp i18n make-json ./src/languages --no-purge --pretty-print"
+  },
+  "devDependencies": {
+    "@roots/bud": "roots/bud#master"
+  },
+  "dependencies": {}
+}

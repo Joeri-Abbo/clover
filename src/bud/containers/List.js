@@ -58,11 +58,12 @@ const List = ({glob, label}) => {
    * in the global store.
    */
   useEffect(() => {
-    complete && dispatch({
-      type: 'SET',
-      key: 'status',
-      value: 'complete',
-    })
+    complete &&
+      dispatch({
+        type: 'SET',
+        key: 'status',
+        value: 'complete',
+      })
 
     dispatch({
       type: 'SEARCH_RESULTS',
@@ -83,7 +84,9 @@ const List = ({glob, label}) => {
     <Box flexDirection="column">
       {results?.map((result, id) => (
         <Box key={id} flexDirection="row" textWrap="truncate-start">
-          <Text><Color gray>yarn generate </Color></Text>
+          <Text>
+            <Color gray>yarn generate </Color>
+          </Text>
           <Text>{`${displayFile(result)}`}</Text>
         </Box>
       ))}
