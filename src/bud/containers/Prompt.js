@@ -22,21 +22,21 @@ const Prompt = ({prompts}) => {
         value: 'questions',
       })
       prompt(prompts).then(data => {
-          /**
-           * Dispatch resultant data to the global store,
-           * to be merged with whatever is already there.
-           */
-          dispatch({
-            type: 'SET_DATA',
-            data,
-          })
-
-          dispatch({
-            type: 'SET',
-            key: 'ready',
-            value: true,
-          })
+        /**
+         * Dispatch resultant data to the global store,
+         * to be merged with whatever is already there.
+         */
+        dispatch({
+          type: 'SET_DATA',
+          data,
         })
+
+        dispatch({
+          type: 'SET',
+          key: 'ready',
+          value: true,
+        })
+      })
     }
   }, [prompts])
 

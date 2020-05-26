@@ -76,7 +76,6 @@ Documentation forthcoming. For now, you can run `yarn generate:list` to see what
 
 | Command        | Description                    |
 | -------------- | ------------------------------ |
-| `bud`          | Bud information                |
 | `bud init`     | Create a new project           |
 | `bud generate` | Generate project functionality |
 | `bud list`     | List generators                |

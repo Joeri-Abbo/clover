@@ -41,14 +41,15 @@ const Search = ({glob, label}) => {
   const [complete, setComplete] = useState(null)
   const [results, setResults] = useState(null)
   useEffect(() => {
-    search && search.subscribe({
-      next: next => {
-        next.status && setStatus(next.status)
-        next.results && setResults(next.results)
-      },
-      complete: () => setComplete(true),
-      error: () => setComplete(true),
-    })
+    search &&
+      search.subscribe({
+        next: next => {
+          next.status && setStatus(next.status)
+          next.results && setResults(next.results)
+        },
+        complete: () => setComplete(true),
+        error: () => setComplete(true),
+      })
   }, [search])
 
   /**

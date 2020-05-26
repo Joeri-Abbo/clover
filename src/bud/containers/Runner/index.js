@@ -24,28 +24,29 @@ const Runner = ({sprout, data, budfile, writeDir, ready}) => {
   const [error, setError] = useState(null)
   const [complete, setComplete] = useState(false)
   useEffect(() => {
-    ready && new Observable(observer =>
-      from(sprout.actions)
-        .pipe(
-          concatMap(task => {
-            return new Observable(async observer => {
-              return tasks[task.action]({
-                task,
-                sprout,
-                data,
-                budfile,
-                observer,
-                templateDir: join(dirname(budfile), 'templates'),
-                writeDir,
+    ready &&
+      new Observable(observer =>
+        from(sprout.actions)
+          .pipe(
+            concatMap(task => {
+              return new Observable(async observer => {
+                return tasks[task.action]({
+                  task,
+                  sprout,
+                  data,
+                  budfile,
+                  observer,
+                  templateDir: join(dirname(budfile), 'templates'),
+                  writeDir,
+                })
               })
-            })
+            }),
+          )
+          .subscribe({
+            next: next => observer.next(next),
+            error: error => observer.error(error),
+            complete: () => observer.complete(),
           }),
-        )
-        .subscribe({
-          next: next => observer.next(next),
-          error: error => observer.error(error),
-          complete: () => observer.complete(),
-        })
       ).subscribe({
         next: next => setStatus(next.status),
         error: error => setError(error),
@@ -54,16 +55,17 @@ const Runner = ({sprout, data, budfile, writeDir, ready}) => {
   }, [state, sprout])
 
   useEffect(() => {
-    complete && (() => {
-      dispatch({
-        type: 'SET',
-        key: 'status',
-        value: 'complete',
-      })
-    })()
+    complete &&
+      (() => {
+        dispatch({
+          type: 'SET',
+          key: 'status',
+          value: 'complete',
+        })
+      })()
   }, [complete])
 
-  return ! complete ? (
+  return !complete ? (
     <Box flexDirection="column">
       {status && (
         <Box flexDirection="column">
@@ -76,16 +78,14 @@ const Runner = ({sprout, data, budfile, writeDir, ready}) => {
       {error && (
         <Box flexDirection="column">
           <Text>
-            <Color red>{
-              typeof error !== 'string'
-                ? JSON.stringify(error)
-                : error
-            }</Color>
+            <Color red>{typeof error !== 'string' ? JSON.stringify(error) : error}</Color>
           </Text>
         </Box>
       )}
     </Box>
-  ) : []
+  ) : (
+    []
+  )
 }
 
 export default Runner

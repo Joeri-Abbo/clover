@@ -1,4 +1,4 @@
-import React  from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {Box} from 'ink'
 import Spinner from 'ink-spinner'
@@ -19,9 +19,13 @@ import Prompt from './containers/Prompt'
  * @see ink (react cli framework)
  * @see pastel (ink project framework)
  *
- * @prop {bool}   moduleReady
- * @prop {string} module
- * @prop {string} writeDir
+ * @todo all of these props are actually just destructured context.
+ *       it's a pain to maintain all of these props and so they
+ *       should really be derived directly from useContext.
+ *
+ *       but it's been helpful in development when trying to pinpoint
+ *       issues to know if a fail is the result of botched props
+ *       or shit state.
  */
 const Bud = ({writeDir, sprout, budfile, data, ready}) => {
   /**
@@ -30,15 +34,13 @@ const Bud = ({writeDir, sprout, budfile, data, ready}) => {
   return sprout ? (
     <Box flexDirection="column">
       <Prompt prompts={sprout.prompts} />
-      <Runner
-        ready={ready}
-        budfile={budfile}
-        writeDir={writeDir}
-        sprout={sprout}
-        data={data}
-      />
+      <Runner ready={ready} budfile={budfile} writeDir={writeDir} sprout={sprout} data={data} />
     </Box>
-  ) : <Box><Spinner /> Loading...</Box>
+  ) : (
+    <Box>
+      <Spinner /> Loading...
+    </Box>
+  )
 }
 
 Bud.propTypes = {

@@ -25,11 +25,12 @@ const template = async ({task, sprout, data, writeDir, templateDir, observer}) =
     data,
   })
 
-  if (! task.prettier == false) string = await Prettify({
-    observer,
-    string: template,
-    extension: task.path.split('.')[task.path.split('.').length - 1],
-  })
+  if (!task.prettier == false)
+    string = await Prettify({
+      observer,
+      string: template,
+      extension: task.path.split('.')[task.path.split('.').length - 1],
+    })
 
   string = await Write({
     observer,

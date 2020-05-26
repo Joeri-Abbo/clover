@@ -20,19 +20,21 @@ const Init = ({projectDir}) => {
   const {state, dispatch} = useContext(store)
 
   useEffect(() => {
-    projectDir && dispatch({
-      type: 'SET',
-      key: 'writeDir',
-      value: join(cwd, projectDir),
-    })
+    projectDir &&
+      dispatch({
+        type: 'SET',
+        key: 'writeDir',
+        value: join(cwd, projectDir),
+      })
   }, [projectDir])
 
   useEffect(() => {
-    budfile && dispatch({
-      type: 'SET',
-      key: 'budfile',
-      value: budfile,
-    })
+    budfile &&
+      dispatch({
+        type: 'SET',
+        key: 'budfile',
+        value: budfile,
+      })
   }, [budfile])
 
   const [sprout, setSprout] = useState(null)
@@ -41,17 +43,20 @@ const Init = ({projectDir}) => {
   }, [budfile])
 
   useEffect(() => {
-    sprout && dispatch({
-      type: 'SET',
-      key: 'sprout',
-      value: sprout,
-    })
+    sprout &&
+      dispatch({
+        type: 'SET',
+        key: 'sprout',
+        value: sprout,
+      })
 
-    sprout && sprout.description && dispatch({
-      type: 'SET',
-      key: 'label',
-      value: sprout.description,
-    })
+    sprout &&
+      sprout.description &&
+      dispatch({
+        type: 'SET',
+        key: 'label',
+        value: sprout.description,
+      })
   }, [sprout])
 
   return (
