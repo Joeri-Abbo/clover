@@ -1,40 +1,29 @@
 import {Observable, from} from 'rxjs'
 import {concatMap} from 'rxjs/operators'
-
-/**
- * Bud componentry
- */
 import makeCompiler from './compiler'
+import makeConfig from './config'
 import makeData from './data'
 import makeUtil from './util'
 import actions from './actions'
 import prettier from './prettier'
 
 /**
- * Bud core
+ * 🌱 bud starter
  *
- * @type  {func}
- * @param {string} outDir
- * @param {object} configData
- * @param {object} data
- * @param {object} sprout
- * @param {string} templateDir
- * @param {bool}   skipInstall
+ * @prop {string} projectDir
+ * @prop {object} projectConfig
+ * @prop {object} data
+ * @prop {object} sprout
+ * @prop {string} templateDir
  *
  * @return {Observable}
  */
-const bud = ({projectDir, configData, data: dataSrc, sprout, templateDir}) => {
-  const config = {
-    projectDir,
-    templateDir,
-    ...configData,
-    execa: {
-      cwd: projectDir,
-    },
-  }
+const bud = props => {
+  const config = makeConfig({...props})
+  const data = makeData({...props})
 
-  const data = makeData(dataSrc)
-  const util = makeUtil(config)
+  const {sprout} = props
+  const util = makeUtil({config})
   const compiler = makeCompiler({sprout, data})
 
   sprout.registerActions &&
@@ -53,11 +42,11 @@ const bud = ({projectDir, configData, data: dataSrc, sprout, templateDir}) => {
               task,
               observer,
               config,
+              data,
               actions,
               compiler,
               prettier,
               util,
-              data,
             })
           })
         }),

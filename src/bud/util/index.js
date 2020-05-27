@@ -3,10 +3,10 @@ import command from './command'
 /**
  * Make util
  *
- * @param  {object} config
+ * @prop   {object} config
  * @return {object}
  */
-const makeUtil = config => ({
+const makeUtil = ({config}) => ({
   command: command(config),
 })
 

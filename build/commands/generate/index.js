@@ -219,7 +219,35 @@ const makeCompiler = ({
 
 var _default = makeCompiler;
 exports.default = _default;
-},{"./helpers":"../src/bud/compiler/helpers/index.js"}],"../src/bud/data/index.js":[function(require,module,exports) {
+},{"./helpers":"../src/bud/compiler/helpers/index.js"}],"../src/bud/config/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * Config
+ *
+ * @param {string} projectDir
+ */
+const makeConfig = ({
+  projectDir,
+  templateDir,
+  config
+}) => ({
+  projectDir,
+  templateDir,
+  ...config,
+  execa: {
+    cwd: projectDir
+  }
+});
+
+var _default = makeConfig;
+exports.default = _default;
+},{}],"../src/bud/data/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -230,17 +258,26 @@ exports.default = void 0;
 /**
  * Make data
  *
- * @param  {object} data
+ * @type   {func}
+ * @prop   {object} data
  * @return {object}
  */
-const makeData = data => ({ ...data,
-  setData: function ({
+const makeData = ({
+  config,
+  data
+}) => {
+  const setData = ({
     key,
     value
-  }) {
-    this[`${key}`] = value;
-  }
-});
+  }) => {
+    data[`${key}`] = value;
+  };
+
+  return { ...(config ? config.project : []),
+    ...data,
+    setData
+  };
+};
 
 var _default = makeData;
 exports.default = _default;
@@ -284,10 +321,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Make util
  *
- * @param  {object} config
+ * @prop   {object} config
  * @return {object}
  */
-const makeUtil = config => ({
+const makeUtil = ({
+  config
+}) => ({
   command: (0, _command.default)(config)
 });
 
@@ -643,6 +682,7 @@ exports.default = void 0;
 
 /**
  * Prettier parsers.
+ * @type {object}
  */
 const parsers = {
   js: 'babel',
@@ -662,6 +702,7 @@ const parsers = {
 /**
  * Infer parser.
  *
+ * @type  {async func}
  * @param {string} file
  */
 
@@ -679,7 +720,7 @@ module.exports = {
   arrowParens: 'avoid',
   bracketSpacing: false,
   tabWidth: 2,
-  printWidth: 90,
+  printWidth: 80,
   singleQuote: true,
   jsxBracketSameLine: true,
   useTabs: false,
@@ -713,6 +754,7 @@ const config = require('../../../prettier.config.js');
 /**
  * Format
  *
+ * @type   {func}
  * @param  {object|string} content
  * @param  {parser} string
  * @return {string}
@@ -765,6 +807,8 @@ var _operators = require("rxjs/operators");
 
 var _compiler = _interopRequireDefault(require("./compiler"));
 
+var _config = _interopRequireDefault(require("./config"));
+
 var _data = _interopRequireDefault(require("./data"));
 
 var _util = _interopRequireDefault(require("./util"));
@@ -776,36 +820,27 @@ var _prettier = _interopRequireDefault(require("./prettier"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Bud componentry
- */
-
-/**
- * Bud core
+ * 🌱 bud starter
  *
- * @param {string} outDir
- * @param {object} configData
- * @param {object} data
- * @param {object} sprout
- * @param {string} templateDir
- * @param {bool}   skipInstall
+ * @prop {string} projectDir
+ * @prop {object} projectConfig
+ * @prop {object} data
+ * @prop {object} sprout
+ * @prop {string} templateDir
+ *
+ * @return {Observable}
  */
-const bud = ({
-  projectDir,
-  configData,
-  data: dataSrc,
-  sprout,
-  templateDir
-}) => {
-  const config = {
-    projectDir,
-    templateDir,
-    ...configData,
-    execa: {
-      cwd: projectDir
-    }
-  };
-  const data = (0, _data.default)(dataSrc);
-  const util = (0, _util.default)(config);
+const bud = props => {
+  const config = (0, _config.default)({ ...props
+  });
+  const data = (0, _data.default)({ ...props
+  });
+  const {
+    sprout
+  } = props;
+  const util = (0, _util.default)({
+    config
+  });
   const compiler = (0, _compiler.default)({
     sprout,
     data
@@ -822,11 +857,11 @@ const bud = ({
           task,
           observer,
           config,
+          data,
           actions: _actions.default,
           compiler,
           prettier: _prettier.default,
-          util,
-          data
+          util
         });
       });
     })).subscribe({
@@ -839,7 +874,7 @@ const bud = ({
 
 var _default = bud;
 exports.default = _default;
-},{"./compiler":"../src/bud/compiler/index.js","./data":"../src/bud/data/index.js","./util":"../src/bud/util/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js"}],"../src/components/Banner.js":[function(require,module,exports) {
+},{"./compiler":"../src/bud/compiler/index.js","./config":"../src/bud/config/index.js","./data":"../src/bud/data/index.js","./util":"../src/bud/util/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js"}],"../src/components/Banner.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1011,57 +1046,46 @@ const App = ({
   /**
    * source bud.config.json
    */
-  const config = (0, _path.join)(cwd, '.bud/bud.config.json');
-  const [configData] = (0, _react.useState)((0, _fs.existsSync)(config) ? require(config) : null);
+  const configFile = (0, _path.join)(cwd, '.bud/bud.config.json');
+  const [config] = (0, _react.useState)((0, _fs.existsSync)(configFile) ? require(configFile) : null);
   /**
-   * Assemble data from various sources
-   * - config file
-   * - prompts (enquirer)
+   * Assemble data from prompts
    */
 
-  const [prompts, setPrompts] = (0, _react.useState)(sprout.prompts ? sprout.prompts : null);
   const [data, setData] = (0, _react.useState)(null);
+  const [prompts, setPrompts] = (0, _react.useState)(sprout.prompts ? sprout.prompts : null);
   (0, _react.useEffect)(() => {
     if (prompts) {
       (0, _enquirer.prompt)(prompts).then(data => {
         setPrompts(null);
-        const projectConfig = configData && configData.project ? configData.project : [];
-        const devConfig = configData && configData.dev ? configData.dev : [];
-        setData({ ...projectConfig,
-          ...devConfig,
-          ...data
-        });
+        setData(data);
       });
     } else {
       setPrompts(null);
-      const projectConfig = configData && configData.project ? configData.project : [];
-      const devConfig = configData && configData.dev ? configData.dev : [];
-      setData({ ...projectConfig,
-        ...devConfig
-      });
+      setData({});
     }
   }, []);
   /**
    * Observer subscribe
    */
 
-  const [budSubscription, setBudSubscription] = (0, _react.useState)(false);
   const [status, setStatus] = (0, _react.useState)(null);
   const [error, setError] = (0, _react.useState)(null);
   const [complete, setComplete] = (0, _react.useState)(false);
+  const [subscription, setSubscription] = (0, _react.useState)(false);
   (0, _react.useEffect)(() => {
-    data && !budSubscription && setBudSubscription((0, _bud.default)({
-      configData,
-      data: data !== null && data !== void 0 ? data : {},
-      templateDir,
+    data && !subscription && setSubscription((0, _bud.default)({
       sprout,
+      data,
+      config,
+      templateDir,
       projectDir: (0, _path.join)(cwd, outDir)
     }).subscribe({
       next: next => setStatus(next),
       error: error => setError(error),
       complete: () => setComplete(true)
     }));
-  }, [data, status]);
+  }, [config, data, status]);
   /**
    * Observer unsubscribe.
    */
@@ -1070,11 +1094,13 @@ const App = ({
     exit
   } = (0, _ink.useApp)();
   (0, _react.useEffect)(() => {
-    complete && (async () => {
-      await budSubscription.unsubscribe();
+    const unsubscribe = async () => {
+      await subscription.unsubscribe();
       exit();
-    })();
-  }, [complete, budSubscription]);
+    };
+
+    complete && unsubscribe();
+  }, [complete, subscription]);
   /**
    * Render observable updates and errors
    */
@@ -1126,9 +1152,9 @@ var _ink = require("ink");
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
-var _App = _interopRequireDefault(require("../../src/components/App"));
-
 var _globby = _interopRequireDefault(require("globby"));
+
+var _App = _interopRequireDefault(require("../../src/components/App"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1165,7 +1191,7 @@ const Generate = props => {
     roots: false
   });
   /**
-   * Local budfiles
+   * Local budfiles.
    */
 
   (0, _react.useEffect)(() => {
@@ -1178,7 +1204,7 @@ const Generate = props => {
     })();
   }, [budName, checked.project]);
   /**
-   * Module budfiles
+   * Module budfiles.
    */
 
   (0, _react.useEffect)(() => {
@@ -1191,7 +1217,7 @@ const Generate = props => {
     })();
   }, [budfile, checked.project]);
   /**
-   * Core budfiles
+   * Core budfiles.
    */
 
   (0, _react.useEffect)(() => {
@@ -1214,7 +1240,7 @@ const Generate = props => {
     budfile && setTemplateDir(`${(0, _path.dirname)(budfile)}/templates`);
   }, [budfile]);
   /**
-   * Render
+   * Render.
    */
 
   return sprout && templateDir ? /*#__PURE__*/_react.default.createElement(_App.default, {

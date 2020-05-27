@@ -2,14 +2,19 @@
  * Make data
  *
  * @type   {func}
- * @param  {object} data
+ * @prop   {object} data
  * @return {object}
  */
-const makeData = data => ({
-  ...data,
-  setData: function ({key, value}) {
-    this[`${key}`] = value
-  },
-})
+const makeData = ({config, data}) => {
+  const setData = ({key, value}) => {
+    data[`${key}`] = value
+  }
+
+  return {
+    ...(config ? config.project : []),
+    ...data,
+    setData,
+  }
+}
 
 export default makeData

@@ -3,10 +3,10 @@
  *
  * @param {string} projectDir
  */
-const makeConfig = ({projectDir, templateDir, configData}) => ({
+const makeConfig = ({projectDir, templateDir, config}) => ({
   projectDir,
   templateDir,
-  ...configData,
+  ...config,
   execa: {
     cwd: projectDir,
   },

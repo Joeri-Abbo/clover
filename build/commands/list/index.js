@@ -146,7 +146,7 @@ const cwd = process.cwd();
 const rootsBudsGlob = `${cwd}/node_modules/@roots/bud/src/budfiles/**/*.bud.js`;
 const moduleBudsGlob = `${cwd}/node_modules/**/bud-plugin-*/*.bud.js`;
 const projectBudsGlob = `${cwd}/.bud/**/*.bud.js`;
-/** Command: generate list */
+/** Command: bud list */
 /// List available budfiles
 
 const List = () => {
