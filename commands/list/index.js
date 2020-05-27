@@ -1,20 +1,20 @@
 import React, {useState, useEffect} from 'react'
-import {Text, Box} from 'ink'
-import Spinner from 'ink-spinner'
-import Table from 'ink-table'
-import BudCLI from '../../src/components/BudCLI'
+import {Box} from 'ink'
 import globby from 'globby'
+import Divider from 'ink-divider'
 
-/**
- * Budfile glob paths
- */
-const rootsBudsGlob = `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/*.bud.js`
-const moduleBudsGlob = `${process.cwd()}/node_modules/**/bud-plugin-*/*.bud.js`
-const projectBudsGlob = `${process.cwd()}/.bud/**/*.bud.js`
+const cwd = process.cwd()
 
 /** Command: generate list */
 /// List available budfiles
 const List = () => {
+  /**
+   * Budfile glob paths
+   */
+  const rootsBudsGlob = `${cwd}/node_modules/@roots/bud/src/budfiles/**/*.bud.js`
+  const moduleBudsGlob = `${cwd}/node_modules/**/bud-plugin-*/*.bud.js`
+  const projectBudsGlob = `${cwd}/.bud/**/*.bud.js`
+
   /**
    * Project buds
    */
@@ -101,20 +101,29 @@ const List = () => {
    * Render
    */
   return (
-    <>
-      <BudCLI label={'Available commands'} inert={true}>
-        <Box flexDirection="column" marginTop={1} marginBottom={1}>
-          {!moduleBuds.length > 0 && (
-            <Box flexDirection="row" marginBottom={1} alignItems="center">
-              <Spinner type="monkey" /> <Text>Looking for modules</Text>
-            </Box>
-          )}
-          <Box width={200} flexDirection="column" flexGrow={1} justifyContent="space-between">
-            {buds.length > 0 && <Table width={200} data={buds} />}
+    <Box flexDirection="column" marginTop={1} marginBottom={1}>
+      <Box flexDirection="row" flexGrow={1} justifyContent="flex-start">
+        <Box width={40}>Command</Box>
+        <Box width={40} marginLeft={1}>
+          Source
+        </Box>
+        <Box width={20} marginLeft={1}>
+          Name
+        </Box>
+      </Box>
+      <Divider padding={0} width={100} />
+      {buds.map((bud, id) => (
+        <Box key={id} flexDirection="row" flexGrow={1} justifyContent="flex-start">
+          <Box width={40}>{bud.command}</Box>
+          <Box width={40} marginLeft={1}>
+            {bud.source}
+          </Box>
+          <Box width={20} marginLeft={1}>
+            {bud.name}
           </Box>
         </Box>
-      </BudCLI>
-    </>
+      ))}
+    </Box>
   )
 }
 

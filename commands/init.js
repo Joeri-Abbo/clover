@@ -1,42 +1,58 @@
 import {resolve} from 'path'
-import React from 'react'
+import React, {useState, useEffect} from 'react'
+import {Box} from 'ink'
 import PropTypes from 'prop-types'
+import Spinner from 'ink-spinner'
+
 import BudCLI from './../src/components/BudCLI'
+
+/** Constants */
+const budfileDir = resolve(__dirname, './../../src/budfiles/init')
 
 /** Command: bud init */
 /// Create a new project
 const Init = props => {
-  return (
+  const [projectDir] = useState(props.projectDir)
+  const [budfile, setBudfile] = useState(null)
+  const [templateDir, setTemplateDir] = useState(null)
+  useEffect(() => {
+    if (budfileDir) {
+      setBudfile(`${budfileDir}/init.bud`)
+      setTemplateDir(`${budfileDir}/templates`)
+    }
+  }, [budfileDir])
+
+  const [sprout, setSprout] = useState(null)
+  useEffect(() => {
+    budfile && setSprout(require(budfile))
+  }, [budfile])
+
+  const [label, setLabel] = useState('Bud CLI')
+  useEffect(() => {
+    sprout && setLabel(sprout.label)
+  }, [sprout])
+
+  return sprout ? (
     <BudCLI
-      values={props.name ? props : null}
-      outDir={props.projectDir}
-      label={require(`${props.budFileDir}/init.bud`).label}
-      sprout={require(`${props.budFileDir}/init.bud`)}
-      templateDir={`${props.budFileDir}/templates`}
-      noClear={true}
+      label={label}
+      outDir={projectDir || ''}
+      sprout={sprout}
+      templateDir={templateDir}
     />
+  ) : (
+    <Box>
+      <Spinner /> Loading
+    </Box>
   )
 }
 
 Init.propTypes = {
-  /// Project name
-  name: PropTypes.string,
-  /// Project namespace
-  namespace: PropTypes.string,
-  /// Project description
-  description: PropTypes.string,
-  /// Project author name
-  author: PropTypes.string,
-  /// Project author email
-  email: PropTypes.string,
-  /// Project website
-  website: PropTypes.string,
   /// Output directory
   projectDir: PropTypes.string,
 }
 
 Init.defaultProps = {
-  budFileDir: resolve(__dirname, './../../src/budfiles/init'),
+  budfileDir: budfileDir,
 }
 
 Init.positionalArgs = ['projectDir']

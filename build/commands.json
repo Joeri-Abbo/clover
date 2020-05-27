@@ -1,65 +1,10 @@
 {
 	"commands": [
 		{
-			"path": "index.js",
-			"name": "index",
-			"description": "Bud information",
-			"args": [],
-			"subCommands": []
-		},
-		{
 			"path": "init.js",
 			"name": "init",
 			"description": "Create a new project",
 			"args": [
-				{
-					"key": "name",
-					"type": "string",
-					"description": "Project name",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "namespace",
-					"type": "string",
-					"description": "Project namespace",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "description",
-					"type": "string",
-					"description": "Project description",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "author",
-					"type": "string",
-					"description": "Project author name",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "email",
-					"type": "string",
-					"description": "Project author email",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
-				{
-					"key": "website",
-					"type": "string",
-					"description": "Project website",
-					"isRequired": false,
-					"aliases": [],
-					"positional": false
-				},
 				{
 					"key": "projectDir",
 					"type": "string",
@@ -69,6 +14,13 @@
 					"positional": true
 				}
 			],
+			"subCommands": []
+		},
+		{
+			"path": "index.js",
+			"name": "index",
+			"description": "Bud information",
+			"args": [],
 			"subCommands": []
 		},
 		{

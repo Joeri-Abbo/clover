@@ -5,19 +5,25 @@ import PropTypes from 'prop-types'
 import BudCLI from '../../src/components/BudCLI'
 import globby from 'globby'
 
-/**
- * Resolvers for different budfile locations
- */
-const getRootBudPath = name =>
-  `${process.cwd()}/node_modules/@roots/bud/src/budfiles/**/${name}.bud.js`
-const getModuleBudPath = name => `${process.cwd()}/node_modules/**/bud-plugin-*/${name}.bud.js`
-const getProjectBudPath = name => `${process.cwd()}/.bud/budfiles/**/${name}.bud.js`
+const cwd = process.cwd()
 
 /** Command: bud generate */
 /// Generate code from a budfile
 const Generate = props => {
   const [budName] = useState(props.budName)
-  const [sprout, setSprout] = useState(false)
+
+  /**
+   * Search helpers
+   */
+  const getRootBudPath = name =>
+    `${cwd}/node_modules/@roots/bud/src/budfiles/**/${name}.bud.js`
+  const getModuleBudPath = name => `${cwd}/node_modules/**/bud-plugin-*/${name}.bud.js`
+  const getProjectBudPath = name => `${cwd}/.bud/budfiles/**/${name}.bud.js`
+
+  /**
+   * Budfile state.
+   */
+  const [budfile, setBudfile] = useState(false)
   const [checked, setChecked] = useState({
     project: false,
     modules: false,
@@ -32,7 +38,8 @@ const Generate = props => {
       !checked.project &&
       (async () => {
         const buds = await globby([getProjectBudPath(budName)])
-        buds && buds.length > 0 && setSprout(buds[0])
+        buds && buds.length > 0 && setBudfile(buds[0])
+
         setChecked({...checked, project: true})
       })()
   }, [budName, checked.project])
@@ -41,37 +48,50 @@ const Generate = props => {
    * Module budfiles
    */
   useEffect(() => {
-    !sprout &&
+    !budfile &&
       checked.project &&
       (async () => {
         const buds = await globby([getModuleBudPath(budName)])
-        buds && buds.length > 0 && setSprout(buds[0])
+        buds && buds.length > 0 && setBudfile(buds[0])
+
         setChecked({...checked, modules: true})
       })()
-  }, [sprout, checked.project])
+  }, [budfile, checked.project])
 
   /**
    * Core budfiles
    */
   useEffect(() => {
-    !sprout &&
+    !budfile &&
       checked.modules &&
       (async () => {
         const buds = await globby([getRootBudPath(budName)])
-        buds && buds.length > 0 && setSprout(buds[0])
+        buds && buds.length > 0 && setBudfile(buds[0])
+
         setChecked({...checked, roots: true})
       })()
-  }, [sprout, checked.modules])
+  }, [budfile, checked.modules])
+
+  /**
+   * Sprout state.
+   */
+  const [sprout, setSprout] = useState(false)
+  const [templateDir, setTemplateDir] = useState(false)
+  useEffect(() => {
+    budfile && setSprout(require(budfile))
+    budfile && setTemplateDir(`${dirname(budfile)}/templates`)
+  }, [budfile])
 
   /**
    * Render
    */
-  return sprout ? (
+  return sprout && templateDir ? (
     <BudCLI
-      label={require(sprout).description}
-      outDir={process.cwd()}
-      templateDir={`${dirname(sprout)}/templates`}
-      sprout={require(sprout)}
+      sprout={sprout}
+      label={sprout.description ?? 'Bud'}
+      outDir={''}
+      noClear={true}
+      templateDir={templateDir ?? ''}
     />
   ) : (
     <Text>

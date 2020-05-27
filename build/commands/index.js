@@ -117,12 +117,495 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../prettier.config.js":[function(require,module,exports) {
+})({"../src/bud/compiler/helpers/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * Templating helpers
+ */
+const helpers = data => [{
+  helper: 'array',
+  fn: function () {
+    return Array.prototype.slice.call(arguments, 0, -1);
+  }
+}, {
+  helper: 'has',
+  fn: function (object, component, options) {
+    if (data[object].indexOf(component) > -1) {
+      return options.fn(this);
+    }
+
+    return options.inverse(this);
+  }
+}, {
+  helper: 'hasAny',
+  fn: function (object, components, options) {
+    let hasInstance = false;
+
+    if (components) {
+      components.forEach(component => {
+        if (data[object].indexOf(component) > -1) {
+          hasInstance = true;
+        }
+      });
+    }
+
+    return hasInstance ? options.fn(this) : options.inverse(this);
+  }
+}, {
+  helper: 'raw',
+  fn: function (options) {
+    return options.fn();
+  }
+}];
+
+var _default = helpers;
+exports.default = _default;
+},{}],"../src/bud/compiler/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _handlebars = _interopRequireDefault(require("handlebars"));
+
+var _helpers = _interopRequireDefault(require("./helpers"));
+
+var _handlebarsHelpers = _interopRequireDefault(require("handlebars-helpers"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Compiler.
+ *
+ * @param {handlebars} handlebars
+ */
+const makeCompiler = ({
+  sprout,
+  data
+}) => {
+  (0, _handlebarsHelpers.default)({
+    handlebars: _handlebars.default
+  });
+  sprout.registerHelpers && sprout.registerHelpers.forEach(helper => {
+    _helpers.default.push(helper);
+  });
+  (0, _helpers.default)(data).forEach(({
+    helper,
+    fn
+  }) => {
+    _handlebars.default.registerHelper(helper, fn);
+  });
+  return {
+    compiler: _handlebars.default,
+
+    /**
+     * Make template.
+     *
+     * @param {string} path
+     */
+    make: function (path) {
+      return this.compiler.compile(path);
+    }
+  };
+};
+
+var _default = makeCompiler;
+exports.default = _default;
+},{"./helpers":"../src/bud/compiler/helpers/index.js"}],"../src/bud/actions/addDependencies.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * Action: Add dependencies
+ *
+ * @param  {object}   task
+ * @param  {Observer} observer
+ * @param  {object}   util
+ *
+ * @return {void}
+ */
+const addDependencies = async ({
+  task,
+  observer,
+  util
+}) => {
+  let installation;
+  observer.next(`Installing packages from ${task.repo}...`);
+
+  if (task.repo !== 'npm' && task.repo !== 'packagist') {
+    observer.error(`Incorrect package repo specified.`);
+  }
+
+  if (task.repo == 'npm') {
+    installation = util.command(`yarn add ${task.dev ? `-D` : ``} ${task.pkgs.join(' ')}`);
+  }
+
+  if (task.repo == 'packagist') {
+    installation = util.command(`composer require ${task.pkgs.join(' ')} ${task.dev ? `--development` : ``}`);
+  }
+
+  installation.stdout.on('data', status => {
+    observer.next(status);
+  });
+  installation.then(() => observer.complete());
+};
+
+var _default = addDependencies;
+exports.default = _default;
+},{}],"../src/bud/actions/compile.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _path = require("path");
+
+var _fsExtra = require("fs-extra");
+
+/**
+ * Action: template
+ *
+ * @param  {object}   task
+ * @param  {Observer} observer
+ * @param  {object}   data
+ * @param  {object}   config
+ * @param  {object}   util
+ * @param  {object}   prettier
+ * @param  {object}   compiler
+ * @return {void}
+ */
+const compile = async ({
+  task,
+  observer,
+  data,
+  config,
+  prettier,
+  compiler
+}) => {
+  const src = await (0, _fsExtra.readFile)((0, _path.join)(config.templateDir, task.src), 'utf8');
+  const dest = compiler.make(task.dest)(data);
+  const template = compiler.make(src)(data);
+  await (0, _fsExtra.outputFile)(...[(0, _path.join)(config.projectDir, dest), task.parser ? prettier.format(template, task.parser) : template]);
+  observer.complete();
+};
+
+var _default = compile;
+exports.default = _default;
+},{}],"../src/bud/actions/copy.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _path = require("path");
+
+var _fsExtra = require("fs-extra");
+
+/**
+ * Action: copy
+ *
+ * @param  {object}   task
+ * @param  {Observer} observer
+ * @param  {object}   config
+ *
+ * @return {void}
+ */
+const copy = async ({
+  task,
+  observer,
+  config
+}) => {
+  const src = (0, _path.join)(config.templateDir, task.src);
+  const dest = (0, _path.join)(config.projectDir, task.dest);
+  await (0, _fsExtra.copy)(src, dest);
+  observer.complete();
+};
+
+var _default = copy;
+exports.default = _default;
+},{}],"../src/bud/actions/install.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * Action: Install from package files
+ *
+ * @prop   {object}   task
+ * @prop   {Observer} observer
+ * @prop   {object}   util
+ *
+ * @return {Observable}
+ */
+const install = async ({
+  task,
+  observer,
+  util
+}) => {
+  let installation;
+  observer.next(`Installing packages from ${task.repo}...`);
+
+  if (task.repo !== 'npm' && task.repo !== 'packagist') {
+    observer.error(`Incorrect package repo specified.`);
+  }
+
+  if (task.repo == 'npm') {
+    installation = util.command(`yarn`);
+  }
+
+  if (task.repo == 'packagist') {
+    installation = util.command(`composer install`);
+  }
+
+  installation.stdout.on('data', status => {
+    observer.next(status);
+  });
+  installation.then(() => observer.complete());
+};
+
+var _default = install;
+exports.default = _default;
+},{}],"../src/bud/actions/json.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _fsExtra = require("fs-extra");
+
+/**
+ * Action: Manipulate project JSON
+ *
+ * @prop {object}   task
+ * @prop {Observer} observer
+ * @prop {Prettier} prettier
+ */
+const json = async function ({
+  task,
+  observer,
+  prettier,
+  config
+}) {
+  const json = require(`${config.projectDir}/${task.file}`);
+
+  observer.next(`Writing JSON to ${task.file}`);
+
+  try {
+    const output = task.merge(json);
+    await (0, _fsExtra.outputFile)(`${config.projectDir}/${task.file}`, prettier.format(output, 'json'));
+    observer.complete();
+  } catch (err) {
+    observer.error(`There was a problem writing to ${task.file}`);
+  }
+};
+
+var _default = json;
+exports.default = _default;
+},{}],"../src/bud/actions/mkDir.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _path = require("path");
+
+var _fsExtra = require("fs-extra");
+
+/**
+ * Make directory
+ *
+ * @param  {object}   task
+ * @param  {Observer} observer
+ * @param  {object}   config
+ * @param  {object}   data
+ * @param  {object}   compiler
+ *
+ * @return {void}
+ */
+const mkDir = async ({
+  task,
+  observer,
+  config,
+  data,
+  compiler
+}) => {
+  const path = (0, _path.join)(config.projectDir, compiler.make(task.path)(data));
+
+  try {
+    await (0, _fsExtra.ensureDir)(path).then(() => {
+      observer.next();
+    });
+  } catch (error) {
+    observer.error(`actions.mkDir: ${JSON.stringify(error)}`);
+  }
+};
+
+var _default = mkDir;
+exports.default = _default;
+},{}],"../src/bud/actions/scaffold.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _rxjs = require("rxjs");
+
+var _operators = require("rxjs/operators");
+
+/**
+ * Scaffold directories
+ *
+ * @param  {array} paths
+ * @return {Observable}
+ */
+const scaffold = ({
+  task,
+  observer,
+  config,
+  data,
+  compiler,
+  actions
+}) => {
+  observer.next(`Creating directories`);
+  return (0, _rxjs.from)(task.paths).pipe((0, _operators.concatMap)(path => {
+    return new _rxjs.Observable(async observer => {
+      try {
+        await actions.mkDir({
+          task: {
+            path
+          },
+          config,
+          data,
+          compiler,
+          observer
+        });
+        observer.complete();
+      } catch (error) {
+        observer.error(`error: thrown in actions.scaffold`);
+      }
+    });
+  })).subscribe({
+    next: next => observer.next(next),
+    error: error => observer.error(error),
+    complete: () => observer.complete()
+  });
+};
+
+var _default = scaffold;
+exports.default = _default;
+},{}],"../src/bud/actions/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _addDependencies = _interopRequireDefault(require("./addDependencies"));
+
+var _compile = _interopRequireDefault(require("./compile"));
+
+var _copy = _interopRequireDefault(require("./copy"));
+
+var _install = _interopRequireDefault(require("./install"));
+
+var _json = _interopRequireDefault(require("./json"));
+
+var _mkDir = _interopRequireDefault(require("./mkDir"));
+
+var _scaffold = _interopRequireDefault(require("./scaffold"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Actions
+ */
+const actions = {
+  addDependencies: _addDependencies.default,
+  compile: _compile.default,
+  copy: _copy.default,
+  install: _install.default,
+  json: _json.default,
+  mkDir: _mkDir.default,
+  scaffold: _scaffold.default,
+  register: function (action) {
+    this[`${action.handle}`] = action.callback;
+  }
+};
+var _default = actions;
+exports.default = _default;
+},{"./addDependencies":"../src/bud/actions/addDependencies.js","./compile":"../src/bud/actions/compile.js","./copy":"../src/bud/actions/copy.js","./install":"../src/bud/actions/install.js","./json":"../src/bud/actions/json.js","./mkDir":"../src/bud/actions/mkDir.js","./scaffold":"../src/bud/actions/scaffold.js"}],"../src/bud/prettier/inferParser.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * Prettier parsers.
+ */
+const parsers = {
+  js: 'babel',
+  jsx: 'babel',
+  graphql: 'graphql',
+  css: 'css',
+  json: 'json',
+  md: 'markdown',
+  html: 'html',
+  htm: 'html',
+  ts: 'typescript',
+  tsx: 'typescript',
+  yml: 'yaml',
+  yaml: 'yaml',
+  less: 'less'
+};
+/**
+ * Infer parser.
+ *
+ * @param {string} file
+ */
+
+const inferParser = async function (file) {
+  var _parsers$;
+
+  const ext = file.split('.')[file.split('.').length - 1];
+  return (_parsers$ = parsers[`${ext}`]) !== null && _parsers$ !== void 0 ? _parsers$ : null;
+};
+
+var _default = inferParser;
+exports.default = _default;
+},{}],"../prettier.config.js":[function(require,module,exports) {
 module.exports = {
   arrowParens: 'avoid',
   bracketSpacing: false,
   tabWidth: 2,
-  printWidth: 100,
+  printWidth: 90,
   singleQuote: true,
   jsxBracketSameLine: true,
   useTabs: false,
@@ -140,461 +623,256 @@ module.exports = {
     }
   }]
 };
-},{}],"../src/bud/helpers.js":[function(require,module,exports) {
-/**
- * Handlebars helpers
- */
-module.exports = data => {
-  return [{
-    helper: 'array',
-    fn: function () {
-      return Array.prototype.slice.call(arguments, 0, -1);
-    }
-  }, {
-    helper: 'has',
-    fn: function (object, component, options) {
-      if (data[object].indexOf(component) > -1) {
-        return options.fn(this);
-      }
-
-      return options.inverse(this);
-    }
-  }, {
-    helper: 'hasAny',
-    fn: function (object, components, options) {
-      let hasInstance = false;
-
-      if (components) {
-        components.forEach(component => {
-          if (data[object].indexOf(component) > -1) {
-            hasInstance = true;
-          }
-        });
-      }
-
-      return hasInstance ? options.fn(this) : options.inverse(this);
-    }
-  }, {
-    helper: 'raw',
-    fn: function (options) {
-      return options.fn();
-    }
-  }];
-};
-},{}],"../src/bud/index.js":[function(require,module,exports) {
+},{}],"../src/bud/prettier/format.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.bud = void 0;
+exports.default = void 0;
 
-const {
-  join,
-  resolve
-} = require('path');
+var _prettier = _interopRequireDefault(require("prettier"));
 
-const fs = require('fs-extra');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const fetch = require('node-fetch');
-
-const execa = require('execa');
-
-const handlebars = require('handlebars');
-
-const prettier = require('prettier');
-
-const globby = require('globby');
-
-const {
-  Observable,
-  from
-} = require('rxjs');
-
-const {
-  concatMap
-} = require('rxjs/operators');
-
-const basePrettierConfig = require('./../../prettier.config.js');
-
-const handlebarsHelpers = require('handlebars-helpers');
-
-const helpers = require('./helpers');
+const config = require('../../../prettier.config.js');
 /**
- * Bud Core
+ * Format
+ *
+ * @param  {object|string} content
+ * @param  {parser} string
+ * @return {string}
  */
 
 
-const bud = {
-  fs,
-  fetch,
-  execa,
-  prettier,
-  handlebars,
+const format = (content, parser) => {
+  content = typeof content !== 'string' ? JSON.stringify(content) : content;
+  return _prettier.default.format(content, { ...config,
+    parser: parser || 'babel'
+  });
+};
 
-  /**
-   * Initialize
-   *
-   * @param {string} outDir
-   * @param {object} data
-   * @param {object} sprout
-   * @param {string} templateDir
-   * @param {bool}   skipInstall
-   */
-  init: function ({
-    outDir = './',
-    data = {},
+var _default = format;
+exports.default = _default;
+},{"../../../prettier.config.js":"../prettier.config.js"}],"../src/bud/prettier/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _inferParser = _interopRequireDefault(require("./inferParser"));
+
+var _format = _interopRequireDefault(require("./format"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Prettier
+ */
+const prettier = {
+  format: _format.default,
+  inferParser: _inferParser.default
+};
+var _default = prettier;
+exports.default = _default;
+},{"./inferParser":"../src/bud/prettier/inferParser.js","./format":"../src/bud/prettier/format.js"}],"../src/bud/util/command.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _execa = _interopRequireDefault(require("execa"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Task runner
+ *
+ * @param  {object} config
+ *
+ * @return {func}
+ */
+const command = config => {
+  return cmd => _execa.default.command(cmd, config.execa);
+};
+
+var _default = command;
+exports.default = _default;
+},{}],"../src/bud/util/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _command = _interopRequireDefault(require("./command"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Util.
+ */
+const util = config => ({
+  command: (0, _command.default)(config)
+});
+
+var _default = util;
+exports.default = _default;
+},{"./command":"../src/bud/util/command.js"}],"../src/bud/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _rxjs = require("rxjs");
+
+var _operators = require("rxjs/operators");
+
+var _compiler = _interopRequireDefault(require("./compiler"));
+
+var _actions = _interopRequireDefault(require("./actions"));
+
+var _prettier = _interopRequireDefault(require("./prettier"));
+
+var _util = _interopRequireDefault(require("./util"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Bud componentry
+ */
+
+/**
+ * Bud core
+ *
+ * @param {string} outDir
+ * @param {object} configData
+ * @param {object} data
+ * @param {object} sprout
+ * @param {string} templateDir
+ * @param {bool}   skipInstall
+ */
+const bud = ({
+  projectDir,
+  configData,
+  data,
+  sprout,
+  templateDir
+}) => {
+  const config = {
+    projectDir,
+    templateDir,
+    ...configData,
+    execa: {
+      cwd: projectDir
+    }
+  };
+  const util = (0, _util.default)(config);
+  const compiler = (0, _compiler.default)({
     sprout,
-    templateDir
-  }) {
-    this.data = data;
-    this.sprout = sprout;
-    this.projectDir = outDir;
-    this.execaOptions = {
-      cwd: this.projectDir
-    };
-    this.templateDir = templateDir;
-    this.registerActions();
-    this.registerHelpers();
-    return this;
-  },
+    data
+  });
+  sprout.registerActions && sprout.registerActions.forEach(action => {
+    _actions.default.register(action);
+  });
+  return new _rxjs.Observable(observer => {
+    (0, _rxjs.from)(sprout.tasks).pipe((0, _operators.concatMap)(function (task) {
+      return new _rxjs.Observable(async observer => {
+        observer.next(task.action);
 
-  /**
-   * Get config.
-   *
-   * @return {object}
-   */
-  getConfig: function () {
-    return {
-      path: `${process.cwd()}/${this.projectDir}/.bud/bud.config.json`,
-      data: require(`${process.cwd()}/${this.projectDir}/.bud/bud.config.json`)
-    };
-  },
-
-  /**
-   * Get data.
-   *
-   * @return {object}
-   */
-  getData: function () {
-    return this.data;
-  },
-
-  /**
-   * Set data.
-   *
-   * @param  {object} data
-   * @return {void}
-   */
-  setData: function (data) {
-    this.data = data;
-  },
-
-  /**
-   * Register actions
-   */
-  registerActions: function () {
-    this.sprout.registerActions && this.sprout.registerActions.forEach(action => {
-      this[`${action.handle}`] = action.callback;
-    });
-  },
-
-  /**
-   * Register helpers
-   */
-  registerHelpers: function () {
-    // lib helpers
-    handlebarsHelpers({
-      handlebars: this.handlebars
-    }); // plugin registered helpers
-
-    this.sprout.registerHelpers && this.sprout.registerHelpers.length > 0 && this.sprout.registerHelpers.forEach(helper => {
-      helpers.push(helper);
-    }); // roots/bud helpers
-
-    helpers(this.getData()).forEach(({
-      helper,
-      fn
-    }) => {
-      this.handlebars.registerHelper(helper, fn);
-    });
-  },
-
-  /**
-   * Format
-   *
-   * @param  {object|string} content
-   * @param  {parser} string
-   * @return {string}
-   */
-  format: function (content, parser) {
-    return this.prettier.format(typeof content !== 'string' ? JSON.stringify(content) : content, { ...basePrettierConfig,
-      parser: parser || 'babel'
-    });
-  },
-
-  /**
-   * Actions
-   *
-   * @return {Observable}
-   */
-  actions: function () {
-    const bud = { ...this
-    };
-    return new Observable(function (observer) {
-      from(bud.sprout.actions).pipe(concatMap(function (task) {
-        return new Observable(async function (observer) {
-          observer.next(task.action);
-          return bud[task.action](task, observer, bud);
+        _actions.default[task.action]({
+          task,
+          observer,
+          config,
+          actions: _actions.default,
+          compiler,
+          prettier: _prettier.default,
+          util,
+          data
         });
-      })).subscribe({
-        next: next => observer.next(next),
-        error: error => observer.error(error),
-        complete: complete => observer.complete(complete)
-      });
-    });
-  },
-
-  /**
-   * Scaffold directories
-   *
-   * @param  {array} paths
-   * @return {Observable}
-   */
-  scaffold: function ({
-    paths
-  }, observer) {
-    observer.next(`Creating directories`);
-    from(paths).pipe(concatMap(path => {
-      return new Observable(async observer => {
-        try {
-          await this.mkDir({
-            path
-          }, observer);
-        } catch (e) {
-          observer.error(e);
-        }
       });
     })).subscribe({
       next: next => observer.next(next),
       error: error => observer.error(error),
-      complete: () => observer.complete()
+      complete: complete => observer.complete(complete)
     });
-  },
-
-  /**
-   * Make directory
-   *
-   * @param  {string}     path
-   * @param  {Observable} observer
-   * @return {Observable}
-   */
-  mkDir: async function ({
-    path
-  }, observer) {
-    const pathTemplate = this.handlebars.compile(path);
-    const dirPath = join(this.projectDir, pathTemplate(this.getData()));
-
-    try {
-      await fs.ensureDir(dirPath).then(() => {
-        observer.complete();
-      });
-    } catch (e) {
-      observer.error(e);
-    }
-  },
-
-  /**
-   * Get template contents.
-   *
-   * @param  {string} template
-   * @return {array}
-   */
-  getTemplate: async function (template) {
-    const path = join(this.templateDir, template);
-    const contents = await fs.readFile(path, 'utf8');
-    return {
-      path,
-      contents
-    };
-  },
-
-  /**
-   * Infer parser
-   *
-   * @param  {string} file
-   * @return {string}
-   */
-  inferParser: async function (file) {
-    var _parserMap$;
-
-    const ext = file.split('.')[file.split('.').length - 1];
-    const parserMap = {
-      js: 'babel',
-      jsx: 'babel',
-      graphql: 'graphql',
-      css: 'css',
-      json: 'json',
-      md: 'markdown',
-      html: 'html',
-      htm: 'html',
-      ts: 'typescript',
-      tsx: 'typescript',
-      yml: 'yaml',
-      yaml: 'yaml',
-      less: 'less'
-    };
-    return (_parserMap$ = parserMap[`${ext}`]) !== null && _parserMap$ !== void 0 ? _parserMap$ : null;
-  },
-
-  /**
-   * Action: template
-   *
-   * @param  {string} parser
-   * @param  {string} path
-   * @param  {string} template
-   * @return {Observable}
-   */
-  template: async function ({
-    parser,
-    path,
-    template
-  }, observer) {
-    try {
-      const {
-        contents
-      } = await this.getTemplate(template);
-      const dest = join(this.projectDir, this.handlebars.compile(path)(this.getData()).replace('.hbs', ''));
-      observer.next(`Writing ${dest.split('/')[dest.split('/').length - 1]}`);
-      const compiled = this.handlebars.compile(contents)(this.getData());
-      const outputContents = parser ? this.format(compiled, parser) : compiled;
-      fs.outputFile(dest, outputContents).then(() => observer.complete());
-    } catch (error) {
-      observer.error(error);
-    }
-  },
-
-  /**
-   * Action: template dir
-   *
-   * @param  {string} parser
-   * @param  {string} path
-   * @param  {string} templateDir
-   * @return {Observable}
-   */
-  templateGlob: async function ({
-    glob
-  }, observer) {
-    try {
-      const templates = await globby([resolve(this.templateDir, glob)]);
-      from(templates).pipe(concatMap(template => {
-        return new Observable(async observer => {
-          try {
-            const parser = await this.inferParser(template.replace('.hbs', ''));
-            await this.template({
-              parser,
-              template: template.replace(this.templateDir, ''),
-              path: template.replace(this.templateDir, '').replace('.hbs', '')
-            }, observer);
-          } catch (error) {
-            observer.error(error);
-          }
-        });
-      })).subscribe({
-        next: next => observer.next(next),
-        error: error => observer.error(error),
-        complete: () => observer.complete()
-      });
-    } catch (error) {
-      observer.error(error);
-    }
-  },
-
-  /**
-   * Action: Modules
-   *
-   * @param  {array} pkgs
-   * @param  {bool}  dev
-   * @return {Observable}
-   */
-  addDependencies: async function ({
-    repo,
-    pkgs,
-    dev
-  }, observer) {
-    let installation;
-    observer.next(`Installing packages from ${repo}...`);
-
-    if (repo !== 'npm' && repo !== 'packagist') {
-      observer.error(`Incorrect package repo specified.`);
-    }
-
-    if (repo == 'npm') {
-      installation = this.execa.command(`yarn add ${dev ? `-D` : ``} ${pkgs.join(' ')}`, this.execaOptions);
-    }
-
-    if (repo == 'packagist') {
-      installation = this.execa.command(`composer require ${pkgs.join(' ')} ${dev ? `--development` : ``}`, this.execaOptions);
-    }
-
-    installation.stdout.on('data', status => {
-      observer.next(status);
-    });
-    installation.then(() => observer.complete());
-  },
-
-  /**
-   * Action: Install from package files
-   *
-   * @param  {string} repo
-   * @return {Observable}
-   */
-  install: async function ({
-    repo
-  }, observer) {
-    let installation;
-    observer.next(`Installing packages from ${repo}...`);
-
-    if (repo !== 'npm' && repo !== 'packagist') {
-      observer.error(`Incorrect package repo specified.`);
-    }
-
-    if (repo == 'npm') {
-      installation = this.execa.command(`yarn`, this.execaOptions);
-    }
-
-    if (repo == 'packagist') {
-      installation = this.execa.command(`composer install`, this.execaOptions);
-    }
-
-    installation.stdout.on('data', status => {
-      observer.next(status);
-    });
-    installation.then(() => observer.complete());
-  },
-
-  /**
-   * Expose project JSON
-   */
-  json: async function ({
-    file,
-    merge
-  }, observer) {
-    const json = require(`${this.projectDir}/${file}`);
-
-    observer.next(`Writing JSON to ${file}`);
-
-    try {
-      const output = merge(json);
-      await fs.outputFile(`${this.projectDir}/${file}`, this.format(output, 'json'));
-      observer.complete();
-    } catch (err) {
-      observer.error(`There was a problem writing to ${file}`);
-    }
-  }
+  });
 };
-exports.bud = bud;
-},{"./../../prettier.config.js":"../prettier.config.js","./helpers":"../src/bud/helpers.js"}],"../src/components/BudCLI.js":[function(require,module,exports) {
+
+var _default = bud;
+exports.default = _default;
+},{"./compiler":"../src/bud/compiler/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js","./util":"../src/bud/util/index.js"}],"../src/components/Banner.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _ink = require("ink");
+
+var _inkLink = _interopRequireDefault(require("ink-link"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Banner component.
+ *
+ * @prop {string} label
+ */
+const Banner = ({
+  label
+}) => /*#__PURE__*/_react.default.createElement(_ink.Box, {
+  marginBottom: 1,
+  flexDirection: "row",
+  justifyContent: "space-between"
+}, label && /*#__PURE__*/_react.default.createElement(_ink.Text, null, label), /*#__PURE__*/_react.default.createElement(_ink.Box, {
+  flexDirection: "row"
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, null, `🌱`), /*#__PURE__*/_react.default.createElement(_ink.Text, {
+  bold: true
+}, /*#__PURE__*/_react.default.createElement(_inkLink.default, {
+  url: "https://roots.io/bud"
+}, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+  green: true
+}, '  Bud')))));
+
+var _default = Banner;
+exports.default = _default;
+},{}],"../src/components/Error.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _ink = require("ink");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Error
+ */
+const Error = ({
+  message
+}) => /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+  red: true
+}, "\uD83D\uDCA5 ", JSON.stringify(message)));
+
+var _default = Error;
+exports.default = _default;
+},{}],"../src/components/BudCLI.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -610,13 +888,15 @@ var _react = _interopRequireWildcard(require("react"));
 
 var _ink = require("ink");
 
-var _inkLink = _interopRequireDefault(require("ink-link"));
-
 var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
 
 var _enquirer = require("enquirer");
 
-var _bud = require("./../bud");
+var _bud = _interopRequireDefault(require("./../bud"));
+
+var _Banner = _interopRequireDefault(require("./Banner"));
+
+var _Error = _interopRequireDefault(require("./Error"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -624,6 +904,7 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+const cwd = process.cwd();
 const DEFAULT_BUDFILE = {
   actions: [],
   label: 'Budfile',
@@ -645,7 +926,6 @@ const BudCLI = ({
   templateDir,
   sprout = DEFAULT_BUDFILE,
   outDir,
-  values = null,
   inert = false,
   children,
   noClear = false
@@ -659,7 +939,7 @@ const BudCLI = ({
    * Parse values from prompt
    */
 
-  const [prompts, setPrompts] = (0, _react.useState)(!values && sprout.prompts ? sprout.prompts : null);
+  const [prompts, setPrompts] = (0, _react.useState)(sprout.prompts ? sprout.prompts : null);
   const {
     exit
   } = (0, _ink.useApp)();
@@ -677,14 +957,12 @@ const BudCLI = ({
       setPrompts(null);
       setData({ ...(configData && configData.project ? configData.project : []),
         ...(configData && configData.dev ? configData.dev : []),
-        ...data,
-        ...(values ? values : [])
+        ...data
       });
     }) : (() => {
       setPrompts(null);
       setData({ ...(configData && configData.project ? configData.project : []),
-        ...(configData && configData.dev ? configData.dev : []),
-        ...(values ? values : [])
+        ...(configData && configData.dev ? configData.dev : [])
       });
     })();
   }, []);
@@ -693,12 +971,13 @@ const BudCLI = ({
    */
 
   (0, _react.useEffect)(() => {
-    data && !inert && !budSubscription && setBudSubscription(_bud.bud.init({
-      data,
+    data && !inert && !budSubscription && setBudSubscription((0, _bud.default)({
+      configData,
+      data: data !== null && data !== void 0 ? data : {},
       templateDir,
       sprout,
-      outDir
-    }).actions().subscribe({
+      projectDir: (0, _path.join)(cwd, outDir)
+    }).subscribe({
       next: next => setStatus(next),
       error: error => setError(error),
       complete: () => setComplete(true)
@@ -718,37 +997,17 @@ const BudCLI = ({
     flexDirection: "column",
     justifyContent: "flex-start",
     padding: 1
-  }, /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    marginBottom: 1,
-    flexDirection: "row",
-    justifyContent: "space-between"
-  }, label && /*#__PURE__*/_react.default.createElement(_ink.Text, null, label), /*#__PURE__*/_react.default.createElement(_ink.Box, {
-    flexDirection: "row"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Text, null, `🌱`), /*#__PURE__*/_react.default.createElement(_ink.Text, {
-    bold: true
-  }, /*#__PURE__*/_react.default.createElement(_inkLink.default, {
-    url: "https://roots.io/bud"
-  }, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, '  Bud'))))), !error ? /*#__PURE__*/_react.default.createElement(Tasks, {
+  }, /*#__PURE__*/_react.default.createElement(_Banner.default, {
+    label: label
+  }), !error ? /*#__PURE__*/_react.default.createElement(Tasks, {
     data: data,
     status: status,
     complete: complete,
     noClear: noClear
-  }) : /*#__PURE__*/_react.default.createElement(Error, {
+  }) : /*#__PURE__*/_react.default.createElement(_Error.default, {
     message: error
-  }), children && children);
+  }));
 };
-/**
- * Error
- */
-
-
-const Error = ({
-  message
-}) => /*#__PURE__*/_react.default.createElement(_ink.Box, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-  red: true
-}, "\uD83D\uDCA5 ", JSON.stringify(message)));
 /**
  * Tasks
  */
@@ -777,7 +1036,7 @@ const Tasks = ({
 
 var _default = BudCLI;
 exports.default = _default;
-},{"./../bud":"../src/bud/index.js"}],"index.js":[function(require,module,exports) {
+},{"./../bud":"../src/bud/index.js","./Banner":"../src/components/Banner.js","./Error":"../src/components/Error.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

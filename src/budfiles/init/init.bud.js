@@ -41,32 +41,28 @@ module.exports = {
       initial: 'wiley@gmail.com',
     },
   ],
-  actions: [
+  tasks: [
     {
-      action: 'scaffold',
-      paths: ['.bud', '.bud/budfiles', '.bud/budfiles/example', '.bud/budfiles/example/templates'],
-    },
-    {
-      action: 'template',
-      template: '.bud/bud.config.json.hbs',
-      path: '.bud/bud.config.json',
+      action: 'compile',
+      src: '.bud/bud.config.json.hbs',
+      dest: '.bud/bud.config.json',
       parser: 'json',
     },
     {
-      action: 'template',
-      template: 'package.json.hbs',
-      path: 'package.json',
+      action: 'compile',
+      src: 'package.json.hbs',
+      dest: 'package.json',
       parser: 'json',
     },
     {
-      action: 'template',
-      template: '.bud/budfiles/example/example.bud.js.hbs',
-      path: '.bud/budfiles/example/example.bud.js',
+      action: 'copy',
+      src: '.bud/budfiles/example/example.bud.js.hbs',
+      dest: '.bud/budfiles/example/example.bud.js',
     },
     {
-      action: 'template',
-      template: '.bud/budfiles/example/templates/Component.js.hbs',
-      path: '.bud/budfiles/example/templates/Component.js.hbs',
+      action: 'copy',
+      src: '.bud/budfiles/example/templates/Component.js.hbs',
+      dest: '.bud/budfiles/example/templates/Component.js.hbs',
     },
     {
       action: 'install',

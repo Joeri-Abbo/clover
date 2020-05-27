@@ -110,6 +110,7 @@ Documentation forthcoming. For now, you can run `yarn generate:list` to see what
 - eslint-plugin-react-hooks
 - globby
 - husky
+- ink-divider
 - markdownlint-cli
 - npm-run-all
 - tree-node-cli

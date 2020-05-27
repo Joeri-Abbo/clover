@@ -4,11 +4,11 @@
 module.exports = {
   name: 'component-image',
   description: 'Generate Image Component',
-  actions: [
+  tasks: [
     {
-      action: 'template',
-      template: 'Image.js.hbs',
-      path: 'src/components/Image.js',
+      action: 'compile',
+      src: 'Image.js.hbs',
+      dest: 'src/components/Image.js',
       parser: 'babel',
     },
   ],

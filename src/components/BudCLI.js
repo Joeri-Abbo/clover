@@ -2,10 +2,14 @@ import {join} from 'path'
 import {existsSync} from 'fs'
 import React, {useState, useEffect} from 'react'
 import {Box, Color, Text, useApp, useStdout} from 'ink'
-import Link from 'ink-link'
 import Spinner from 'ink-spinner'
 import {prompt} from 'enquirer'
-import {bud as BudCore} from './../bud'
+import bud from './../bud'
+
+import Banner from './Banner'
+import Error from './Error'
+
+const cwd = process.cwd()
 
 const DEFAULT_BUDFILE = {
   actions: [],
@@ -28,9 +32,7 @@ const BudCLI = ({
   templateDir,
   sprout = DEFAULT_BUDFILE,
   outDir,
-  values = null,
   inert = false,
-  children,
   noClear = false,
 }) => {
   /**
@@ -42,7 +44,7 @@ const BudCLI = ({
   /**
    * Parse values from prompt
    */
-  const [prompts, setPrompts] = useState(!values && sprout.prompts ? sprout.prompts : null)
+  const [prompts, setPrompts] = useState(sprout.prompts ? sprout.prompts : null)
 
   const {exit} = useApp()
   const [data, setData] = useState(null)
@@ -62,7 +64,6 @@ const BudCLI = ({
             ...(configData && configData.project ? configData.project : []),
             ...(configData && configData.dev ? configData.dev : []),
             ...data,
-            ...(values ? values : []),
           })
         })
       : (() => {
@@ -70,7 +71,6 @@ const BudCLI = ({
           setData({
             ...(configData && configData.project ? configData.project : []),
             ...(configData && configData.dev ? configData.dev : []),
-            ...(values ? values : []),
           })
         })()
   }, [])
@@ -83,18 +83,17 @@ const BudCLI = ({
       !inert &&
       !budSubscription &&
       setBudSubscription(
-        BudCore.init({
-          data,
+        bud({
+          configData,
+          data: data ?? {},
           templateDir,
           sprout,
-          outDir,
-        })
-          .actions()
-          .subscribe({
-            next: next => setStatus(next),
-            error: error => setError(error),
-            complete: () => setComplete(true),
-          }),
+          projectDir: join(cwd, outDir),
+        }).subscribe({
+          next: next => setStatus(next),
+          error: error => setError(error),
+          complete: () => setComplete(true),
+        }),
       )
   }, [data, status])
 
@@ -111,37 +110,15 @@ const BudCLI = ({
    */
   return (
     <Box flexDirection="column" justifyContent="flex-start" padding={1}>
-      <Box marginBottom={1} flexDirection="row" justifyContent="space-between">
-        {label && <Text>{label}</Text>}
-        <Box flexDirection="row">
-          <Text>{`🌱`}</Text>
-          <Text bold>
-            <Link url="https://roots.io/bud">
-              <Color green>{'  Bud'}</Color>
-            </Link>
-          </Text>
-        </Box>
-      </Box>
-
+      <Banner label={label} />
       {!error ? (
         <Tasks data={data} status={status} complete={complete} noClear={noClear} />
       ) : (
         <Error message={error} />
       )}
-
-      {children && children}
     </Box>
   )
 }
-
-/**
- * Error
- */
-const Error = ({message}) => (
-  <Box>
-    <Color red>💥 {JSON.stringify(message)}</Color>
-  </Box>
-)
 
 /**
  * Tasks

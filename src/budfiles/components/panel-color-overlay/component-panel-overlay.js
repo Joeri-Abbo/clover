@@ -4,11 +4,11 @@
 module.exports = {
   name: 'component-panel-color-overlay',
   description: 'Inspector Panel: Color Overlay',
-  actions: [
+  tasks: [
     {
-      action: 'template',
-      template: 'PanelColorOverlay.js.hbs',
-      path: 'src/components/PanelColorOverlay.js',
+      action: 'compile',
+      src: 'PanelColorOverlay.js.hbs',
+      dest: 'src/components/PanelColorOverlay.js',
       parser: 'babel',
     },
     {
