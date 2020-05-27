@@ -4,6 +4,7 @@ const config = require('../../../prettier.config.js')
 /**
  * Format
  *
+ * @type   {func}
  * @param  {object|string} content
  * @param  {parser} string
  * @return {string}

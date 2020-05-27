@@ -4,7 +4,7 @@ import {Box} from 'ink'
 import PropTypes from 'prop-types'
 import Spinner from 'ink-spinner'
 
-import BudCLI from './../src/components/BudCLI'
+import App from './../src/components/App'
 
 /** Constants */
 const budfileDir = resolve(__dirname, './../../src/budfiles/init')
@@ -12,6 +12,9 @@ const budfileDir = resolve(__dirname, './../../src/budfiles/init')
 /** Command: bud init */
 /// Create a new project
 const Init = props => {
+  /**
+   * Directories
+   */
   const [projectDir] = useState(props.projectDir)
   const [budfile, setBudfile] = useState(null)
   const [templateDir, setTemplateDir] = useState(null)
@@ -22,18 +25,27 @@ const Init = props => {
     }
   }, [budfileDir])
 
+  /**
+   * Sprout.
+   */
   const [sprout, setSprout] = useState(null)
   useEffect(() => {
     budfile && setSprout(require(budfile))
   }, [budfile])
 
+  /**
+   * Label.
+   */
   const [label, setLabel] = useState('Bud CLI')
   useEffect(() => {
     sprout && setLabel(sprout.label)
   }, [sprout])
 
+  /**
+   * Render.
+   */
   return sprout ? (
-    <BudCLI
+    <App
       label={label}
       outDir={projectDir || ''}
       sprout={sprout}

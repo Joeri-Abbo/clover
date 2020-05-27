@@ -5,21 +5,25 @@ import {concatMap} from 'rxjs/operators'
  * Bud componentry
  */
 import makeCompiler from './compiler'
+import makeData from './data'
+import makeUtil from './util'
 import actions from './actions'
 import prettier from './prettier'
-import sproutUtil from './util'
 
 /**
  * Bud core
  *
+ * @type  {func}
  * @param {string} outDir
  * @param {object} configData
  * @param {object} data
  * @param {object} sprout
  * @param {string} templateDir
  * @param {bool}   skipInstall
+ *
+ * @return {Observable}
  */
-const bud = ({projectDir, configData, data, sprout, templateDir}) => {
+const bud = ({projectDir, configData, data: dataSrc, sprout, templateDir}) => {
   const config = {
     projectDir,
     templateDir,
@@ -28,7 +32,9 @@ const bud = ({projectDir, configData, data, sprout, templateDir}) => {
       cwd: projectDir,
     },
   }
-  const util = sproutUtil(config)
+
+  const data = makeData(dataSrc)
+  const util = makeUtil(config)
   const compiler = makeCompiler({sprout, data})
 
   sprout.registerActions &&

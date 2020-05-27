@@ -3,18 +3,17 @@ import {Box} from 'ink'
 import globby from 'globby'
 import Divider from 'ink-divider'
 
+/**
+ * Budfile glob paths
+ */
 const cwd = process.cwd()
+const rootsBudsGlob = `${cwd}/node_modules/@roots/bud/src/budfiles/**/*.bud.js`
+const moduleBudsGlob = `${cwd}/node_modules/**/bud-plugin-*/*.bud.js`
+const projectBudsGlob = `${cwd}/.bud/**/*.bud.js`
 
-/** Command: generate list */
+/** Command: bud list */
 /// List available budfiles
 const List = () => {
-  /**
-   * Budfile glob paths
-   */
-  const rootsBudsGlob = `${cwd}/node_modules/@roots/bud/src/budfiles/**/*.bud.js`
-  const moduleBudsGlob = `${cwd}/node_modules/**/bud-plugin-*/*.bud.js`
-  const projectBudsGlob = `${cwd}/.bud/**/*.bud.js`
-
   /**
    * Project buds
    */
@@ -111,9 +110,15 @@ const List = () => {
           Name
         </Box>
       </Box>
+
       <Divider padding={0} width={100} />
+
       {buds.map((bud, id) => (
-        <Box key={id} flexDirection="row" flexGrow={1} justifyContent="flex-start">
+        <Box
+          key={id}
+          flexDirection="row"
+          flexGrow={1}
+          justifyContent="flex-start">
           <Box width={40}>{bud.command}</Box>
           <Box width={40} marginLeft={1}>
             {bud.source}

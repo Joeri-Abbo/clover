@@ -219,7 +219,81 @@ const makeCompiler = ({
 
 var _default = makeCompiler;
 exports.default = _default;
-},{"./helpers":"../src/bud/compiler/helpers/index.js"}],"../src/bud/actions/addDependencies.js":[function(require,module,exports) {
+},{"./helpers":"../src/bud/compiler/helpers/index.js"}],"../src/bud/data/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * Make data
+ *
+ * @param  {object} data
+ * @return {object}
+ */
+const makeData = data => ({ ...data,
+  setData: function ({
+    key,
+    value
+  }) {
+    this[`${key}`] = value;
+  }
+});
+
+var _default = makeData;
+exports.default = _default;
+},{}],"../src/bud/util/command.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _execa = _interopRequireDefault(require("execa"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Task runner
+ *
+ * @param  {object} config
+ *
+ * @return {func}
+ */
+const command = config => {
+  return cmd => _execa.default.command(cmd, config.execa);
+};
+
+var _default = command;
+exports.default = _default;
+},{}],"../src/bud/util/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _command = _interopRequireDefault(require("./command"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Make util
+ *
+ * @param  {object} config
+ * @return {object}
+ */
+const makeUtil = config => ({
+  command: (0, _command.default)(config)
+});
+
+var _default = makeUtil;
+exports.default = _default;
+},{"./command":"../src/bud/util/command.js"}],"../src/bud/actions/addDependencies.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -677,53 +751,7 @@ const prettier = {
 };
 var _default = prettier;
 exports.default = _default;
-},{"./inferParser":"../src/bud/prettier/inferParser.js","./format":"../src/bud/prettier/format.js"}],"../src/bud/util/command.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _execa = _interopRequireDefault(require("execa"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Task runner
- *
- * @param  {object} config
- *
- * @return {func}
- */
-const command = config => {
-  return cmd => _execa.default.command(cmd, config.execa);
-};
-
-var _default = command;
-exports.default = _default;
-},{}],"../src/bud/util/index.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _command = _interopRequireDefault(require("./command"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Util.
- */
-const util = config => ({
-  command: (0, _command.default)(config)
-});
-
-var _default = util;
-exports.default = _default;
-},{"./command":"../src/bud/util/command.js"}],"../src/bud/index.js":[function(require,module,exports) {
+},{"./inferParser":"../src/bud/prettier/inferParser.js","./format":"../src/bud/prettier/format.js"}],"../src/bud/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -737,11 +765,13 @@ var _operators = require("rxjs/operators");
 
 var _compiler = _interopRequireDefault(require("./compiler"));
 
+var _data = _interopRequireDefault(require("./data"));
+
+var _util = _interopRequireDefault(require("./util"));
+
 var _actions = _interopRequireDefault(require("./actions"));
 
 var _prettier = _interopRequireDefault(require("./prettier"));
-
-var _util = _interopRequireDefault(require("./util"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -762,7 +792,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const bud = ({
   projectDir,
   configData,
-  data,
+  data: dataSrc,
   sprout,
   templateDir
 }) => {
@@ -774,6 +804,7 @@ const bud = ({
       cwd: projectDir
     }
   };
+  const data = (0, _data.default)(dataSrc);
   const util = (0, _util.default)(config);
   const compiler = (0, _compiler.default)({
     sprout,
@@ -808,7 +839,7 @@ const bud = ({
 
 var _default = bud;
 exports.default = _default;
-},{"./compiler":"../src/bud/compiler/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js","./util":"../src/bud/util/index.js"}],"../src/components/Banner.js":[function(require,module,exports) {
+},{"./compiler":"../src/bud/compiler/index.js","./data":"../src/bud/data/index.js","./util":"../src/bud/util/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js"}],"../src/components/Banner.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -847,6 +878,57 @@ const Banner = ({
 
 var _default = Banner;
 exports.default = _default;
+},{}],"../src/components/Tasks.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _ink = require("ink");
+
+var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+/**
+ * Tasks
+ *
+ * @prop {object} data
+ * @prop {object} status
+ * @prop {bool}   complete
+ * @prop {bool}   noClear
+ */
+const Tasks = ({
+  data,
+  status,
+  complete,
+  noClear
+}) => {
+  const {
+    stdout
+  } = (0, _ink.useStdout)();
+  (0, _react.useEffect)(() => {
+    data && !noClear && stdout.write('\x1B[2J\x1B[0f');
+  }, [data]);
+  return status ? /*#__PURE__*/_react.default.createElement(_ink.Box, null, complete ? /*#__PURE__*/_react.default.createElement(_ink.Color, {
+    green: true
+  }, "\u26A1\uFE0F All set.") : /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
+    green: true
+  }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, {
+    type: "dots"
+  })), ` ${status}`)) : null;
+};
+
+var _default = Tasks;
+exports.default = _default;
 },{}],"../src/components/Error.js":[function(require,module,exports) {
 "use strict";
 
@@ -872,7 +954,7 @@ const Error = ({
 
 var _default = Error;
 exports.default = _default;
-},{}],"../src/components/BudCLI.js":[function(require,module,exports) {
+},{}],"../src/components/App.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -888,13 +970,15 @@ var _react = _interopRequireWildcard(require("react"));
 
 var _ink = require("ink");
 
-var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _enquirer = require("enquirer");
 
-var _bud = _interopRequireDefault(require("./../bud"));
+var _bud = _interopRequireDefault(require("../bud"));
 
 var _Banner = _interopRequireDefault(require("./Banner"));
+
+var _Tasks = _interopRequireDefault(require("./Tasks"));
 
 var _Error = _interopRequireDefault(require("./Error"));
 
@@ -905,73 +989,68 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 const cwd = process.cwd();
-const DEFAULT_BUDFILE = {
-  actions: [],
-  label: 'Budfile',
-  prompts: []
-};
 /**
- * Bud CLI
+ * App
  *
  * @prop {string} label
- * @prop {string} budFile
+ * @prop {string} templateDir
+ * @prop {object} sprout
  * @prop {string} outDir
  * @prop {object} values
  * @prop {object} children
  * @prop {bool}   noClear
  */
 
-const BudCLI = ({
+const App = ({
   label,
   templateDir,
-  sprout = DEFAULT_BUDFILE,
+  sprout,
   outDir,
-  inert = false,
-  children,
-  noClear = false
+  noClear
 }) => {
   /**
-   * Parse values from .bud/bud.config.json
+   * source bud.config.json
    */
-  const config = (0, _path.join)(process.cwd(), '.bud/bud.config.json');
+  const config = (0, _path.join)(cwd, '.bud/bud.config.json');
   const [configData] = (0, _react.useState)((0, _fs.existsSync)(config) ? require(config) : null);
   /**
-   * Parse values from prompt
+   * Assemble data from various sources
+   * - config file
+   * - prompts (enquirer)
    */
 
   const [prompts, setPrompts] = (0, _react.useState)(sprout.prompts ? sprout.prompts : null);
-  const {
-    exit
-  } = (0, _ink.useApp)();
   const [data, setData] = (0, _react.useState)(null);
+  (0, _react.useEffect)(() => {
+    if (prompts) {
+      (0, _enquirer.prompt)(prompts).then(data => {
+        setPrompts(null);
+        const projectConfig = configData && configData.project ? configData.project : [];
+        const devConfig = configData && configData.dev ? configData.dev : [];
+        setData({ ...projectConfig,
+          ...devConfig,
+          ...data
+        });
+      });
+    } else {
+      setPrompts(null);
+      const projectConfig = configData && configData.project ? configData.project : [];
+      const devConfig = configData && configData.dev ? configData.dev : [];
+      setData({ ...projectConfig,
+        ...devConfig
+      });
+    }
+  }, []);
+  /**
+   * Observer subscribe
+   */
+
+  const [budSubscription, setBudSubscription] = (0, _react.useState)(false);
   const [status, setStatus] = (0, _react.useState)(null);
   const [error, setError] = (0, _react.useState)(null);
   const [complete, setComplete] = (0, _react.useState)(false);
-  const [budSubscription, setBudSubscription] = (0, _react.useState)(false);
-  /**
-   * Assemble data from config files, prompt & cli args/flags.
-   */
-
   (0, _react.useEffect)(() => {
-    prompts ? (0, _enquirer.prompt)(prompts).then(data => {
-      setPrompts(null);
-      setData({ ...(configData && configData.project ? configData.project : []),
-        ...(configData && configData.dev ? configData.dev : []),
-        ...data
-      });
-    }) : (() => {
-      setPrompts(null);
-      setData({ ...(configData && configData.project ? configData.project : []),
-        ...(configData && configData.dev ? configData.dev : [])
-      });
-    })();
-  }, []);
-  /**
-   * Run the budfile actions
-   */
-
-  (0, _react.useEffect)(() => {
-    data && !inert && !budSubscription && setBudSubscription((0, _bud.default)({
+    data && !budSubscription && setBudSubscription((0, _bud.default)({
       configData,
       data: data !== null && data !== void 0 ? data : {},
       templateDir,
@@ -983,6 +1062,13 @@ const BudCLI = ({
       complete: () => setComplete(true)
     }));
   }, [data, status]);
+  /**
+   * Observer unsubscribe.
+   */
+
+  const {
+    exit
+  } = (0, _ink.useApp)();
   (0, _react.useEffect)(() => {
     complete && (async () => {
       await budSubscription.unsubscribe();
@@ -990,7 +1076,7 @@ const BudCLI = ({
     })();
   }, [complete, budSubscription]);
   /**
-   * Render TTY
+   * Render observable updates and errors
    */
 
   return /*#__PURE__*/_react.default.createElement(_ink.Box, {
@@ -999,44 +1085,32 @@ const BudCLI = ({
     padding: 1
   }, /*#__PURE__*/_react.default.createElement(_Banner.default, {
     label: label
-  }), !error ? /*#__PURE__*/_react.default.createElement(Tasks, {
+  }), /*#__PURE__*/_react.default.createElement(_Tasks.default, {
     data: data,
     status: status,
     complete: complete,
     noClear: noClear
-  }) : /*#__PURE__*/_react.default.createElement(_Error.default, {
+  }), error && /*#__PURE__*/_react.default.createElement(_Error.default, {
     message: error
   }));
 };
-/**
- * Tasks
- */
 
-
-const Tasks = ({
-  data,
-  status,
-  complete,
-  noClear
-}) => {
-  const {
-    stdout
-  } = (0, _ink.useStdout)();
-  (0, _react.useEffect)(() => {
-    data && !noClear && stdout.write('\x1B[2J\x1B[0f');
-  }, [data]);
-  return status ? /*#__PURE__*/_react.default.createElement(_ink.Box, null, complete ? /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, "\u26A1\uFE0F All set.") : /*#__PURE__*/_react.default.createElement(_ink.Text, null, /*#__PURE__*/_react.default.createElement(_ink.Color, {
-    green: true
-  }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, {
-    type: "dots"
-  })), ` ${status}`)) : [];
+App.propTypes = {
+  label: _propTypes.default.string,
+  sprout: _propTypes.default.object,
+  noClear: _propTypes.default.bool
 };
-
-var _default = BudCLI;
+App.defaultProps = {
+  sprout: {
+    actions: [],
+    label: 'Bud',
+    prompts: []
+  },
+  noClear: false
+};
+var _default = App;
 exports.default = _default;
-},{"./../bud":"../src/bud/index.js","./Banner":"../src/components/Banner.js","./Error":"../src/components/Error.js"}],"init.js":[function(require,module,exports) {
+},{"../bud":"../src/bud/index.js","./Banner":"../src/components/Banner.js","./Tasks":"../src/components/Tasks.js","./Error":"../src/components/Error.js"}],"init.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1054,7 +1128,7 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _inkSpinner = _interopRequireDefault(require("ink-spinner"));
 
-var _BudCLI = _interopRequireDefault(require("./../src/components/BudCLI"));
+var _App = _interopRequireDefault(require("./../src/components/App"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1085,7 +1159,7 @@ const Init = props => {
   (0, _react.useEffect)(() => {
     sprout && setLabel(sprout.label);
   }, [sprout]);
-  return sprout ? /*#__PURE__*/_react.default.createElement(_BudCLI.default, {
+  return sprout ? /*#__PURE__*/_react.default.createElement(_App.default, {
     label: label,
     outDir: projectDir || '',
     sprout: sprout,
@@ -1103,5 +1177,5 @@ Init.defaultProps = {
 Init.positionalArgs = ['projectDir'];
 var _default = Init;
 exports.default = _default;
-},{"./../src/components/BudCLI":"../src/components/BudCLI.js"}]},{},["init.js"], null)
+},{"./../src/components/App":"../src/components/App.js"}]},{},["init.js"], null)
 //# sourceMappingURL=/init.js.map

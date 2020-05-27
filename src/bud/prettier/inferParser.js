@@ -1,5 +1,6 @@
 /**
  * Prettier parsers.
+ * @type {object}
  */
 const parsers = {
   js: 'babel',
@@ -20,6 +21,7 @@ const parsers = {
 /**
  * Infer parser.
  *
+ * @type  {async func}
  * @param {string} file
  */
 const inferParser = async function (file) {
