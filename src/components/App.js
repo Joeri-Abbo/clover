@@ -28,21 +28,13 @@ const App = ({label, templateDir, sprout, outDir, noClear}) => {
    * source bud.config.json
    */
   const configFile = join(cwd, '.bud/bud.config.json')
-  const [config] = useState(
-    existsSync(configFile)
-      ? require(configFile)
-      : null
-  )
+  const [config] = useState(existsSync(configFile) ? require(configFile) : null)
 
   /**
    * Assemble data from prompts
    */
   const [data, setData] = useState(null)
-  const [prompts, setPrompts] = useState(
-    sprout.prompts
-    ? sprout.prompts
-    : null
-  )
+  const [prompts, setPrompts] = useState(sprout.prompts ? sprout.prompts : null)
   useEffect(() => {
     if (prompts) {
       prompt(prompts).then(data => {
@@ -97,10 +89,7 @@ const App = ({label, templateDir, sprout, outDir, noClear}) => {
    * Render observable updates and errors
    */
   return (
-    <Box
-      flexDirection="column"
-      justifyContent="flex-start"
-      padding={1}>
+    <Box flexDirection="column" justifyContent="flex-start" padding={1}>
       <Banner label={label} />
       <Tasks
         data={data}

@@ -1,17 +1,26 @@
 {
 	"commands": [
 		{
-			"path": "list/index.js",
-			"name": "list",
-			"description": "List available budfiles",
-			"args": [],
-			"subCommands": []
-		},
-		{
 			"path": "index.js",
 			"name": "index",
 			"description": "Bud information",
 			"args": [],
+			"subCommands": []
+		},
+		{
+			"path": "init.js",
+			"name": "init",
+			"description": "Create a new project",
+			"args": [
+				{
+					"key": "projectDir",
+					"type": "string",
+					"description": "Output directory",
+					"isRequired": false,
+					"aliases": [],
+					"positional": true
+				}
+			],
 			"subCommands": []
 		},
 		{
@@ -31,19 +40,10 @@
 			"subCommands": []
 		},
 		{
-			"path": "init.js",
-			"name": "init",
-			"description": "Create a new project",
-			"args": [
-				{
-					"key": "projectDir",
-					"type": "string",
-					"description": "Output directory",
-					"isRequired": false,
-					"aliases": [],
-					"positional": true
-				}
-			],
+			"path": "list/index.js",
+			"name": "list",
+			"description": "List available budfiles",
+			"args": [],
 			"subCommands": []
 		}
 	]
