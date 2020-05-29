@@ -332,7 +332,69 @@ const makeUtil = ({
 
 var _default = makeUtil;
 exports.default = _default;
-},{"./command":"../src/bud/util/command.js"}],"../src/bud/actions/addDependencies.js":[function(require,module,exports) {
+},{"./command":"../src/bud/util/command.js"}],"../src/bud/pipes/actions.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _rxjs = require("rxjs");
+
+var _operators = require("rxjs/operators");
+
+/**
+ * Curried actions
+ *
+ * @prop {Observer} observer
+ * @prop {object}   sprout
+ * @prop {object}   task
+ * @prop {object}   actionProps
+ */
+const actions = ({
+  observer,
+  sprout,
+  actions,
+  ...props
+}) => {
+  (0, _rxjs.from)(sprout.tasks).pipe((0, _operators.concatMap)(task => new _rxjs.Observable(async observer => {
+    actions[task.task]({
+      task,
+      actions,
+      observer,
+      ...props
+    });
+  }))).subscribe({
+    next: next => observer.next(next),
+    error: error => observer.error(error),
+    complete: () => observer.complete()
+  });
+};
+
+var _default = actions;
+exports.default = _default;
+},{}],"../src/bud/pipes/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _actions = _interopRequireDefault(require("./actions"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Make Pipes
+ *
+ * @return {object}
+ */
+const pipes = [_actions.default];
+var _default = pipes;
+exports.default = _default;
+},{"./actions":"../src/bud/pipes/actions.js"}],"../src/bud/actions/addDependencies.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -351,21 +413,30 @@ exports.default = void 0;
  */
 const addDependencies = async ({
   task,
+  logger,
   observer,
   util
 }) => {
   let installation;
-  observer.next(`Installing packages from ${task.repo}...`);
+  observer.next(`Installing packages`);
 
   if (task.repo !== 'npm' && task.repo !== 'packagist') {
     observer.error(`Incorrect package repo specified.`);
   }
 
   if (task.repo == 'npm') {
+    logger.info({
+      emitter: 'addDependencies',
+      task
+    });
     installation = util.command(`yarn add ${task.dev ? `-D` : ``} ${task.pkgs.join(' ')}`);
   }
 
   if (task.repo == 'packagist') {
+    logger.info({
+      emitter: 'addDependencies',
+      task
+    });
     installation = util.command(`composer require ${task.pkgs.join(' ')} ${task.dev ? `--development` : ``}`);
   }
 
@@ -404,6 +475,7 @@ var _fsExtra = require("fs-extra");
 const compile = async ({
   task,
   observer,
+  logger,
   data,
   config,
   prettier,
@@ -412,6 +484,13 @@ const compile = async ({
   const src = await (0, _fsExtra.readFile)((0, _path.join)(config.templateDir, task.src), 'utf8');
   const dest = compiler.make(task.dest)(data);
   const template = compiler.make(src)(data);
+  logger.info({
+    emitter: 'compile',
+    task,
+    template: task.src,
+    dest
+  });
+  observer.next(`Writing file ${dest}`);
   await (0, _fsExtra.outputFile)(...[(0, _path.join)(config.projectDir, dest), task.parser ? prettier.format(template, task.parser) : template]);
   observer.complete();
 };
@@ -442,15 +521,179 @@ var _fsExtra = require("fs-extra");
 const copy = async ({
   task,
   observer,
+  logger,
   config
 }) => {
   const src = (0, _path.join)(config.templateDir, task.src);
   const dest = (0, _path.join)(config.projectDir, task.dest);
+  logger.info({
+    emitter: 'copy',
+    task
+  });
+  observer.next(`Copying file`);
   await (0, _fsExtra.copy)(src, dest);
   observer.complete();
 };
 
 var _default = copy;
+exports.default = _default;
+},{}],"../src/bud/actions/ensureDir.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _path = require("path");
+
+var _fsExtra = _interopRequireDefault(require("fs-extra"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Make directory
+ *
+ * @param  {object}   task
+ * @param  {Observer} observer
+ * @param  {object}   config
+ * @param  {object}   data
+ * @param  {object}   compiler
+ *
+ * @return {void}
+ */
+const ensureDir = async ({
+  task,
+  observer,
+  logger,
+  config,
+  data,
+  compiler
+}) => {
+  const path = (0, _path.join)(config.projectDir, compiler.make(task.path)(data));
+  logger.info({
+    emitter: 'ensureDir',
+    task,
+    path
+  });
+  observer.next(`Writing directory ${path}`);
+  await _fsExtra.default.ensureDir(path);
+  observer.complete();
+};
+
+var _default = ensureDir;
+exports.default = _default;
+},{}],"../src/bud/actions/ensureDirs.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _rxjs = require("rxjs");
+
+var _operators = require("rxjs/operators");
+
+/**
+ * Scaffold directories
+ *
+ * @prop   {task array} dirs
+ * @return {Observable}
+ */
+const ensureDirs = ({
+  task,
+  observer,
+  logger,
+  actions,
+  config,
+  data,
+  compiler
+}) => {
+  logger.info({
+    emitter: 'ensureDirs',
+    task
+  });
+  (0, _rxjs.from)(task.dirs).pipe((0, _operators.concatMap)(path => new _rxjs.Observable(observer => {
+    actions.ensureDir({
+      task: {
+        path
+      },
+      config,
+      data,
+      compiler,
+      observer,
+      logger
+    });
+  }))).subscribe({
+    next: next => observer.next(next),
+    error: error => observer.error(error),
+    complete: () => observer.complete()
+  });
+};
+
+var _default = ensureDirs;
+exports.default = _default;
+},{}],"../src/bud/actions/git.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * Action: git clone
+ *
+ * @prop {object}   task
+ * @prop {Observer} observer
+ * @prop {object}   util
+ */
+const clone = async ({
+  observer,
+  logger,
+  task,
+  util
+}) => {
+  logger.next({
+    emitter: 'clone',
+    task
+  });
+  observer.next(`Cloning ${task.repo} to ${task.dest}`);
+  const clone = util.command(`git clone git@github.com:${task.repo} ${task.dest}`);
+  clone.stdout.on('data', () => observer.next(observer.next(`Cloning ${task.repo} to ${task.dest}}`)));
+  clone.then(() => observer.complete());
+};
+/**
+ * Action: Github
+ *
+ * @prop   {object}   task
+ * @prop   {Observer} observer
+ * @prop   {object}   util
+ */
+
+
+const git = async ({
+  task,
+  observer,
+  logger,
+  ...props
+}) => {
+  logger.info({
+    emitter: 'gite',
+    task
+  });
+
+  if (task.action == 'clone') {
+    clone({
+      task,
+      observer,
+      ...props
+    });
+  }
+};
+
+var _default = git;
 exports.default = _default;
 },{}],"../src/bud/actions/install.js":[function(require,module,exports) {
 "use strict";
@@ -483,16 +726,16 @@ const install = async ({
 
   if (task.repo == 'npm') {
     installation = util.command(`yarn`);
+    installation.stdout.on('data', status => {
+      observer.next(status);
+    });
+    installation.then(() => observer.complete());
   }
 
   if (task.repo == 'packagist') {
     installation = util.command(`composer install`);
+    installation.then(() => observer.complete());
   }
-
-  installation.stdout.on('data', status => {
-    observer.next(status);
-  });
-  installation.then(() => observer.complete());
 };
 
 var _default = install;
@@ -529,13 +772,13 @@ const json = async function ({
     await (0, _fsExtra.outputFile)(`${config.projectDir}/${task.file}`, prettier.format(output, 'json'));
     observer.complete();
   } catch (err) {
-    observer.error(`There was a problem writing to ${task.file}`);
+    console.log(`There was a problem writing to ${task.file}`);
   }
 };
 
 var _default = json;
 exports.default = _default;
-},{}],"../src/bud/actions/mkDir.js":[function(require,module,exports) {
+},{}],"../src/bud/actions/touch.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -543,93 +786,41 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _path = require("path");
-
 var _fsExtra = require("fs-extra");
 
+var _path = require("path");
+
 /**
- * Make directory
+ * Action: Touch
  *
- * @param  {object}   task
- * @param  {Observer} observer
- * @param  {object}   config
- * @param  {object}   data
- * @param  {object}   compiler
- *
- * @return {void}
+ * @prop   {object}   task
+ * @prop   {Observer} observer
+ * @prop   {object}   util
  */
-const mkDir = async ({
+const touch = async ({
   task,
-  observer,
   config,
+  compiler,
   data,
-  compiler
+  observer
 }) => {
   const path = (0, _path.join)(config.projectDir, compiler.make(task.path)(data));
 
   try {
-    await (0, _fsExtra.ensureDir)(path).then(() => {
+    await (0, _fsExtra.ensureFile)(path).then(() => {
       observer.next();
     });
+    observer.complete();
   } catch (error) {
-    observer.error(`actions.mkDir: ${JSON.stringify(error)}`);
+    observer.error(`${JSON.stringify({
+      task,
+      config,
+      data
+    })}`);
   }
 };
 
-var _default = mkDir;
-exports.default = _default;
-},{}],"../src/bud/actions/scaffold.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _rxjs = require("rxjs");
-
-var _operators = require("rxjs/operators");
-
-/**
- * Scaffold directories
- *
- * @param  {array} paths
- * @return {Observable}
- */
-const scaffold = ({
-  task,
-  observer,
-  config,
-  data,
-  compiler,
-  actions
-}) => {
-  observer.next(`Creating directories`);
-  return (0, _rxjs.from)(task.paths).pipe((0, _operators.concatMap)(path => {
-    return new _rxjs.Observable(async observer => {
-      try {
-        await actions.mkDir({
-          task: {
-            path
-          },
-          config,
-          data,
-          compiler,
-          observer
-        });
-        observer.complete();
-      } catch (error) {
-        observer.error(`error: thrown in actions.scaffold`);
-      }
-    });
-  })).subscribe({
-    next: next => observer.next(next),
-    error: error => observer.error(error),
-    complete: () => observer.complete()
-  });
-};
-
-var _default = scaffold;
+var _default = touch;
 exports.default = _default;
 },{}],"../src/bud/actions/index.js":[function(require,module,exports) {
 "use strict";
@@ -645,34 +836,44 @@ var _compile = _interopRequireDefault(require("./compile"));
 
 var _copy = _interopRequireDefault(require("./copy"));
 
+var _ensureDir = _interopRequireDefault(require("./ensureDir"));
+
+var _ensureDirs = _interopRequireDefault(require("./ensureDirs"));
+
+var _git = _interopRequireDefault(require("./git"));
+
 var _install = _interopRequireDefault(require("./install"));
 
 var _json = _interopRequireDefault(require("./json"));
 
-var _mkDir = _interopRequireDefault(require("./mkDir"));
-
-var _scaffold = _interopRequireDefault(require("./scaffold"));
+var _touch = _interopRequireDefault(require("./touch"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Actions
+ *
+ * @type {object}
  */
 const actions = {
   addDependencies: _addDependencies.default,
   compile: _compile.default,
   copy: _copy.default,
+  ensureDir: _ensureDir.default,
+  ensureDirs: _ensureDirs.default,
+  git: _git.default,
   install: _install.default,
   json: _json.default,
-  mkDir: _mkDir.default,
-  scaffold: _scaffold.default,
-  register: function (action) {
+  touch: _touch.default,
+  register: function ({
+    action
+  }) {
     this[`${action.handle}`] = action.callback;
   }
 };
 var _default = actions;
 exports.default = _default;
-},{"./addDependencies":"../src/bud/actions/addDependencies.js","./compile":"../src/bud/actions/compile.js","./copy":"../src/bud/actions/copy.js","./install":"../src/bud/actions/install.js","./json":"../src/bud/actions/json.js","./mkDir":"../src/bud/actions/mkDir.js","./scaffold":"../src/bud/actions/scaffold.js"}],"../src/bud/prettier/inferParser.js":[function(require,module,exports) {
+},{"./addDependencies":"../src/bud/actions/addDependencies.js","./compile":"../src/bud/actions/compile.js","./copy":"../src/bud/actions/copy.js","./ensureDir":"../src/bud/actions/ensureDir.js","./ensureDirs":"../src/bud/actions/ensureDirs.js","./git":"../src/bud/actions/git.js","./install":"../src/bud/actions/install.js","./json":"../src/bud/actions/json.js","./touch":"../src/bud/actions/touch.js"}],"../src/bud/prettier/inferParser.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -793,7 +994,38 @@ const prettier = {
 };
 var _default = prettier;
 exports.default = _default;
-},{"./inferParser":"../src/bud/prettier/inferParser.js","./format":"../src/bud/prettier/format.js"}],"../src/bud/index.js":[function(require,module,exports) {
+},{"./inferParser":"../src/bud/prettier/inferParser.js","./format":"../src/bud/prettier/format.js"}],"../src/bud/logger/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+const pino = require('pino');
+
+const prettifier = require('pino-pretty');
+/**
+ * Make logger
+ *
+ * @return {<Pino>()=>logger}
+ */
+
+
+const makeLogger = ({
+  projectDir
+}) => {
+  return pino({
+    prettyPrint: {
+      levelFirst: true
+    },
+    prettifier
+  }, pino.destination(`${projectDir}/.bud/bud.log`));
+};
+
+var _default = makeLogger;
+exports.default = _default;
+},{}],"../src/bud/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -813,9 +1045,13 @@ var _data = _interopRequireDefault(require("./data"));
 
 var _util = _interopRequireDefault(require("./util"));
 
+var _pipes = _interopRequireDefault(require("./pipes"));
+
 var _actions = _interopRequireDefault(require("./actions"));
 
 var _prettier = _interopRequireDefault(require("./prettier"));
+
+var _logger = _interopRequireDefault(require("./logger"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -831,13 +1067,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @return {Observable}
  */
 const bud = props => {
+  const {
+    sprout
+  } = props;
+  const logger = (0, _logger.default)({ ...props
+  });
   const config = (0, _config.default)({ ...props
   });
   const data = (0, _data.default)({ ...props
   });
-  const {
-    sprout
-  } = props;
   const util = (0, _util.default)({
     config
   });
@@ -846,35 +1084,49 @@ const bud = props => {
     data
   });
   sprout.registerActions && sprout.registerActions.forEach(action => {
-    _actions.default.register(action);
+    _actions.default.register({
+      action
+    });
   });
   return new _rxjs.Observable(observer => {
-    (0, _rxjs.from)(sprout.tasks).pipe((0, _operators.concatMap)(function (task) {
-      return new _rxjs.Observable(async observer => {
-        observer.next(task.action);
-
-        _actions.default[task.action]({
-          task,
-          observer,
-          config,
-          data,
-          actions: _actions.default,
-          compiler,
-          prettier: _prettier.default,
-          util
-        });
+    const props = {
+      config,
+      data,
+      actions: _actions.default,
+      compiler,
+      prettier: _prettier.default,
+      util,
+      sprout,
+      logger
+    };
+    (0, _rxjs.from)(_pipes.default).pipe((0, _operators.concatMap)(job => new _rxjs.Observable(async observer => {
+      await job({
+        observer,
+        ...props
       });
-    })).subscribe({
-      next: next => observer.next(next),
-      error: error => observer.error(error),
-      complete: complete => observer.complete(complete)
+    }))).subscribe({
+      next: next => {
+        next && logger.info({
+          emitter: 'bud',
+          emitted: 'next'
+        });
+        observer.next(next);
+      },
+      error: error => {
+        error && logger.error({
+          emitter: 'bud',
+          emitted: 'error'
+        });
+        observer.error(error);
+      },
+      complete: () => observer.complete()
     });
   });
 };
 
 var _default = bud;
 exports.default = _default;
-},{"./compiler":"../src/bud/compiler/index.js","./config":"../src/bud/config/index.js","./data":"../src/bud/data/index.js","./util":"../src/bud/util/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js"}],"../src/components/Banner.js":[function(require,module,exports) {
+},{"./compiler":"../src/bud/compiler/index.js","./config":"../src/bud/config/index.js","./data":"../src/bud/data/index.js","./util":"../src/bud/util/index.js","./pipes":"../src/bud/pipes/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js","./logger":"../src/bud/logger/index.js"}],"../src/components/Banner.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

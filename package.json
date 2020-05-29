@@ -1,6 +1,6 @@
 {
   "name": "@roots/bud",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "repository": {
     "type": "git",
     "url": "git://github.com/roots/bud.git"
@@ -32,8 +32,11 @@
     "ink-spinner": "^3.0.1",
     "ink-table": "^2.0.1",
     "ink-use-stdout-dimensions": "^1.0.5",
+    "next-pino": "^0.0.1",
     "node-fetch": "^2.6.0",
     "pastel": "^1.0.3",
+    "pino": "^6.3.0",
+    "pino-pretty": "^4.0.0",
     "prettier": "2.0.5",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
