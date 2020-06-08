@@ -50,7 +50,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 Bud is currently pre-release. But, you can try it out now:
 
 ```sh
-npx @roots/bud@1.0.0-rc.3 init [project-dir]
+npx @roots/bud@1.0.0-rc.4 init [project-dir]
 ```
 
 This will initialize your project and install `@roots/bud` as a local dev dependency.
@@ -87,14 +87,12 @@ Documentation forthcoming. For now, you can run `yarn generate:list` to see what
 - handlebars
 - handlebars-helpers
 - ink
+- ink-divider
 - ink-link
 - ink-spinner
 - ink-table
 - ink-use-stdout-dimensions
-- node-fetch
 - pastel
-- pino
-- pino-pretty
 - prettier
 - prop-types
 - react
@@ -109,7 +107,6 @@ Documentation forthcoming. For now, you can run `yarn generate:list` to see what
 - eslint-plugin-react-hooks
 - globby
 - husky
-- ink-divider
 - markdownlint-cli
 - npm-run-all
 - tree-node-cli
