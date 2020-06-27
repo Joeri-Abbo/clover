@@ -1,6 +1,5 @@
 import React from 'react'
-import {Box} from 'ink'
-import Spinner from 'ink-spinner'
+import {Text} from 'ink'
 import PropTypes from 'prop-types'
 
 /**
@@ -8,10 +7,8 @@ import PropTypes from 'prop-types'
  *
  * @prop {string} message
  */
-const Loading = ({message}) => (
-  <Box>
-    <Spinner /> {message}
-  </Box>
+const Loading = ({message, spinnerColor = 'white'}) => (
+  <Text color={spinnerColor}> {message}</Text>
 )
 
 Loading.propTypes = {

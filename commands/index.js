@@ -1,17 +1,14 @@
 import React from 'react'
-import {Box, Color, Text} from 'ink'
+import PropTypes from 'prop-types'
 
-import Banner from './../src/components/Banner'
+import Generate from './generate'
 
 /** Command: bud */
-/// Bud information
-const Bud = () => (
-  <Box width="103" flexDirection="column" justifyContent="flex-start" padding={1}>
-    <Banner label={'Bud'} />
-    <Text>
-      To get started run <Color green>npx @roots/bud init {`{project-dir}`}</Color>
-    </Text>
-  </Box>
-)
+/// Bud CLI
+const Bud = ({inputArgs}) => <Generate inputArgs={inputArgs} />
+
+Bud.propTypes = {
+  inputArgs: PropTypes.array,
+}
 
 export default Bud

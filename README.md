@@ -50,7 +50,7 @@ Bud is an extendable, zero configuration scaffolding CLI for WordPress editor bl
 Bud is currently pre-release. But, you can try it out now:
 
 ```sh
-npx @roots/bud@1.0.0-rc.4 init [project-dir]
+npx @roots/bud@1.0.0-rc.5 init [project-dir]
 ```
 
 This will initialize your project and install `@roots/bud` as a local dev dependency.
@@ -71,45 +71,50 @@ Documentation forthcoming. For now, you can run `yarn generate:list` to see what
 
 ## All commands:
 
-| Command      | Description                  |
-| ------------ | ---------------------------- |
-| bud          | Bud information              |
-| bud init     | Create a new project         |
-| bud generate | Generate code from a budfile |
-| bud list     | List available budfiles      |
+| Command      | Description             |
+| ------------ | ----------------------- |
+| bud          | Bud CLI                 |
+| bud generate | Run a generator.        |
+| bud init     | Create a new project    |
+| bud list     | List available budfiles |
+| bud preset   | Run a preset.           |
 
 ### Dependencies
 
+- chalk
 - enquirer
 - esm
 - execa
+- find-plugins
 - fs-extra
+- globby
 - handlebars
 - handlebars-helpers
 - ink
-- ink-divider
 - ink-link
 - ink-spinner
-- ink-table
+- ink-text-input
 - ink-use-stdout-dimensions
+- lodash
 - pastel
 - prettier
 - prop-types
 - react
+- resolve-pkg
 - rxjs
 
 ### Development dependencies
 
+- @roots/bud
+- @roots/bud-generators
+- arr-rotate
 - babel-eslint
 - eslint
-- eslint-plugin-jsx-a11y
 - eslint-plugin-react
 - eslint-plugin-react-hooks
-- globby
 - husky
 - markdownlint-cli
 - npm-run-all
-- tree-node-cli
 
 ## Contributing
 
