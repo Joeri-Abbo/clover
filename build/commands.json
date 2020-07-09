@@ -1,9 +1,9 @@
 {
 	"commands": [
 		{
-			"path": "generate/index.js",
-			"name": "generate",
-			"description": "Run a generator.",
+			"path": "index.js",
+			"name": "index",
+			"description": "Bud CLI",
 			"args": [
 				{
 					"key": "inputArgs",
@@ -17,9 +17,9 @@
 			"subCommands": []
 		},
 		{
-			"path": "index.js",
-			"name": "index",
-			"description": "Bud CLI",
+			"path": "generate/index.js",
+			"name": "generate",
+			"description": "Run a generator.",
 			"args": [
 				{
 					"key": "inputArgs",

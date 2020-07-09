@@ -11,7 +11,7 @@ import Spinner from 'ink-spinner'
  */
 const Tasks = ({status, complete}) => {
   if (complete) {
-    return <Text green>🏁{'  '}Done</Text>
+    return <Text color="green">🏁{'  '}Done</Text>
   }
 
   if (!status || complete) {
@@ -21,7 +21,7 @@ const Tasks = ({status, complete}) => {
   return (
     <Box>
       {status && (
-        <Text green>
+        <Text color="green">
           <Spinner /> {status}
         </Text>
       )}

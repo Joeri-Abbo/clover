@@ -24,6 +24,7 @@ const App = ({isLoading, loadingMessage, children}) => (
         message={loadingMessage ?? 'Loading'}
       />
     )}
+
     {children}
   </Box>
 )

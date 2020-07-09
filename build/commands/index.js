@@ -139,9 +139,9 @@ const Indicator = ({
   isSelected
 }) => /*#__PURE__*/_react.default.createElement(_ink.Box, {
   marginRight: 1
-}, isSelected ? /*#__PURE__*/_react.default.createElement(_ink.Text, {
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, {
   color: "blue"
-}, _figures.default.pointer) : ' ');
+}, isSelected ? _figures.default.pointer : ' '));
 
 Indicator.propTypes = {
   isSelected: _propTypes.default.bool
@@ -490,7 +490,7 @@ const Loading = ({
   spinnerColor = 'white'
 }) => /*#__PURE__*/_react.default.createElement(_ink.Text, {
   color: spinnerColor
-}, " ", message);
+}, message);
 
 Loading.propTypes = {
   message: _propTypes.default.string
@@ -1705,7 +1705,7 @@ const Tasks = ({
 }) => {
   if (complete) {
     return /*#__PURE__*/_react.default.createElement(_ink.Text, {
-      green: true
+      color: "green"
     }, "\uD83C\uDFC1", '  ', "Done");
   }
 
@@ -1714,7 +1714,7 @@ const Tasks = ({
   }
 
   return /*#__PURE__*/_react.default.createElement(_ink.Box, null, status && /*#__PURE__*/_react.default.createElement(_ink.Text, {
-    green: true
+    color: "green"
   }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null), " ", status));
 };
 
@@ -1952,11 +1952,14 @@ const Generate = ({
   } = (0, _useGeneratorIndex.default)();
   const [generators, setGenerators] = (0, _react.useState)(null);
   (0, _react.useEffect)(() => {
-    const allResults = [...project, ...plugin, ...core].map(bud => ({
+    const allResults = [...project, ...plugin, ...core].filter(bud => bud.name.indexOf('bud-init')).map(bud => ({
       value: bud.path,
       label: bud.name
     }));
-    complete && setGenerators(allResults);
+
+    if (complete) {
+      setGenerators(allResults);
+    }
   }, [name, complete]);
   /**
    * If the user passed a name as an argument, filter the generators
@@ -1982,9 +1985,10 @@ const Generate = ({
 
   const isLoading = !generators && !selection;
   /**
-   * Display search when no particular generator was specified,
-   * we have generators to display and no selection has yet
-   * been made.
+   * Display search when:
+   *  - no particular generator was specified,
+   *  - there are generators to display
+   *  - no selection has yet been made.
    */
 
   const displaySearch = !name && generators && !selection;
