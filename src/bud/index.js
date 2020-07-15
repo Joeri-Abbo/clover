@@ -22,9 +22,13 @@ import prettier from './prettier'
  */
 const bud = props => {
   const {generator} = props
+
   const config = makeConfig({...props})
+
   const data = makeData({...props})
+
   const util = makeUtil({config})
+
   const compiler = makeCompiler({generator, data})
 
   generator.registerActions &&

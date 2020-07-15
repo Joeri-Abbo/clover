@@ -39,12 +39,16 @@ const Generate = ({inputArgs}) => {
   const {core, plugin, project, complete} = useGeneratorIndex()
   const [generators, setGenerators] = useState(null)
   useEffect(() => {
-    const allResults = [...project, ...plugin, ...core].map(bud => ({
-      value: bud.path,
-      label: bud.name,
-    }))
+    const allResults = [...project, ...plugin, ...core]
+      .filter(bud => bud.name.indexOf('bud-init'))
+      .map(bud => ({
+        value: bud.path,
+        label: bud.name,
+      }))
 
-    complete && setGenerators(allResults)
+    if (complete) {
+      setGenerators(allResults)
+    }
   }, [name, complete])
 
   /**
@@ -74,9 +78,10 @@ const Generate = ({inputArgs}) => {
   const isLoading = !generators && !selection
 
   /**
-   * Display search when no particular generator was specified,
-   * we have generators to display and no selection has yet
-   * been made.
+   * Display search when:
+   *  - no particular generator was specified,
+   *  - there are generators to display
+   *  - no selection has yet been made.
    */
   const displaySearch = !name && generators && !selection
 

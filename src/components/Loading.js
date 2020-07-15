@@ -8,7 +8,7 @@ import PropTypes from 'prop-types'
  * @prop {string} message
  */
 const Loading = ({message, spinnerColor = 'white'}) => (
-  <Text color={spinnerColor}> {message}</Text>
+  <Text color={spinnerColor}>{message}</Text>
 )
 
 Loading.propTypes = {

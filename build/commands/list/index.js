@@ -345,7 +345,7 @@ const Loading = ({
   spinnerColor = 'white'
 }) => /*#__PURE__*/_react.default.createElement(_ink.Text, {
   color: spinnerColor
-}, " ", message);
+}, message);
 
 Loading.propTypes = {
   message: _propTypes.default.string

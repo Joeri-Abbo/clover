@@ -139,9 +139,9 @@ const Indicator = ({
   isSelected
 }) => /*#__PURE__*/_react.default.createElement(_ink.Box, {
   marginRight: 1
-}, isSelected ? /*#__PURE__*/_react.default.createElement(_ink.Text, {
+}, /*#__PURE__*/_react.default.createElement(_ink.Text, {
   color: "blue"
-}, _figures.default.pointer) : ' ');
+}, isSelected ? _figures.default.pointer : ' '));
 
 Indicator.propTypes = {
   isSelected: _propTypes.default.bool
@@ -567,7 +567,7 @@ const Loading = ({
   spinnerColor = 'white'
 }) => /*#__PURE__*/_react.default.createElement(_ink.Text, {
   color: spinnerColor
-}, " ", message);
+}, message);
 
 Loading.propTypes = {
   message: _propTypes.default.string
@@ -1868,7 +1868,7 @@ const Tasks = ({
 }) => {
   if (complete) {
     return /*#__PURE__*/_react.default.createElement(_ink.Text, {
-      green: true
+      color: "green"
     }, "\uD83C\uDFC1", '  ', "Done");
   }
 
@@ -1877,7 +1877,7 @@ const Tasks = ({
   }
 
   return /*#__PURE__*/_react.default.createElement(_ink.Box, null, status && /*#__PURE__*/_react.default.createElement(_ink.Text, {
-    green: true
+    color: "green"
   }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null), " ", status));
 };
 

@@ -158,7 +158,6 @@ class SelectInput extends PureComponent {
 
   hasLimit = () => {
     const {limit, items} = this.props
-
     return typeof limit === 'number' && items.length > limit
   }
 

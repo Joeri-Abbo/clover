@@ -1281,7 +1281,7 @@ const Tasks = ({
 }) => {
   if (complete) {
     return /*#__PURE__*/_react.default.createElement(_ink.Text, {
-      green: true
+      color: "green"
     }, "\uD83C\uDFC1", '  ', "Done");
   }
 
@@ -1290,7 +1290,7 @@ const Tasks = ({
   }
 
   return /*#__PURE__*/_react.default.createElement(_ink.Box, null, status && /*#__PURE__*/_react.default.createElement(_ink.Text, {
-    green: true
+    color: "green"
   }, /*#__PURE__*/_react.default.createElement(_inkSpinner.default, null), " ", status));
 };
 
