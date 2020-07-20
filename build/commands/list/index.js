@@ -141,11 +141,11 @@ const cwd = process.cwd();
  */
 
 const fromMatches = matches => matches.map(generator => ({
-  name: _path.default.basename(generator).replace('.bud.js', ''),
+  name: _path.default.basename(generator).replace('.clover.js', ''),
   path: generator
 }));
 /**
- * Generators sourced from project .bud dir
+ * Generators sourced from project .clover dir
  */
 
 
@@ -157,7 +157,7 @@ const useProjectGenerators = () => {
 
     (async () => {
       setChecked(false);
-      const matches = await (0, _globby.default)([`${cwd}/.bud/generators/**/*.bud.js`]);
+      const matches = await (0, _globby.default)([`${cwd}/.clover/generators/**/*.clover.js`]);
       setGenerators(fromMatches(matches));
       setChecked(true);
     })();
@@ -185,8 +185,8 @@ const useModuleGenerators = keyword => {
         dir: _path.default.resolve(_path.default.join(cwd, 'node_modules')),
         scanAllDirs: true,
         keyword
-      }).map(plugin => _path.default.join(plugin.dir, '/generators/**/*.bud.js'));
-      const matches = await (0, _globby.default)([...packages, '!/**/*.preset.bud.js']);
+      }).map(plugin => _path.default.join(plugin.dir, '/generators/**/*.clover.js'));
+      const matches = await (0, _globby.default)([...packages, '!/**/*.preset.clover.js']);
       setGenerators(fromMatches(matches));
       setChecked(true);
     })();
@@ -202,8 +202,8 @@ exports.useModuleGenerators = useModuleGenerators;
 
 const useGeneratorIndex = () => {
   const [project, checkedProject] = useProjectGenerators();
-  const [core, checkedCore] = useModuleGenerators('bud-core-generators');
-  const [plugin, checkedPlugin] = useModuleGenerators('bud-generator');
+  const [core, checkedCore] = useModuleGenerators('clover-core-generators');
+  const [plugin, checkedPlugin] = useModuleGenerators('clover-generator');
   return {
     project,
     plugin,
@@ -243,7 +243,7 @@ const cwd = process.cwd();
  */
 
 const fromMatches = matches => matches.map(generator => ({
-  name: _path.default.basename(generator).replace('.preset.bud.js', ''),
+  name: _path.default.basename(generator).replace('.preset.clover.js', ''),
   path: generator
 }));
 /**
@@ -265,7 +265,7 @@ const useModulePresets = keyword => {
         dir: _path.default.resolve(_path.default.join(cwd, 'node_modules')),
         scanAllDirs: true,
         keyword
-      }).map(pkg => _path.default.join(_path.default.join(pkg.dir, 'presets'), '/**/*.preset.bud.js'));
+      }).map(pkg => _path.default.join(_path.default.join(pkg.dir, 'presets'), '/**/*.preset.clover.js'));
       const matches = await (0, _globby.default)(packages);
       setPresets(fromMatches(matches));
       setChecked(true);
@@ -281,8 +281,8 @@ const useModulePresets = keyword => {
 exports.useModulePresets = useModulePresets;
 
 const usePresetIndex = () => {
-  const [core, checkedCore] = useModulePresets('bud-core-presets');
-  const [plugin, checkedPlugin] = useModulePresets('bud-preset');
+  const [core, checkedCore] = useModulePresets('clover-core-presets');
+  const [plugin, checkedPlugin] = useModulePresets('clover-preset');
   return {
     plugin,
     core,
@@ -310,12 +310,17 @@ var _ink = require("ink");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Banner
+ *
+ * @return {React.Component}
+ */
 const Banner = () => /*#__PURE__*/_react.default.createElement(_ink.Box, {
   flexDirection: "column",
   marginBottom: 1
 }, /*#__PURE__*/_react.default.createElement(_ink.Text, {
   color: "green"
-}, "\u26A1\uFE0F @roots/bud"));
+}, "\u2618\uFE0F Clover"));
 
 var _default = Banner;
 exports.default = _default;
@@ -374,7 +379,7 @@ var _Loading = _interopRequireDefault(require("./Loading"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Bud application.
+ * Clover application.
  *
  * @prop {object} children
  */
@@ -415,7 +420,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @prop {string} label
  * @prop {array}  items
- * @return {ReactElement}
+ * @return {React.Component}
  */
 const List = ({
   label,
@@ -455,8 +460,8 @@ var _List = _interopRequireDefault(require("./../../src/components/List"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/** Command: bud list */
-/// List available budfiles
+/** Command: clover list */
+/// List available generators
 const ListCommand = () => {
   /**
    * Fetch all available generators.

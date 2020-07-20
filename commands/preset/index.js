@@ -2,16 +2,15 @@ import {join} from 'path'
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {isEqual} from 'lodash'
+
 import SelectInput from '../../src/components/input/select-input'
-
 import usePresetIndex from '../../src/hooks/usePresetIndex'
-
 import App from './../../src/components/App'
 import PresetMiddleware from './../../src/middleware/PresetMiddleware'
 
 const cwd = process.cwd()
 
-/** Command: bud preset */
+/** Command: clover preset */
 /// Run a preset.
 const Preset = ({inputArgs}) => {
   /**

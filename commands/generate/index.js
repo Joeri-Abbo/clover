@@ -10,7 +10,7 @@ import useGeneratorIndex from './../../src/hooks/useGeneratorIndex'
 
 const cwd = process.cwd()
 
-/** Command: bud generate */
+/** Command: clover generate */
 /// Run a generator.
 const Generate = ({inputArgs}) => {
   /**
@@ -40,10 +40,10 @@ const Generate = ({inputArgs}) => {
   const [generators, setGenerators] = useState(null)
   useEffect(() => {
     const allResults = [...project, ...plugin, ...core]
-      .filter(bud => bud.name.indexOf('bud-init'))
-      .map(bud => ({
-        value: bud.path,
-        label: bud.name,
+      .filter(clover => clover.name.indexOf('clover-init'))
+      .map(clover => ({
+        value: clover.path,
+        label: clover.name,
       }))
 
     if (complete) {
@@ -62,8 +62,8 @@ const Generate = ({inputArgs}) => {
      *       the specified name. We should let the user know that we are running
      *       the first result we find, but that a conflict existed.
      */
-    const candidates = generators?.filter(bud =>
-      isEqual(bud.label, name),
+    const candidates = generators?.filter(clover =>
+      isEqual(clover.label, name),
     )
     const selection = candidates?.[0]
 

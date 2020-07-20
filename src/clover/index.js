@@ -3,13 +3,13 @@ import {concatMap} from 'rxjs/operators'
 import makeCompiler from './compiler'
 import makeConfig from './config'
 import makeData from './data'
-import makeUtil from './util'
+import {makeUtil} from './util'
 import pipes from './pipes'
 import actions from './actions'
 import prettier from './prettier'
 
 /**
- * Bud
+ * Clover
  *
  * @prop {string} projectDir
  * @prop {object} config
@@ -20,7 +20,7 @@ import prettier from './prettier'
  *
  * @return {Observable}
  */
-const bud = props => {
+const clover = props => {
   const {generator} = props
 
   const config = makeConfig({...props})
@@ -71,4 +71,4 @@ const bud = props => {
   })
 }
 
-export default bud
+export default clover

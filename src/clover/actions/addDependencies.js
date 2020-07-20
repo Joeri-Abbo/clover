@@ -1,10 +1,10 @@
 /**
  * Action: Add dependencies
  *
+ * @type   {async function} addDependencies
  * @param  {object}   task
  * @param  {Observer} observer
  * @param  {object}   util
- *
  * @return {void}
  */
 const addDependencies = async ({task, observer, util}) => {
@@ -29,4 +29,4 @@ const addDependencies = async ({task, observer, util}) => {
   exitCode == 0 ? observer.complete() : observer.error(stderr)
 }
 
-export default addDependencies
+export {addDependencies}

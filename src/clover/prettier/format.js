@@ -1,10 +1,11 @@
 import prettier from 'prettier'
+
 const config = require('../../../prettier.config.js')
 
 /**
  * Format
  *
- * @type   {func}
+ * @type   {function (content: string, parser: object) => string}
  * @param  {object|string} content
  * @param  {parser} string
  * @return {string}

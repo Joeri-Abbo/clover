@@ -1,4 +1,4 @@
-import command from './command'
+import {command} from './command'
 
 /**
  * Make util
@@ -10,4 +10,4 @@ const makeUtil = ({config}) => ({
   command: command(config),
 })
 
-export default makeUtil
+export {makeUtil}

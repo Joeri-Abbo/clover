@@ -8,17 +8,17 @@ import GeneratorMiddleware from './../../src/middleware/GeneratorMiddleware'
 
 /** Constants */
 const cwd = process.cwd()
-const generatorsDir = require('@roots/bud-generators')
+const generatorsDir = require('@roots/clover-generators')
 const newProjectInit = join(
   generatorsDir,
-  'bud-init-new/bud-init-new.bud.js',
+  'clover-init-new/clover-init-new.clover.js',
 )
 const existingProjectInit = join(
   generatorsDir,
-  'bud-init-existing/bud-init-existing.bud.js',
+  'clover-init-existing/clover-init-existing.clover.js',
 )
 
-/** Command: bud init */
+/** Command: clover init */
 /// Create a new project
 const Init = ({inputArgs}) => {
   /**

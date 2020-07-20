@@ -1,4 +1,4 @@
-import addDependencies from './addDependencies'
+import {addDependencies} from './addDependencies'
 import command from './command'
 import compile from './compile'
 import copy from './copy'

@@ -6,7 +6,7 @@ import {Box, Text} from 'ink'
  *
  * @prop {string} label
  * @prop {array}  items
- * @return {ReactElement}
+ * @return {React.Component}
  */
 const List = ({label, items}) => (
   <Box flexDirection="column" marginBottom={1}>

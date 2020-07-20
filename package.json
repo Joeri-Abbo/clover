@@ -1,28 +1,27 @@
 {
-  "name": "@roots/bud",
-  "version": "1.0.0-rc.10",
+  "name": "@roots/clover",
+  "version": "2.0.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/roots/bud.git"
+    "url": "git://github.com/roots/clover.git"
   },
   "bin": {
-    "bud": "build/cli.js"
+    "clover": "build/cli.js"
   },
   "engines": {
     "node": ">=12"
   },
   "scripts": {
-    "bud": "bud",
+    "clover": "clover",
     "build": "pastel build",
     "dev": "pastel dev",
-    "docs": "bud generate readme",
+    "docs": "clover generate readme",
     "lint": "npm-run-all -c lint:*",
     "lint:eslint": "eslint .",
     "lint:prettier": "prettier --write ."
   },
   "files": ["assets", "build", "src"],
   "dependencies": {
-    "@roots/bud-generators": "roots/bud-generators#master",
     "arr-rotate": "^1.0.0",
     "chalk": "^4.1.0",
     "enquirer": "^2.3.6",

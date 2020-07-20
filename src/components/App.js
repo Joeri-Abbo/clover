@@ -5,11 +5,15 @@ import Banner from './Banner'
 import Loading from './Loading'
 
 /**
- * Bud application.
+ * Clover application.
  *
  * @prop {object} children
  */
-const App = ({isLoading, loadingMessage, children}) => (
+const App = ({
+  isLoading,
+  loadingMessage,
+  children,
+}) => (
   <Box
     flexDirection="column"
     justifyContent="flex-start"

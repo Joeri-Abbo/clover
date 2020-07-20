@@ -465,7 +465,7 @@ const cwd = process.cwd();
  */
 
 const fromMatches = matches => matches.map(generator => ({
-  name: _path.default.basename(generator).replace('.preset.bud.js', ''),
+  name: _path.default.basename(generator).replace('.preset.clover.js', ''),
   path: generator
 }));
 /**
@@ -487,7 +487,7 @@ const useModulePresets = keyword => {
         dir: _path.default.resolve(_path.default.join(cwd, 'node_modules')),
         scanAllDirs: true,
         keyword
-      }).map(pkg => _path.default.join(_path.default.join(pkg.dir, 'presets'), '/**/*.preset.bud.js'));
+      }).map(pkg => _path.default.join(_path.default.join(pkg.dir, 'presets'), '/**/*.preset.clover.js'));
       const matches = await (0, _globby.default)(packages);
       setPresets(fromMatches(matches));
       setChecked(true);
@@ -503,8 +503,8 @@ const useModulePresets = keyword => {
 exports.useModulePresets = useModulePresets;
 
 const usePresetIndex = () => {
-  const [core, checkedCore] = useModulePresets('bud-core-presets');
-  const [plugin, checkedPlugin] = useModulePresets('bud-preset');
+  const [core, checkedCore] = useModulePresets('clover-core-presets');
+  const [plugin, checkedPlugin] = useModulePresets('clover-preset');
   return {
     plugin,
     core,
@@ -532,12 +532,17 @@ var _ink = require("ink");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Banner
+ *
+ * @return {React.Component}
+ */
 const Banner = () => /*#__PURE__*/_react.default.createElement(_ink.Box, {
   flexDirection: "column",
   marginBottom: 1
 }, /*#__PURE__*/_react.default.createElement(_ink.Text, {
   color: "green"
-}, "\u26A1\uFE0F @roots/bud"));
+}, "\u2618\uFE0F Clover"));
 
 var _default = Banner;
 exports.default = _default;
@@ -596,7 +601,7 @@ var _Loading = _interopRequireDefault(require("./Loading"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Bud application.
+ * Clover application.
  *
  * @prop {object} children
  */
@@ -634,7 +639,7 @@ var _fsExtra = require("fs-extra");
  * Use config
  */
 const useConfig = cwd => {
-  const configFile = (0, _path.join)(cwd, '.bud/bud.config.json');
+  const configFile = (0, _path.join)(cwd, '.clover/clover.config.json');
   const config = (0, _fsExtra.existsSync)(configFile) ? require(configFile) : null;
   return {
     config
@@ -748,13 +753,13 @@ const usePreset = presetFile => {
       const pkg = await (0, _resolvePkg.default)(step.pkg);
       /** Resolve the actual generator obj. */
 
-      const results = await (0, _globby.default)([`${pkg}/generators/${step.name}/*.bud.js`]);
+      const results = await (0, _globby.default)([`${pkg}/generators/${step.name}/*.clover.js`]);
       const current = generatorObj(results[0]);
       const templateDir = getTemplateDir(results[0]);
       /**
        * Map the current generators template dir path
        * onto each task in the generator. This simplifies things
-       * when Bud is processing each action.
+       * when Clover is processing each action.
        */
 
       if (current) {
@@ -799,7 +804,7 @@ const usePreset = presetFile => {
 
 var _default = usePreset;
 exports.default = _default;
-},{}],"../src/bud/compiler/helpers/index.js":[function(require,module,exports) {
+},{}],"../src/clover/compiler/helpers/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -848,7 +853,7 @@ const helpers = data => [{
 
 var _default = helpers;
 exports.default = _default;
-},{}],"../src/bud/compiler/index.js":[function(require,module,exports) {
+},{}],"../src/clover/compiler/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -901,7 +906,7 @@ const makeCompiler = ({
 
 var _default = makeCompiler;
 exports.default = _default;
-},{"./helpers":"../src/bud/compiler/helpers/index.js"}],"../src/bud/config/index.js":[function(require,module,exports) {
+},{"./helpers":"../src/clover/compiler/helpers/index.js"}],"../src/clover/config/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -927,7 +932,7 @@ const makeConfig = ({
 
 var _default = makeConfig;
 exports.default = _default;
-},{}],"../src/bud/data/index.js":[function(require,module,exports) {
+},{}],"../src/clover/data/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -963,13 +968,13 @@ const makeData = ({
 
 var _default = makeData;
 exports.default = _default;
-},{}],"../src/bud/util/command.js":[function(require,module,exports) {
+},{}],"../src/clover/util/command.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.command = void 0;
 
 var _execa = _interopRequireDefault(require("execa"));
 
@@ -979,26 +984,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Task runner
  *
  * @param  {object} config
- *
- * @return {func}
+ * @return {Function}
  */
 const command = config => {
   return cmd => _execa.default.command(cmd, config.execa);
 };
 
-var _default = command;
-exports.default = _default;
-},{}],"../src/bud/util/index.js":[function(require,module,exports) {
+exports.command = command;
+},{}],"../src/clover/util/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.makeUtil = void 0;
 
-var _command = _interopRequireDefault(require("./command"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _command = require("./command");
 
 /**
  * Make util
@@ -1009,12 +1010,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const makeUtil = ({
   config
 }) => ({
-  command: (0, _command.default)(config)
+  command: (0, _command.command)(config)
 });
 
-var _default = makeUtil;
-exports.default = _default;
-},{"./command":"../src/bud/util/command.js"}],"../src/bud/pipes/actions.js":[function(require,module,exports) {
+exports.makeUtil = makeUtil;
+},{"./command":"../src/clover/util/command.js"}],"../src/clover/pipes/actions.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1056,7 +1056,7 @@ const actions = ({
 
 var _default = actions;
 exports.default = _default;
-},{}],"../src/bud/pipes/index.js":[function(require,module,exports) {
+},{}],"../src/clover/pipes/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1076,21 +1076,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const pipes = [_actions.default];
 var _default = pipes;
 exports.default = _default;
-},{"./actions":"../src/bud/pipes/actions.js"}],"../src/bud/actions/addDependencies.js":[function(require,module,exports) {
+},{"./actions":"../src/clover/pipes/actions.js"}],"../src/clover/actions/addDependencies.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.addDependencies = void 0;
 
 /**
  * Action: Add dependencies
  *
+ * @type   {async function} addDependencies
  * @param  {object}   task
  * @param  {Observer} observer
  * @param  {object}   util
- *
  * @return {void}
  */
 const addDependencies = async ({
@@ -1121,9 +1121,8 @@ const addDependencies = async ({
   exitCode == 0 ? observer.complete() : observer.error(stderr);
 };
 
-var _default = addDependencies;
-exports.default = _default;
-},{}],"../src/bud/actions/command.js":[function(require,module,exports) {
+exports.addDependencies = addDependencies;
+},{}],"../src/clover/actions/command.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1155,7 +1154,7 @@ const command = async ({
 
 var _default = command;
 exports.default = _default;
-},{}],"../src/bud/actions/compile.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/compile.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1198,7 +1197,7 @@ const compile = async ({
 
 var _default = compile;
 exports.default = _default;
-},{}],"../src/bud/actions/copy.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/copy.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1233,7 +1232,7 @@ const copy = async ({
 
 var _default = copy;
 exports.default = _default;
-},{}],"../src/bud/actions/ensureDir.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/ensureDir.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1273,7 +1272,7 @@ const ensureDir = async ({
 
 var _default = ensureDir;
 exports.default = _default;
-},{}],"../src/bud/actions/ensureDirs.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/ensureDirs.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1318,7 +1317,7 @@ const ensureDirs = ({
 
 var _default = ensureDirs;
 exports.default = _default;
-},{}],"../src/bud/actions/git/clone.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/git/clone.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1346,7 +1345,7 @@ const clone = async ({
 
 var _default = clone;
 exports.default = _default;
-},{}],"../src/bud/actions/git/index.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/git/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1381,7 +1380,7 @@ const git = async ({
 
 var _default = git;
 exports.default = _default;
-},{"./clone":"../src/bud/actions/git/clone.js"}],"../src/bud/actions/install.js":[function(require,module,exports) {
+},{"./clone":"../src/clover/actions/git/clone.js"}],"../src/clover/actions/install.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1428,7 +1427,7 @@ const install = async ({
 
 var _default = install;
 exports.default = _default;
-},{}],"../src/bud/actions/json.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/json.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1466,7 +1465,7 @@ const json = async function ({
 
 var _default = json;
 exports.default = _default;
-},{}],"../src/bud/actions/touch.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/touch.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1508,7 +1507,7 @@ const touch = async ({
 
 var _default = touch;
 exports.default = _default;
-},{}],"../src/bud/actions/index.js":[function(require,module,exports) {
+},{}],"../src/clover/actions/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1516,7 +1515,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _addDependencies = _interopRequireDefault(require("./addDependencies"));
+var _addDependencies = require("./addDependencies");
 
 var _command = _interopRequireDefault(require("./command"));
 
@@ -1544,7 +1543,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @type {object}
  */
 const actions = {
-  addDependencies: _addDependencies.default,
+  addDependencies: _addDependencies.addDependencies,
   command: _command.default,
   compile: _compile.default,
   copy: _copy.default,
@@ -1562,7 +1561,7 @@ const actions = {
 };
 var _default = actions;
 exports.default = _default;
-},{"./addDependencies":"../src/bud/actions/addDependencies.js","./command":"../src/bud/actions/command.js","./compile":"../src/bud/actions/compile.js","./copy":"../src/bud/actions/copy.js","./ensureDir":"../src/bud/actions/ensureDir.js","./ensureDirs":"../src/bud/actions/ensureDirs.js","./git":"../src/bud/actions/git/index.js","./install":"../src/bud/actions/install.js","./json":"../src/bud/actions/json.js","./touch":"../src/bud/actions/touch.js"}],"../src/bud/prettier/inferParser.js":[function(require,module,exports) {
+},{"./addDependencies":"../src/clover/actions/addDependencies.js","./command":"../src/clover/actions/command.js","./compile":"../src/clover/actions/compile.js","./copy":"../src/clover/actions/copy.js","./ensureDir":"../src/clover/actions/ensureDir.js","./ensureDirs":"../src/clover/actions/ensureDirs.js","./git":"../src/clover/actions/git/index.js","./install":"../src/clover/actions/install.js","./json":"../src/clover/actions/json.js","./touch":"../src/clover/actions/touch.js"}],"../src/clover/prettier/inferParser.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1628,7 +1627,7 @@ module.exports = {
     }
   }]
 };
-},{}],"../src/bud/prettier/format.js":[function(require,module,exports) {
+},{}],"../src/clover/prettier/format.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1644,7 +1643,7 @@ const config = require('../../../prettier.config.js');
 /**
  * Format
  *
- * @type   {func}
+ * @type   {function (content: string, parser: object) => string}
  * @param  {object|string} content
  * @param  {parser} string
  * @return {string}
@@ -1660,7 +1659,7 @@ const format = (content, parser) => {
 
 var _default = format;
 exports.default = _default;
-},{"../../../prettier.config.js":"../prettier.config.js"}],"../src/bud/prettier/index.js":[function(require,module,exports) {
+},{"../../../prettier.config.js":"../prettier.config.js"}],"../src/clover/prettier/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1683,7 +1682,7 @@ const prettier = {
 };
 var _default = prettier;
 exports.default = _default;
-},{"./inferParser":"../src/bud/prettier/inferParser.js","./format":"../src/bud/prettier/format.js"}],"../src/bud/index.js":[function(require,module,exports) {
+},{"./inferParser":"../src/clover/prettier/inferParser.js","./format":"../src/clover/prettier/format.js"}],"../src/clover/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1701,7 +1700,7 @@ var _config = _interopRequireDefault(require("./config"));
 
 var _data = _interopRequireDefault(require("./data"));
 
-var _util = _interopRequireDefault(require("./util"));
+var _util = require("./util");
 
 var _pipes = _interopRequireDefault(require("./pipes"));
 
@@ -1712,7 +1711,7 @@ var _prettier = _interopRequireDefault(require("./prettier"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Bud
+ * Clover
  *
  * @prop {string} projectDir
  * @prop {object} config
@@ -1723,7 +1722,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @return {Observable}
  */
-const bud = props => {
+const clover = props => {
   const {
     generator
   } = props;
@@ -1731,7 +1730,7 @@ const bud = props => {
   });
   const data = (0, _data.default)({ ...props
   });
-  const util = (0, _util.default)({
+  const util = (0, _util.makeUtil)({
     config
   });
   const compiler = (0, _compiler.default)({
@@ -1772,9 +1771,9 @@ const bud = props => {
   });
 };
 
-var _default = bud;
+var _default = clover;
 exports.default = _default;
-},{"./compiler":"../src/bud/compiler/index.js","./config":"../src/bud/config/index.js","./data":"../src/bud/data/index.js","./util":"../src/bud/util/index.js","./pipes":"../src/bud/pipes/index.js","./actions":"../src/bud/actions/index.js","./prettier":"../src/bud/prettier/index.js"}],"../src/hooks/useSubscription.js":[function(require,module,exports) {
+},{"./compiler":"../src/clover/compiler/index.js","./config":"../src/clover/config/index.js","./data":"../src/clover/data/index.js","./util":"../src/clover/util/index.js","./pipes":"../src/clover/pipes/index.js","./actions":"../src/clover/actions/index.js","./prettier":"../src/clover/prettier/index.js"}],"../src/hooks/useSubscription.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1786,19 +1785,24 @@ var _react = require("react");
 
 var _ink = require("ink");
 
-var _bud = _interopRequireDefault(require("./../bud"));
+var _clover = _interopRequireDefault(require("./../clover"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Use subscription.
+ * useClover.
  *
- * Once there is a generator and data available it is passed to the bud
- * engine to be run. Bud will return an rxjs observable to be utilized
+ * Once there is a generator and data available it is passed to the clover
+ * engine to be run. Clover will return an rxjs observable to be utilized
  * by components like Tasks to indicate to the user what is going on
  * with the scaffold process.
+ *
+ * @type   {function}
+ * @param  {object} options
+ * @param  {object.config} options.config
+ * @return {object}
  */
-const useSubscription = ({
+const useClover = ({
   config,
   data,
   projectDir,
@@ -1813,7 +1817,7 @@ const useSubscription = ({
   const [complete, setComplete] = (0, _react.useState)(false);
   (0, _react.useEffect)(() => {
     if (generator && data && !subscription) {
-      setSubscription((0, _bud.default)({
+      setSubscription((0, _clover.default)({
         config,
         data,
         generator,
@@ -1837,9 +1841,9 @@ const useSubscription = ({
   };
 };
 
-var _default = useSubscription;
+var _default = useClover;
 exports.default = _default;
-},{"./../bud":"../src/bud/index.js"}],"../src/components/Tasks.js":[function(require,module,exports) {
+},{"./../clover":"../src/clover/index.js"}],"../src/components/Tasks.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1972,7 +1976,7 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 const cwd = process.cwd();
-/** Command: bud preset */
+/** Command: clover preset */
 /// Run a preset.
 
 const Preset = ({

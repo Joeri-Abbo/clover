@@ -6,8 +6,8 @@ import usePresetIndex from './../../src/hooks/usePresetIndex'
 import App from './../../src/components/App'
 import List from './../../src/components/List'
 
-/** Command: bud list */
-/// List available budfiles
+/** Command: clover list */
+/// List available generators
 const ListCommand = () => {
   /**
    * Fetch all available generators.

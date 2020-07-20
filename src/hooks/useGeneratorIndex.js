@@ -10,12 +10,12 @@ const cwd = process.cwd()
  */
 const fromMatches = matches =>
   matches.map(generator => ({
-    name: path.basename(generator).replace('.bud.js', ''),
+    name: path.basename(generator).replace('.clover.js', ''),
     path: generator,
   }))
 
 /**
- * Generators sourced from project .bud dir
+ * Generators sourced from project .clover dir
  */
 const useProjectGenerators = () => {
   const [generators, setGenerators] = useState([])
@@ -25,7 +25,7 @@ const useProjectGenerators = () => {
       setChecked(false)
 
       const matches = await globby([
-        `${cwd}/.bud/generators/**/*.bud.js`,
+        `${cwd}/.clover/generators/**/*.clover.js`,
       ])
 
       setGenerators(fromMatches(matches))
@@ -54,12 +54,12 @@ const useModuleGenerators = keyword => {
         scanAllDirs: true,
         keyword,
       }).map(plugin =>
-        path.join(plugin.dir, '/generators/**/*.bud.js'),
+        path.join(plugin.dir, '/generators/**/*.clover.js'),
       )
 
       const matches = await globby([
         ...packages,
-        '!/**/*.preset.bud.js',
+        '!/**/*.preset.clover.js',
       ])
 
       setGenerators(fromMatches(matches))
@@ -76,9 +76,9 @@ const useModuleGenerators = keyword => {
 const useGeneratorIndex = () => {
   const [project, checkedProject] = useProjectGenerators()
   const [core, checkedCore] = useModuleGenerators(
-    'bud-core-generators',
+    'clover-core-generators',
   )
-  const [plugin, checkedPlugin] = useModuleGenerators('bud-generator')
+  const [plugin, checkedPlugin] = useModuleGenerators('clover-generator')
 
   return {
     project,

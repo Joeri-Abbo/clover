@@ -1,9 +1,14 @@
 import React from 'react'
 import {Box, Text} from 'ink'
 
+/**
+ * Banner
+ *
+ * @return {React.Component}
+ */
 const Banner = () => (
   <Box flexDirection="column" marginBottom={1}>
-    <Text color="green">⚡️ @roots/bud</Text>
+    <Text color="green">☘️ Clover</Text>
   </Box>
 )
 

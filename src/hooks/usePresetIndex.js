@@ -10,7 +10,7 @@ const cwd = process.cwd()
  */
 const fromMatches = matches =>
   matches.map(generator => ({
-    name: path.basename(generator).replace('.preset.bud.js', ''),
+    name: path.basename(generator).replace('.preset.clover.js', ''),
     path: generator,
   }))
 
@@ -34,7 +34,7 @@ const useModulePresets = keyword => {
       }).map(pkg =>
         path.join(
           path.join(pkg.dir, 'presets'),
-          '/**/*.preset.bud.js',
+          '/**/*.preset.clover.js',
         ),
       )
 
@@ -52,8 +52,8 @@ const useModulePresets = keyword => {
  * usePresets hook
  */
 const usePresetIndex = () => {
-  const [core, checkedCore] = useModulePresets('bud-core-presets')
-  const [plugin, checkedPlugin] = useModulePresets('bud-preset')
+  const [core, checkedCore] = useModulePresets('clover-core-presets')
+  const [plugin, checkedPlugin] = useModulePresets('clover-preset')
 
   return {
     plugin,

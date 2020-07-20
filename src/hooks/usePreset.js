@@ -55,7 +55,7 @@ const usePreset = presetFile => {
 
       /** Resolve the actual generator obj. */
       const results = await globby([
-        `${pkg}/generators/${step.name}/*.bud.js`,
+        `${pkg}/generators/${step.name}/*.clover.js`,
       ])
       const current = generatorObj(results[0])
       const templateDir = getTemplateDir(results[0])
@@ -63,7 +63,7 @@ const usePreset = presetFile => {
       /**
        * Map the current generators template dir path
        * onto each task in the generator. This simplifies things
-       * when Bud is processing each action.
+       * when Clover is processing each action.
        */
       if (current) {
         current.tasks = current.tasks.map(task => ({
