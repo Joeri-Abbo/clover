@@ -9,11 +9,7 @@ import Loading from './Loading'
  *
  * @prop {object} children
  */
-const App = ({
-  isLoading,
-  loadingMessage,
-  children,
-}) => (
+const App = ({isLoading, loadingMessage, children}) => (
   <Box
     flexDirection="column"
     justifyContent="flex-start"
@@ -22,6 +18,7 @@ const App = ({
     paddingBottom={0}
     paddingLeft={1}>
     <Banner />
+
     {isLoading && (
       <Loading
         spinnerColor="green"

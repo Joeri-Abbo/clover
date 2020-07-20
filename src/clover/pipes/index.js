@@ -1,9 +1,7 @@
 import actions from './actions'
 
 /**
- * Make Pipes
- *
- * @return {object}
+ * @type {array} pipes
  */
 const pipes = [actions]
 

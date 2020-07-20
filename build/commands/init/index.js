@@ -477,9 +477,7 @@ var _actions = _interopRequireDefault(require("./actions"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Make Pipes
- *
- * @return {object}
+ * @type {array} pipes
  */
 const pipes = [_actions.default];
 var _default = pipes;

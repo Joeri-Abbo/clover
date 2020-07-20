@@ -78,7 +78,9 @@ const useGeneratorIndex = () => {
   const [core, checkedCore] = useModuleGenerators(
     'clover-core-generators',
   )
-  const [plugin, checkedPlugin] = useModuleGenerators('clover-generator')
+  const [plugin, checkedPlugin] = useModuleGenerators(
+    'clover-generator',
+  )
 
   return {
     project,
