@@ -1,0 +1,10 @@
+/**
+ * Shared styles.
+ */
+
+.wp-block-{{namespace}}-{{name}} {
+  /**
+   * Styles includes in this block will be applied
+   * in both the editor and in public app views.
+   */
+}

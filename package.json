@@ -1,63 +1,98 @@
 {
   "name": "@roots/clover",
   "version": "2.0.0",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/roots/clover.git"
   },
-  "bin": {
-    "clover": "build/cli.js"
+  "bugs": {
+    "url": "https://github.com/roots/bud/issues"
   },
-  "engines": {
-    "node": ">=12"
-  },
-  "scripts": {
-    "clover": "clover",
-    "build": "pastel build",
-    "dev": "pastel dev",
-    "docs": "clover generate readme",
-    "lint": "npm-run-all -c lint:*",
-    "lint:eslint": "eslint .",
-    "lint:prettier": "prettier --write ."
-  },
-  "files": ["assets", "build", "src"],
-  "dependencies": {
-    "arr-rotate": "^1.0.0",
-    "chalk": "^4.1.0",
-    "enquirer": "^2.3.6",
-    "esm": "^3.2.25",
-    "execa": "^4.0.3",
-    "find-plugins": "^1.1.7",
-    "fs-extra": "^9.0.1",
-    "globby": "^11.0.1",
-    "handlebars": "^4.7.6",
-    "handlebars-helpers": "^0.10.0",
-    "ink": "^3.0.0-6",
-    "ink-link": "^1.1.0",
-    "ink-spinner": "^4.0.0-0",
-    "ink-text-input": "^4.0.0-1",
-    "ink-use-stdout-dimensions": "^1.0.5",
-    "lodash": "^4.17.19",
-    "pastel": "^1.0.3",
-    "prettier": "2.0.5",
-    "prop-types": "^15.7.2",
-    "react": "^16.13.1",
-    "resolve-pkg": "^2.0.0",
-    "rxjs": "^6.6.0"
-  },
-  "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.4.0",
-    "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.8",
-    "husky": "^4.2.5",
-    "markdownlint-cli": "^0.23.2",
-    "npm-run-all": "^4.1.5"
+  "funding": {
+    "type": "github sponsors",
+    "url": "https://github.com/sponsors/roots"
   },
   "licenses": [
     {
       "type": "MIT",
       "url": "http://opensource.org/licenses/MIT"
     }
-  ]
+  ],
+  "contributors": [
+    "Kelly Mears <kelly@roots.io> (https://kellymears.me)"
+  ],
+  "engines": {
+    "node": "14.9.0"
+  },
+  "bin": {
+    "clover": "./packages/clover/bin/clover.js"
+  },
+  "scripts": {
+    "make": "run-s --silent clean install build",
+    "clean": "lerna clean -y --loglevel silent",
+    "install": "lerna bootstrap --loglevel silent",
+    "build": "run-s --silent build:clover build:generators",
+    "build:clover": "lerna run --loglevel silent --parallel --stream --profile --scope=@roots/clover build",
+    "build:generators": "lerna run --loglevel silent --parallel --stream --profile --scope=@roots/* --ignore=@roots/clover build",
+    "lint": "eslint 'packages/**/*.{js,ts,tsx}' --fix",
+    "test": "ava",
+    "test:coverage": "nyc yarn run test",
+    "test:coverage:lcov": "nyc --reporter=lcov yarn run test",
+    "changelog": "conventional-changelog -i CHANGELOG.md -s -u",
+    "release:next": "lerna publish --ignore-scripts --dist-tag next",
+    "release:next:pre": "lerna publish prerelease --ignore-scripts --pre-dist-tag next",
+    "release:latest": "lerna publish --ignore-scripts",
+    "release:latest:pre": "lerna publish --ignore-scripts --pre-dist-tag rc"
+  },
+  "devDependencies": {
+    "@ava/babel": "^1.0.1",
+    "@ava/typescript": "^1.1.1",
+    "@babel/core": "^7.11.5",
+    "@babel/plugin-transform-runtime": "^7.11.0",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/register": "^7.11.5",
+    "@roots/clover": "^2.0.0-next.0",
+    "@roots/clover-generators": "^2.0.0-next.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/eslint": "^7.2.0",
+    "@types/fs-extra": "^9.0.1",
+    "@types/lodash": "^4.14.157",
+    "@types/node": "^14.0.23",
+    "@types/prettier": "^2.0.2",
+    "@types/react": "^16.9.46",
+    "@types/react-dom": "^16.9.8",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "ava": "^3.11.1",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "commitizen": "^4.1.5",
+    "conventional-changelog-cli": "^2.1.0",
+    "cz-lerna-changelog": "^2.0.3",
+    "eslint": "^7.6.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.5",
+    "eslint-plugin-react-hooks": "^4.1.0",
+    "execa": "^4.0.3",
+    "husky": "^4.3.0",
+    "ink-testing-library": "^2.0.1",
+    "lerna": "^3.22.1",
+    "markdownlint-cli": "^0.23.2",
+    "nodemon": "^2.0.4",
+    "npm-run-all": "^4.1.5",
+    "nyc": "^15.1.0",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "semantic-release": "^17.1.1",
+    "typescript": "^4.0.2",
+    "webpack": "^4.44.1"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/clover",
+      "packages/generators"
+    ]
+  }
 }

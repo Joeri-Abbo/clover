@@ -1,0 +1,42 @@
+{
+  "name": "{{lowercase (dashcase namespace)}}/{{lowercase (dashcase name)}}",
+  "type": "wordpress-plugin",
+  "license": "MIT",
+  "description": "{{description}}",
+  "homepage": "{{lowercase website}}",
+  "authors": [
+    {
+      "name": "{{capitalizeAll author}}",
+      "email": "{{lowercase email}}"
+    }
+  ],
+  "keywords": [
+    "wordpress",
+    "wordpress-block"
+  ],
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git@github.com:roots/bud-support"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "{{pascalcase namespace}}\\": "app/",
+    }
+  },
+  "require": {
+    "php": "^7.2",
+    "roots/bud-support": "dev-master"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.5"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "scripts": {
+    "lint": [
+      "phpcs --ignore=vendor,dist --extensions=php --standard=PSR12 ."
+    ]
+  }
+}

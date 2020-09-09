@@ -1,12 +1,10 @@
 const package = require('../../../package.json')
-const commands = require('./helpers/commands')
 const listKeys = require('./helpers/listKeys')
 
 module.exports = {
   name: 'readme',
   description: 'Generate the repo readme',
   data: {
-    commands,
     package: package.name,
     version: package.version,
     repo: package.name.replace('@', ''),

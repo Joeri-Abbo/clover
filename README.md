@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="https://roots.io">Official Website</a> | <a href="https://roots.io/docs/bud/master/usage">Documentation</a> | <a href="https://roots.io/docs/bud/master/changes">Change Log</a>
+  <a href="https://roots.io">Official Website</a> | <a href="https://roots.io/docs/clover/master/usage">Documentation</a> | <a href="https://roots.io/docs/clover/master/changes">Change Log</a>
 </p>
 
 ## Supporting
@@ -36,7 +36,9 @@ However, the amount of effort needed to maintain and develop new features and pr
 
 ## Overview
 
-Clover is an extendable, zero configuration scaffolding CLI.
+**🧳 roots/clover is the new home for the scaffolding tool formerly known as roots/bud.** If you are looking for the webpack framework you can find it at [https://github.com/roots/bud](roots/bud). These packages were born out of the same repository and it took a hot minute before we realized where everything belongs. Both packages are being bumped to v2.0.0 to reflect this change; sorry for any confusion.
+
+Clover is an extendable scaffolding CLI.
 
 ## Requirements
 
@@ -47,7 +49,7 @@ Clover is an extendable, zero configuration scaffolding CLI.
 
 ## Usage
 
-Bud is currently pre-release. But, you can try it out now:
+Clover is currently pre-release. But, you can try it out now:
 
 Initialize your project. This will install `@roots/clover` as a development dependency.
 
@@ -56,16 +58,6 @@ npx @2.0.0 init [project-dir]
 ```
 
 Documentation forthcoming. For now, you can run `yarn clover list` to see what is available out-of-the-box.
-
-## All commands:
-
-| Command         | Description               |
-| --------------- | ------------------------- |
-| clover          | Clover CLI                |
-| clover generate | Run a generator.          |
-| clover init     | Create a new project      |
-| clover list     | List available generators |
-| clover preset   | Run a preset.             |
 
 ### Dependencies
 
@@ -108,7 +100,7 @@ Contributions are welcome from everyone.
 
 We have [contributing guidelines](https://github.com/roots/guidelines/blob/master/CONTRIBUTING.md) to help you get started.
 
-## Bud sponsors
+## Clover sponsors
 
 Help support our open-source development efforts by [becoming a patron](https://www.patreon.com/rootsdev).
 

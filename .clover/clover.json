@@ -1,9 +1,9 @@
 {
   "project": {
-    "name": "@roots/bud",
+    "name": "@roots/clover",
     "namespace": "@roots",
     "description": "dogfood",
-    "website": "https://roots.io/bud",
+    "website": "https://roots.io/clover",
     "author": "Kelly M.",
     "email": "kelly@roots.io"
   }

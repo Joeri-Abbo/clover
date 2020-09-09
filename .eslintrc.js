@@ -1,37 +1,30 @@
 module.exports = {
-  root: true,
-  extends: ['eslint:recommended', 'plugin:react/recommended'],
-  plugins: ['react', 'react-hooks'],
-  globals: {
-    wp: true,
-    window: true,
-    document: true,
-  },
-  env: {
-    node: true,
-    es6: true,
-    browser: true,
-    amd: true,
-  },
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 7,
+    ecmaVersion: 2020,
+    sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
-    sourceType: 'module',
   },
   settings: {
     react: {
       version: 'detect',
     },
   },
+  extends: [
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint',
+    'plugin:prettier/recommended',
+  ],
   rules: {
-    strict: 0,
+    '@typescript-eslint/no-namespace': 0,
+    '@typescript-eslint/no-explicit-any': 1,
+    'react/prop-types': 'off',
     'no-console': 0,
     'react/prop-types': 0,
     'react/react-in-jsx-scope': 0,
-    'react-hooks/rules-of-hooks': 'error',
     'no-extra-semi': 0,
     quotes: [
       'error',
