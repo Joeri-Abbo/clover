@@ -1,10 +1,20 @@
-import React from 'react'
+import React, {ReactChildren, ReactElement} from 'react'
 import {Box} from 'ink'
 
 import Banner from './Banner'
 import Loading from './Loading'
 
-const App = ({isLoading, loadingMessage = 'loading', children}) => (
+interface Props {
+  isLoading: boolean
+  loadingMessage: string
+  children: ReactChildren
+}
+
+const App = ({
+  isLoading,
+  loadingMessage = 'loading',
+  children,
+}: Props): ReactElement => (
   <Box
     flexDirection="column"
     justifyContent="flex-start"

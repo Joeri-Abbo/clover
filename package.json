@@ -1,53 +1,50 @@
 {
-  "name": "@roots/clover",
-  "version": "2.0.0",
+  "name": "clover",
   "private": true,
+  "description": "Scaffolding utility",
+  "homepage": "https://roots.io/clover",
   "repository": {
     "type": "git",
-    "url": "git://github.com/roots/clover.git"
+    "url": "https://github.com/roots/clover.git"
   },
-  "bugs": {
-    "url": "https://github.com/roots/bud/issues"
-  },
-  "funding": {
-    "type": "github sponsors",
-    "url": "https://github.com/sponsors/roots"
-  },
-  "licenses": [
+  "license": "MIT",
+  "contributors": [
     {
-      "type": "MIT",
-      "url": "http://opensource.org/licenses/MIT"
+      "name": "Kelly Mears",
+      "url": "https://github.com/kellymears"
     }
   ],
-  "contributors": [
-    "Kelly Mears <kelly@roots.io> (https://kellymears.me)"
-  ],
   "engines": {
-    "node": "14.9.0"
+    "node": "^16.3.0"
   },
-  "bin": {
-    "clover": "./packages/clover/bin/clover.js"
+  "workspaces": {
+    "src": ["@roots/*"]
   },
   "scripts": {
-    "make": "run-s --silent clean install build",
-    "clean": "lerna clean -y --loglevel silent",
-    "install": "lerna bootstrap --loglevel silent",
-    "build": "run-s --silent build:clover build:generators",
-    "build:clover": "lerna run --loglevel silent --parallel --stream --profile --scope=@roots/clover build",
-    "build:generators": "lerna run --loglevel silent --parallel --stream --profile --scope=@roots/* --ignore=@roots/clover build",
-    "lint": "eslint 'packages/**/*.{js,ts,tsx}' --fix",
-    "test": "ava",
-    "test:coverage": "nyc yarn run test",
-    "test:coverage:lcov": "nyc --reporter=lcov yarn run test",
-    "changelog": "conventional-changelog -i CHANGELOG.md -s -u",
-    "release:next": "lerna publish --ignore-scripts --dist-tag next",
-    "release:next:pre": "lerna publish prerelease --ignore-scripts --pre-dist-tag next",
-    "release:latest": "lerna publish --ignore-scripts",
-    "release:latest:pre": "lerna publish --ignore-scripts --pre-dist-tag rc"
+    "build": "yarn workspaces foreach --topological-dev --no-private  -i -p -v run build",
+    "build:cjs": "yarn workspaces foreach --no-private --topological-dev -i -p -v run build:cjs",
+    "build:esm": "yarn workspaces foreach --no-private  --topological-dev -i -p -v run build:esm",
+    "build:ci": "yarn workspaces foreach --no-private  --topological-dev run build",
+    "build:ci:cjs": "yarn workspaces foreach --no-private  --topological-dev run build:cjs",
+    "build:ci:esm": "yarn workspaces foreach --no-private  --topological-dev run build:esm",
+    "profile": "yarn workspaces foreach --topological-dev --no-private  run profile",
+    "profile:cjs": "yarn workspaces foreach --no-private  --topological-dev run profile:cjs",
+    "profile:esm": "yarn workspaces foreach --no-private  --topological-dev run profile:esm",
+    "clean": "yarn workspaces foreach --no-private  -p -v run clean",
+    "lint": "yarn workspaces foreach --no-private  -p -v run lint",
+    "pkg": "yarn workspaces foreach --no-private -p -v run pkg",
+    "docs": "yarn node ./dev/docs/gen/cli.js",
+    "test:pre": "yarn node ./jest.pre.js",
+    "test:post": "yarn node ./jest.post.js",
+    "test:spec:ci": "yarn run jest --coverage --maxWorkers=1 --testPathIgnorePatterns='tests/integration' --testPathIgnorePatterns='tests/util'",
+    "test:spec": "yarn run jest --coverage --testPathIgnorePatterns='tests/integration' --testPathIgnorePatterns='tests/util'",
+    "test:integration": "yarn node ./jest.integration.js",
+    "test:ci": "yarn run-s test:spec:ci test:integration",
+    "test:all": "yarn run-s test:spec test:integration",
+    "test": "yarn jest --coverage --testPathIgnorePatterns='tests/integration' --testPathIgnorePatterns='tests/util'",
+    "majestic": "yarn dlx majestic"
   },
   "devDependencies": {
-    "@ava/babel": "^1.0.1",
-    "@ava/typescript": "^1.1.1",
     "@babel/core": "^7.11.5",
     "@babel/plugin-transform-runtime": "^7.11.0",
     "@babel/preset-env": "^7.11.5",
@@ -64,35 +61,21 @@
     "@types/react-dom": "^16.9.8",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",
-    "ava": "^3.11.1",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
-    "commitizen": "^4.1.5",
-    "conventional-changelog-cli": "^2.1.0",
-    "cz-lerna-changelog": "^2.0.3",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.5",
     "eslint-plugin-react-hooks": "^4.1.0",
     "execa": "^4.0.3",
-    "husky": "^4.3.0",
     "ink-testing-library": "^2.0.1",
-    "lerna": "^3.22.1",
-    "markdownlint-cli": "^0.23.2",
     "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
-    "nyc": "^15.1.0",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "semantic-release": "^17.1.1",
-    "typescript": "^4.0.2",
+    "type-fest": "^1.2.0",
+    "typescript": "^4.3.2",
     "webpack": "^4.44.1"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/clover",
-      "packages/generators"
-    ]
   }
 }
