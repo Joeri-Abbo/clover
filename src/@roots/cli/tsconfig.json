@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "lib": ["dom", "es5", "es2015.collection", "es2015.iterable"],
+    "downlevelIteration": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declarationMap": true,
+    "sourceMap": true,
+    "watch": false,
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "declarationDir": "./lib/types",
+    "skipLibCheck": true
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules"]
+}

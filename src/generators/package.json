@@ -14,13 +14,8 @@
       "url": "http://opensource.org/licenses/MIT"
     }
   ],
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "main": "src/index.js",
-  "scripts": {
-    "build": "echo 'this just works yo'"
-  },
   "devDependencies": {
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.11.0",

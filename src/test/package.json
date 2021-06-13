@@ -1,0 +1,25 @@
+{
+  "name": "test",
+  "private": true,
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/roots/clover-generators.git"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "files": [
+    "src"
+  ],
+  "main": "src/index.js",
+  "devDependencies": {
+    "@roots/clover": "workspace:*"
+  }
+}
