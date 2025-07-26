@@ -2073,6 +2073,11 @@ chalk@^4.0.0, chalk@^4.1.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+chalk@^5.3.0:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.4.1.tgz#1b48bf0963ec158dce2aacf69c093ae2dd2092d8"
+  integrity sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==
+
 chokidar@^2.1.5:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.1.8.tgz#804b3a7b6a99358c3c5c61e71d8728f041cff917"
@@ -4136,13 +4141,13 @@ ink-spinner@^4.0.0-0:
     "@types/react" "^16.9.38"
     cli-spinners "^2.3.0"
 
-ink-text-input@^4.0.0-1:
-  version "4.0.0-1"
-  resolved "https://registry.yarnpkg.com/ink-text-input/-/ink-text-input-4.0.0-1.tgz#d6ee88995613fe0b6d4c43627c2aad9791b09375"
-  integrity sha512-muFPlcWrH16MGV7zfD2LYf8a9x0gstOttIbB4h+wKJTE+NpVAyidljTpqwxd7ygLS80vP35Dq6+SV2y6l7kP9A==
+ink-text-input@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/ink-text-input/-/ink-text-input-6.0.0.tgz#71bdfacbfd161fbaff88bb8ca6b3a55dbc3d36e0"
+  integrity sha512-Fw64n7Yha5deb1rHY137zHTAbSTNelUKuB5Kkk2HACXEtwIHBCf9OH2tP/LQ9fRYTl1F0dZgbW0zPnZk6FA9Lw==
   dependencies:
-    chalk "^4.1.0"
-    type-fest "^0.15.1"
+    chalk "^5.3.0"
+    type-fest "^4.18.2"
 
 ink-use-stdout-dimensions@^1.0.5:
   version "1.0.5"
@@ -7591,11 +7596,6 @@ type-fest@^0.12.0:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.12.0.tgz#f57a27ab81c68d136a51fd71467eff94157fa1ee"
   integrity sha512-53RyidyjvkGpnWPMF9bQgFtWp+Sl8O2Rp13VavmJgfAP9WWG6q6TkrKU8iyJdnwnfgHI6k2hTlgqH4aSdjoTbg==
 
-type-fest@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.15.1.tgz#d2c4e73d3e4a53cf1a906396dd460a1c5178ca00"
-  integrity sha512-n+UXrN8i5ioo7kqT/nF8xsEzLaqFra7k32SEsSPwvXVGyAcRgV/FUQN/sgfptJTR1oRmmq7z4IXMFSM7im7C9A==
-
 type-fest@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.6.0.tgz#8d2a2370d3df886eb5c90ada1c5bf6188acf838b"
@@ -7605,6 +7605,11 @@ type-fest@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
+
+type-fest@^4.18.2:
+  version "4.41.0"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.41.0.tgz#6ae1c8e5731273c2bf1f58ad39cbae2c91a46c58"
+  integrity sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==
 
 typedarray@^0.0.6:
   version "0.0.6"
