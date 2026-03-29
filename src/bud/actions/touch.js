@@ -19,7 +19,7 @@ const touch = async ({task, config, compiler, data, observer}) => {
     })
 
     observer.complete()
-  } catch (error) {
+  } catch {
     observer.error()
   }
 }

@@ -19,7 +19,7 @@ const json = async function ({task, observer, prettier, config}) {
     )
 
     observer.complete()
-  } catch (err) {
+  } catch {
     console.log(`There was a problem writing to ${task.file}`)
   }
 }
