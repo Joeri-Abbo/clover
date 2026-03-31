@@ -43,7 +43,7 @@
     "pastel": "^1.0.3",
     "prettier": "3.8.1",
     "prop-types": "^15.7.2",
-    "react": "^19.1.0",
+    "react": "^19.2.4",
     "resolve-pkg": "^2.0.0",
     "rxjs": "^7.8.2"
   },
