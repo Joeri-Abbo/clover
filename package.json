@@ -41,7 +41,7 @@
     "ink-use-stdout-dimensions": "^1.0.5",
     "lodash": "^4.17.21",
     "pastel": "^1.0.3",
-    "prettier": "2.0.5",
+    "prettier": "3.8.1",
     "prop-types": "^15.7.2",
     "react": "^19.1.0",
     "resolve-pkg": "^2.0.0",
