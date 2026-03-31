@@ -85,7 +85,6 @@ class SelectInput extends PureComponent {
   componentDidUpdate(prevProps) {
     if (!isEqual(prevProps.items, this.props.items)) {
       this.setState({
-        // eslint-disable-line react/no-did-update-set-state
         rotateIndex: 0,
         selectedIndex: 0,
       })
