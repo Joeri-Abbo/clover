@@ -15,7 +15,7 @@
     "bud": "bud",
     "build": "pastel build",
     "dev": "pastel dev",
-    "docs": "bud generate readme",
+    "docs": "node build/cli.js generate readme",
     "lint": "npm-run-all -c lint:*",
     "lint:eslint": "eslint .",
     "lint:prettier": "prettier --write .",
