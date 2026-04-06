@@ -4127,6 +4127,11 @@ find-plugins@^1.1.7:
     resolve-pkg "^1.0.0"
     try-require "^1.2.1"
 
+find-up-simple@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/find-up-simple/-/find-up-simple-1.0.1.tgz#18fb90ad49e45252c4d7fca56baade04fa3fca1e"
+  integrity sha512-afd4O7zpqHeRyg4PfDQsXmlDe2PfdHtJt6Akt8jOWaApLOZk5JXs6VMR29lz03pRe9mpykrRCYIYxaJYcfpncQ==
+
 find-up@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/find-up/-/find-up-2.1.0.tgz#45d1b7e506c717ddd482775a2b77920a3c0c57a7"
@@ -8025,11 +8030,6 @@ resolve-from@^4.0.0:
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
   integrity sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==
 
-resolve-from@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-5.0.0.tgz#c35225843df8f776df21c57557bc087e9dfdfc69"
-  integrity sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==
-
 resolve-pkg@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/resolve-pkg/-/resolve-pkg-1.0.0.tgz#e19a15e78aca2e124461dc92b2e3943ef93494d9"
@@ -8037,12 +8037,12 @@ resolve-pkg@^1.0.0:
   dependencies:
     resolve-from "^2.0.0"
 
-resolve-pkg@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/resolve-pkg/-/resolve-pkg-2.0.0.tgz#ac06991418a7623edc119084edc98b0e6bf05a41"
-  integrity sha512-+1lzwXehGCXSeryaISr6WujZzowloigEofRB+dj75y9RRa/obVcYgbHJd53tdYw8pvZj8GojXaaENws8Ktw/hQ==
+resolve-pkg@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/resolve-pkg/-/resolve-pkg-3.0.1.tgz#f9b6b43b85b1f5bd3cb7a7d249c290a6e423192d"
+  integrity sha512-OYIg+p3xVYwh4R0tnEKU+XZA8qiDY4y7iC+XgoC8LFbZuKHjPuuJ9mhWdSX6KYFNKvgar6hOdNj207DDI0nMfg==
   dependencies:
-    resolve-from "^5.0.0"
+    find-up-simple "^1.0.1"
 
 resolve-url@^0.2.1:
   version "0.2.1"
