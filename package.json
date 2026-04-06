@@ -30,7 +30,7 @@
     "esm": "^3.2.25",
     "execa": "^4.0.3",
     "find-plugins": "^1.1.7",
-    "fs-extra": "^11.3.2",
+    "fs-extra": "^11.3.4",
     "globby": "^16.2.0",
     "handlebars": "^4.7.9",
     "handlebars-helpers": "^0.10.0",
